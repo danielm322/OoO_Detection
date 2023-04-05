@@ -37,7 +37,7 @@ from dataset_utils.woodscape import WoodScapeDataModule
 
 ### DNN Model Imports
 ```python
-from probabilistic_unet.probabilistic_unet_module import ProbabilisticUnetModule, ProbabilisticUnetPriorMcdModule
+from probabilistic_unet.probabilistic_unet_module import ProbabilisticUnetPriorMcdModule
 from deeplab_v3p import DeepLabV3PlusModule
 from dropblock import DropBlock2D
 ```
@@ -137,7 +137,7 @@ cs_dlv3p_model.deeplab_v3plus_model.apply(deeplabv3p_apply_dropout); # enable dr
 
 
 ```python
-mc_samples=10
+mc_samples=10  # in this example we use 10 Monte-Carlo samples
 ```
 
 

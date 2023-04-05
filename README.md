@@ -21,7 +21,7 @@ ToDo!
 ToDo!
 
 ## Usage
-For detailed usage procedure, check this [document](./ls_ood_detect_cea/CEA-LSEA-OoD%20Detection%20DNN%20Latent%20Space.md)
+For detailed usage, check this [document](./ls_ood_detect_cea/CEA-LSEA-OoD%20Detection%20DNN%20Latent%20Space.md)
 
 ## Publications and Technical Reports
 For more technical and implementation details, we refer the user to the following technical
