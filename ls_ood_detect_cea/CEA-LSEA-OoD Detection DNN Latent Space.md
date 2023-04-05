@@ -1,6 +1,6 @@
 # CEA-LSEA: Out-of-Distribution Detection using DNN Latent Space Uncertainty Guide
 
-## General Procedure 
+## Package usage overview 
 
 Steps for using the package:
 
@@ -77,7 +77,7 @@ cs_dm_normal_dlv3p = CityscapesDataModule(data_dir=dataset_path,
                                           num_workers=10,
                                           drop_last=True,
                                           default_transforms=True, # Here this should be True!
-                                          default_img_mask_transforms=False) # And here this should be False!
+                                          default_img_mask_transforms=False) # And here this should be False! (Disable anomalies)
 
 cs_dm_anomal_dlv3p = CityscapesDataModule(data_dir=dataset_path,
                                           batch_size=batch_size,
