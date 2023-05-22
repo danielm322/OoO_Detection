@@ -1,4 +1,4 @@
-# CEA-LSEA: Out-of-Distribution Detection in DNN Latent Space Uncertainty
+# CEA-LSEA: Out-of-Distribution Detection using DNN Latent Representations Uncertainty
 
 ## Description
 CEA-LSEA package for Out-of-Distribution (OoD) detection in DNN latent space.
