@@ -1,17 +1,26 @@
 # CEA-LSEA: Out-of-Distribution Detection using DNN Latent Representations Uncertainty
 
 ## Description
-CEA-LSEA package for Out-of-Distribution (OoD) detection in DNN latent space.
-The package currently supports the following DNN architectures for semantic segmentation:
 
-    - Deeplabv3+
-    - Probabilistic U-Net
+CEA-LSEA package for Out-of-Distribution (OoD) detection using the uncertainty (entropy) from DNN latent representations.
+The package has been used with the following applications, the corresponding DNN architectures and datasets:
+
+- **Simple Classification:**
+    - **In-Distribution Dataset:** GTSRB
+    - **Out-of-Distribution Datasets:** CIFAR10 & STL10
+    - **DNN Architectures:**
+        1. ResNet-18
+        2. ResNet-18 with Spectral Normalization 
+
+- **Semantic Segmentation:**
+    - **In-Distribution Dataset:** Woodscape  & Cityscapes
+    - **Out-of-Distribution Datasets:** Woodscape soiling, Woodscape-anomalies, Cityscapes-anomalies
+    - **DNN Architectures:**
+      1. Deeplabv3+
+      2. U-Net
     
 
-In both cases, the DNN were slightly modified to capture _epistemic_ uncertainty using the Monte-Carlo Dropout.
-approach, and adding a ``DropBlock2D`` layer.
-
-To train the OoD detector, we assume access to In-Distribution (InD) and OoD Samples. 
+In all the above cases, the DNNs were slightly modified to capture _epistemic_ uncertainty using the Monte-Carlo Dropout by adding a ``DropBlock2D`` layer.
 
 
 ## Requirements
