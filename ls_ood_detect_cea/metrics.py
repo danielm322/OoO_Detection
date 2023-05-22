@@ -9,13 +9,13 @@ import seaborn as sns
 from icecream import ic
 
 
-def get_ood_detector_results(classifier_name: str, kde_classifier_ood, samples_test_ds, labels_test_ds) -> pd.DataFrame:
+def get_ood_detector_results(classifier_name: str, classifier_ood, samples_test_ds, labels_test_ds) -> pd.DataFrame:
     """
 
     :rtype: pd.DataFrame
     """
     kde_class_models = {
-        classifier_name: kde_classifier_ood
+        classifier_name: classifier_ood
     }
     datasets = {
         classifier_name: samples_test_ds
@@ -60,11 +60,11 @@ def get_ood_detector_results(classifier_name: str, kde_classifier_ood, samples_t
         results_table = results_table.append({'classifiers': cls_type,
                                               'fpr': fpr,
                                               'tpr': tpr,
-                                              'auc': roc_auc,
                                               'acc': acc,
                                               'mcc': mcc,
-                                              'f1': f1,
-                                              'fpr@95': fpr_95}, ignore_index=True)
+                                              'auc': roc_auc,
+                                              'fpr@95': fpr_95,
+                                              'f1': f1}, ignore_index=True)
 
     # Set name of the classifiers as index labels
     results_table.set_index('classifiers', inplace=True)
