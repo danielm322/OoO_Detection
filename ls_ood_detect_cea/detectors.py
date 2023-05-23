@@ -15,13 +15,14 @@ class DetectorKDE():
 
         self.kernel = kernel
         self.bandwidth = bandwidth
-        self.embeddings = train_embeddings
+        self.train_embeddings = train_embeddings
         self.save_path = save_path
         self.density = self.density_fit()
     
     def density_fit(self):
-        self.density = KernelDensity(kernel=self.kernel,
-                                     bandwidth=self.bandwidth).fit(self.embeddings)
+        density = KernelDensity(kernel=self.kernel,
+                                bandwidth=self.bandwidth).fit(self.train_embeddings)
+        return density
     
     def get_density_scores(self, test_embeddings):
         density_scores = self.density.score_samples(test_embeddings)
