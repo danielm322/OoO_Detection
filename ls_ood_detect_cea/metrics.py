@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
+from sklearn.metrics import auc
 import torchmetrics.functional as tmf
 import seaborn as sns
 from icecream import ic
@@ -21,40 +22,42 @@ def get_hz_detector_results(detect_exp_name: str,
     
     scores = np.vstack((ind_samples_scores, ood_samples_scores))
     labels = np.vstack((labels_ind_test, labels_ood_test))
+    labels = labels.astype('int32')
     
-    results_table = pd.DataFrame(columns=['experiment', 'fpr', 'tpr', 'auc', 'acc', 'mcc', 'f1', 'fpr@95'])
+    results_table = pd.DataFrame(columns=['experiment',
+                                          'auroc', 'fpr@95', 'aupr',
+                                          'fpr', 'tpr', 'roc_thresholds',
+                                          'precision', 'recall', 'pr_thresholds'])
     
-    fpr, tpr, thresholds = roc_curve(labels, scores)
-    auc = roc_auc_score(labels, scores)
     roc_auc = tmf.auroc(torch.from_numpy(scores),
                         torch.from_numpy(labels))
     
+    fpr, tpr, roc_thresholds = tmf.roc(torch.from_numpy(scores),
+                                   torch.from_numpy(labels))
+    
     fpr_95 = fpr[torch.where(tpr >= 0.95)[0][0]]
     
-    acc = tmf.accuracy(torch.from_numpy(scores),
-                       torch.from_numpy(labels))
-    
-    mcc = tmf.matthews_corrcoef(torch.from_numpy(scores),
-                                torch.from_numpy(labels), num_classes=2)
-
-    f1 = tmf.f1_score(torch.from_numpy(scores),
-                      torch.from_numpy(labels),
-                      task='binary')
+    precision, recall, pr_thresholds = tmf.precision_recall_curve(torch.from_numpy(scores),
+                                                                  torch.from_numpy(labels))
+    aupr = auc(recall.numpy(), precision.numpy())
     
     results_table = results_table.append({'experiment': detect_exp_name,
+                                          'auroc': roc_auc,
+                                          'fpr@95': fpr_95,
+                                          'aupr': aupr,
                                           'fpr': fpr,
                                           'tpr': tpr,
-                                          'acc': acc,
-                                          'mcc': mcc,
-                                          'auc': roc_auc,
-                                          'fpr@95': fpr_95,
-                                          'f1': f1}, ignore_index=True)
+                                          'roc_thresholds': roc_thresholds,
+                                          'precision': precision,
+                                          'recall': recall,
+                                          'pr_thresholds': pr_thresholds},
+                                         ignore_index=True)
     
     results_table.set_index('experiment', inplace=True)
     
-    print("AUROC: {:0.4f}".format(results_table['auc'][0].item()))
+    print("AUROC: {:0.4f}".format(results_table['auroc'][0].item()))
     print("FPR95: {:0.4f}".format(results_table['fpr@95'][0].item()))
-    print("F1: {:0.4f}".format(results_table['f1'][0].item()))
+    print("AUPR: {:0.4f}".format(results_table['aupr'][0].item()))
 
     return results_table
 
