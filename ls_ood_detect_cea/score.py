@@ -2,8 +2,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+from detectors import DetectorKDE
 from torch.autograd import grad
 
+
+def get_hz_scores(hz_detector: DetectorKDE,
+                  samples: np.ndarray):
+    scores = hz_detector.get_density_scores(samples)
+    return scores
 
 def get_msp_score(inputs, model, forward_func, method_args, logits=None):
     """

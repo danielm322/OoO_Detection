@@ -6,6 +6,27 @@ from sklearn.neighbors import KernelDensity
 # from icecream import ic
 
 
+class DetectorKDE():
+    def __init__(self,
+                 train_embeddings,
+                 save_path=None,
+                 kernel="gaussian",
+                 bandwidth=1.0) -> None:
+
+        self.kernel = kernel
+        self.bandwidth = bandwidth
+        self.embeddings = train_embeddings
+        self.save_path = save_path
+        self.density = None
+    
+    def density_fit(self):
+        self.density = KernelDensity(kernel=self.kernel, bandwidth=self.bandwidth).fit(self.embeddings)
+    
+    def get_density_scores(self, test_embeddings):
+        density_scores = self.density.score_samples(test_embeddings)
+        norm = np.linalg.norm(-density_scores)
+        return -density_scores/norm
+
 class KDEClassifier(BaseEstimator, ClassifierMixin):
     """Bayesian classifier for OoD Detection
     based on KDE
@@ -79,3 +100,4 @@ class KDEClassifier(BaseEstimator, ClassifierMixin):
     def predict(self, X):
         # return self.classes_[np.argmax(self.predict_prob(X), 1)]
         return self.classes_[np.argmax(self.pred_prob(X), 1)]
+    
