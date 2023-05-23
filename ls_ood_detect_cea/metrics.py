@@ -85,7 +85,7 @@ def get_ood_detector_results(classifier_name: str, classifier_ood, samples_test_
         preds[cls][0] = kde_class_models[cls].pred_prob(datasets[cls])[:, 1]  # pred probs
         preds[cls][1] = kde_class_models[cls].predict(datasets[cls])  # pred class
 
-    results_table = pd.DataFrame(columns=['classifiers', 'fpr', 'tpr', 'auc', 'acc', 'mcc', 'f1', 'fpr@95'])
+    results_table = pd.DataFrame(columns=['classifiers', 'fpr', 'tpr', 'auroc', 'acc', 'mcc', 'f1', 'fpr@95'])
 
     for cls_type in preds:
         print(cls_type)
@@ -115,7 +115,7 @@ def get_ood_detector_results(classifier_name: str, classifier_ood, samples_test_
                                               'tpr': tpr,
                                               'acc': acc,
                                               'mcc': mcc,
-                                              'auc': roc_auc,
+                                              'auroc': roc_auc,
                                               'fpr@95': fpr_95,
                                               'f1': f1}, ignore_index=True)
 
@@ -124,20 +124,43 @@ def get_ood_detector_results(classifier_name: str, classifier_ood, samples_test_
     return results_table
 
 
-def plot_roc_ood_detector(results_table, legend_title: str = "Legend Title", plot_title: str = "Plot Title"):
+def plot_roc_ood_detector(results_table,
+                          legend_title: str = "Legend Title",
+                          plot_title: str = "Plot Title"):
+
     fig = plt.figure(figsize=(8, 6))
-    # legend_title = "Woodscape vs Woodscape-Anomalies"
     for i in results_table.index:
         print(i)
         plt.plot(results_table.loc[i]['fpr'],
                  results_table.loc[i]['tpr'],
-                 label=legend_title + ", AUROC={:.4f}".format(results_table.loc[i]['auc']))
+                 label=legend_title + ", AUROC={:.4f}".format(results_table.loc[i]['auroc']))
 
     plt.plot([0, 1], [0, 1], color='orange', linestyle='--')
     plt.xticks(np.arange(0.0, 1.1, step=0.1))
     plt.xlabel("False Positive Rate", fontsize=15)
     plt.yticks(np.arange(0.0, 1.1, step=0.1))
     plt.ylabel("True Positive Rate", fontsize=15)
+    plt.title(plot_title, fontweight='bold', fontsize=15)
+    plt.legend(prop={'size': 12}, loc='lower right')
+    plt.show()
+
+
+def plot_auprc_ood_detector(results_table: pd.DataFrame,
+                            legend_title:str = "Legend Title",
+                            plot_title: str = "Plot Title"):
+    
+    fig = plt.figure(figsize=(8, 6))
+    for i in results_table.index:
+        print(i)
+        plt.plot(results_table.loc[i]['recall'],
+                 results_table.loc[i]['precision'],
+                 label=legend_title + ", AUPRC={:.4f}".format(results_table.loc[i]['aupr']))
+
+    plt.plot([0, 1], [0, 1], color='orange', linestyle='--')
+    plt.xticks(np.arange(0.0, 1.1, step=0.1))
+    plt.xlabel("Recall", fontsize=15)
+    plt.yticks(np.arange(0.0, 1.1, step=0.1))
+    plt.ylabel("Precision", fontsize=15)
     plt.title(plot_title, fontweight='bold', fontsize=15)
     plt.legend(prop={'size': 12}, loc='lower right')
     plt.show()
