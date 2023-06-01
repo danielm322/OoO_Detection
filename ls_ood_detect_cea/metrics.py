@@ -12,7 +12,8 @@ from icecream import ic
 
 def get_hz_detector_results(detect_exp_name: str,
                             ind_samples_scores: np.ndarray,
-                            ood_samples_scores: np.ndarray) -> pd.DataFrame:
+                            ood_samples_scores: np.ndarray,
+                            return_results_for_mlflow: bool = False) -> pd.DataFrame:
 
     labels_ind_test = np.ones((ind_samples_scores.shape[0], 1)) # postive class
     labels_ood_test = np.zeros((ood_samples_scores.shape[0], 1)) # negative class
@@ -42,24 +43,30 @@ def get_hz_detector_results(detect_exp_name: str,
     aupr = auc(recall.numpy(), precision.numpy())
     
     results_table = results_table.append({'experiment': detect_exp_name,
-                                          'auroc': roc_auc,
-                                          'fpr@95': fpr_95,
+                                          'auroc': roc_auc.item(),
+                                          'fpr@95': fpr_95.item(),
                                           'aupr': aupr,
-                                          'fpr': fpr,
-                                          'tpr': tpr,
-                                          'roc_thresholds': roc_thresholds,
-                                          'precision': precision,
-                                          'recall': recall,
-                                          'pr_thresholds': pr_thresholds},
+                                          'fpr': fpr.tolist(),
+                                          'tpr': tpr.tolist(),
+                                          'roc_thresholds': roc_thresholds.tolist(),
+                                          'precision': precision.tolist(),
+                                          'recall': recall.tolist(),
+                                          'pr_thresholds': pr_thresholds.tolist()},
                                          ignore_index=True)
-    
-    results_table.set_index('experiment', inplace=True)
-    
-    print("AUROC: {:0.4f}".format(results_table['auroc'][0].item()))
-    print("FPR95: {:0.4f}".format(results_table['fpr@95'][0].item()))
-    print("AUPR: {:0.4f}".format(results_table['aupr'][0].item()))
 
-    return results_table
+    results_table.set_index('experiment', inplace=True)
+
+    
+    # print("AUROC: {:0.4f}".format(results_table['auroc'][0].item()))
+    # print("FPR95: {:0.4f}".format(results_table['fpr@95'][0].item()))
+    # print("AUPR: {:0.4f}".format(results_table['aupr'][0].item()))
+    if not return_results_for_mlflow:
+        return results_table
+    else:
+        results_for_mlflow = results_table.loc[detect_exp_name, ["auroc", "fpr@95", "aupr"]].to_dict()
+        # MLFlow doesn't accept the character '@'
+        results_for_mlflow["fpr_95"] = results_for_mlflow.pop("fpr@95")
+        return results_table, results_for_mlflow
 
 
 def get_ood_detector_results(classifier_name: str, classifier_ood, samples_test_ds, labels_test_ds) -> pd.DataFrame:
@@ -143,6 +150,24 @@ def plot_roc_ood_detector(results_table,
     plt.title(plot_title, fontweight='bold', fontsize=15)
     plt.legend(prop={'size': 12}, loc='lower right')
     plt.show()
+
+
+def save_roc_ood_detector(results_table: pd.DataFrame,
+                          plot_title: str = "Plot Title") -> plt.Figure:
+    fig, ax = plt.subplots(figsize=(8, 6))
+    for i in results_table.index:
+        ax.plot(results_table.loc[i]['fpr'],
+                 results_table.loc[i]['tpr'],
+                 label=i + ", AUROC={:.4f}".format(results_table.loc[i]['auroc']))
+
+    ax.plot([0, 1], [0, 1], color='orange', linestyle='--')
+    ax.set_xticks(np.arange(0.0, 1.1, step=0.1))
+    ax.set_xlabel("False Positive Rate", fontsize=15)
+    ax.set_yticks(np.arange(0.0, 1.1, step=0.1))
+    ax.set_ylabel("True Positive Rate", fontsize=15)
+    ax.set_title(plot_title, fontweight='bold', fontsize=15)
+    ax.legend(prop={'size': 12}, loc='lower right')
+    return fig
 
 
 def plot_auprc_ood_detector(results_table: pd.DataFrame,
