@@ -1,3 +1,11 @@
+# (c) 2023, CEA LIST
+#
+# All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+# Contributors
+#    Fabio Arnez
+
 import numpy as np
 from typing import Tuple
 from .dimensionality_reduction import apply_pca_ds

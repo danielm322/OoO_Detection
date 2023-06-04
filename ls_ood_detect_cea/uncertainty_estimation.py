@@ -1,3 +1,12 @@
+# (c) 2023, CEA LIST
+#
+# All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+# Contributors
+#    Based on https://github.com/fregu856/deeplabv3
+#    Fabio Arnez, probabilistic adaptation
+
 from typing import Tuple
 import numpy as np
 import torch
