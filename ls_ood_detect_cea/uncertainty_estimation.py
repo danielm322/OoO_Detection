@@ -284,7 +284,10 @@ def get_dl_h_z(dl_z_samples: Tensor, mcd_samples_nro: int = 32) -> Tuple[np.ndar
     z_samples_np_ls = [t.cpu().numpy() for t in z_samples_ls]
     # ic(z_samples_np_ls[0].shape)
     # dl_h_mvn_z_samples_ls = [continuous.get_h_mvn(s) for s in z_samples_np_ls]
-    dl_h_mvn_z_samples_ls = [continuous.get_h(s, k=5, norm='max', min_dist=1e-5) for s in z_samples_np_ls]
+    # Choose correctly the number of neighbors for the entropy calculations:
+    # It has to be smaller than the mcd_samples_nro by at least 1
+    k_neighbors = 5 if mcd_samples_nro > 5 else mcd_samples_nro - 1
+    dl_h_mvn_z_samples_ls = [continuous.get_h(s, k=k_neighbors, norm='max', min_dist=1e-5) for s in z_samples_np_ls]
     dl_h_mvn_z_samples_np = np.array(dl_h_mvn_z_samples_ls)
     dl_h_mvn_z_samples_np = np.expand_dims(dl_h_mvn_z_samples_np, axis=1)
     # ic(dl_h_mvn_z_samples_np.shape)
@@ -294,7 +297,7 @@ def get_dl_h_z(dl_z_samples: Tensor, mcd_samples_nro: int = 32) -> Tuple[np.ndar
         h_z_batch = []
         for z_val_i in range(input_mcd_samples.shape[1]):
             # h_z_i = continuous.get_h(input_mcd_samples[:, z_val_i], k=5)  # old
-            h_z_i = continuous.get_h(input_mcd_samples[:, z_val_i], k=5, norm='max', min_dist=1e-5)
+            h_z_i = continuous.get_h(input_mcd_samples[:, z_val_i], k=k_neighbors, norm='max', min_dist=1e-5)
             h_z_batch.append(h_z_i)
         h_z_batch_np = np.asarray(h_z_batch)
         dl_h_z_samples.append(h_z_batch_np)
