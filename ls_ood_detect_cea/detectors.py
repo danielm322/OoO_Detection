@@ -1,33 +1,37 @@
+"""Module containing the KDE Detectors"""
 import numpy as np
 from scipy.special import logsumexp
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.neighbors import KernelDensity
-# from sklearn.mixture import GaussianMixture
-# from icecream import ic
 
 
-class DetectorKDE():
-    def __init__(self,
-                 train_embeddings,
-                 save_path=None,
-                 kernel="gaussian",
-                 bandwidth=1.0) -> None:
+class DetectorKDE:
+    """
+    Instantiates a Kernel Density Estimation Estimator
+    """
 
+    def __init__(self, train_embeddings, save_path=None, kernel="gaussian", bandwidth=1.0) -> None:
         self.kernel = kernel
         self.bandwidth = bandwidth
         self.train_embeddings = train_embeddings
         self.save_path = save_path
         self.density = self.density_fit()
-    
+
     def density_fit(self):
-        density = KernelDensity(kernel=self.kernel,
-                                bandwidth=self.bandwidth).fit(self.train_embeddings)
+        """
+        Fit the KDE Estimator
+        """
+        density = KernelDensity(kernel=self.kernel, bandwidth=self.bandwidth).fit(self.train_embeddings)
         return density
-    
+
     def get_density_scores(self, test_embeddings):
+        """
+        Transforms the scores from a second distribution while normalizing the scores
+        """
         density_scores = self.density.score_samples(test_embeddings)
         norm = np.linalg.norm(-density_scores)
-        return -density_scores/norm
+        return -density_scores / norm
+
 
 class KDEClassifier(BaseEstimator, ClassifierMixin):
     """Bayesian classifier for OoD Detection
@@ -42,7 +46,7 @@ class KDEClassifier(BaseEstimator, ClassifierMixin):
         the kernel name, passed to KernelDensity
     """
 
-    def __init__(self, bandwidth=1.0, kernel='gaussian'):
+    def __init__(self, bandwidth=1.0, kernel="gaussian"):
         self.bandwidth = bandwidth
         self.kernel = kernel
         self.classes_ = None
@@ -102,4 +106,3 @@ class KDEClassifier(BaseEstimator, ClassifierMixin):
     def predict(self, X):
         # return self.classes_[np.argmax(self.predict_prob(X), 1)]
         return self.classes_[np.argmax(self.pred_prob(X), 1)]
-    

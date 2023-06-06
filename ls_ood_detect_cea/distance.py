@@ -4,8 +4,6 @@ from torch import Tensor
 from torch.utils.data import DataLoader
 from torch.distributions.multivariate_normal import MultivariateNormal
 import pytorch_lightning as pl
-from torch.distributions import Normal, Independent
-import numpy as np
 from icecream import ic
 
 
@@ -29,9 +27,9 @@ def mahalanobis_distance(x: Tensor, mean_ref_dist: Tensor, cov_ref_dist: Tensor)
     return torch.diag(m)
 
 
-def mahalanobis_distance_to_ref_pdf(prob_module: pl.LightningModule,
-                                    dataloader: DataLoader,
-                                    ref_pdf: MultivariateNormal) -> Tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
+def mahalanobis_distance_to_ref_pdf(
+    prob_module: pl.LightningModule, dataloader: DataLoader, ref_pdf: MultivariateNormal
+) -> Tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
     """
     Compute the Mahalanobis Distance to a Ref. Probability Distribution, from each batch (sample) in the dataloader
 
@@ -44,7 +42,7 @@ def mahalanobis_distance_to_ref_pdf(prob_module: pl.LightningModule,
     :return dl_m_dist_t: Dataloader samples  Mahalanobis distances to reference PDF
     :rtype dl_m_dist_t: Tuple[Tensor, Tensor, Tensor, Tensor, Tensor]
     """
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     ic(device)
     ref_pdf_mean = ref_pdf.loc
     ref_pdf_cov = ref_pdf.covariance_matrix

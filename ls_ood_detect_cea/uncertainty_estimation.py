@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 
 def get_ls_samples_priornet(prob_module: pl.LightningModule, dataloader: DataLoader):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     ic(device)
     with torch.no_grad():
         dl_mean_samples = []
@@ -48,7 +48,7 @@ def get_ls_mc_samples_priornet(prob_module, dataloader, mc_samples_nro=32):
     """
     Get Monte Carlo Dropout (MCD) Samples from Probabilistic U-Net - Prior Net
     """
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     ic(device)
     with torch.no_grad():
         dl_mean_samples = []
@@ -95,6 +95,7 @@ class Hook:
     """
     Hook class that returns the input and output of a layer during forward/backward pass
     """
+
     def __init__(self, module: torch.nn.Module, backward: bool = False):
         """
         Hook Class constructor
@@ -118,10 +119,12 @@ class Hook:
         self.hook.remove()
 
 
-def deeplabv3p_get_ls_mcd_samples(model_module: pl.LightningModule,
-                                  dataloader: DataLoader,
-                                  mcd_nro_samples: int,
-                                  hook_dropout_layer: Hook) -> Tensor:
+def deeplabv3p_get_ls_mcd_samples(
+    model_module: pl.LightningModule,
+    dataloader: DataLoader,
+    mcd_nro_samples: int,
+    hook_dropout_layer: Hook,
+) -> Tensor:
     """
     Get Monte-Carlo samples form Deeplabv3+ DNN Dropout Layer
 
@@ -136,7 +139,7 @@ def deeplabv3p_get_ls_mcd_samples(model_module: pl.LightningModule,
     :return: Monte-Carlo Dropout samples for the input dataloader
     :rtype: Tensor
     """
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     with torch.no_grad():
         dl_imgs_latent_mcd_samples = []
         for i, (image, label) in enumerate(dataloader):
@@ -163,11 +166,13 @@ def deeplabv3p_get_ls_mcd_samples(model_module: pl.LightningModule,
     return dl_imgs_latent_mcd_samples_t
 
 
-def get_latent_representation_mcd_samples(dnn_model: torch.nn.Module,
-                                          dataloader: DataLoader,
-                                          mcd_nro_samples: int,
-                                          layer_hook: Hook,
-                                          layer_type: str) -> Tensor:
+def get_latent_representation_mcd_samples(
+    dnn_model: torch.nn.Module,
+    dataloader: DataLoader,
+    mcd_nro_samples: int,
+    layer_hook: Hook,
+    layer_type: str,
+) -> Tensor:
     """
     Get latent representations Monte-Carlo samples froom DNN using a layer hook
 
@@ -185,7 +190,7 @@ def get_latent_representation_mcd_samples(dnn_model: torch.nn.Module,
     :rtype: Tensor
     """
     assert layer_type in ("FC", "Conv"), "Layer type must be either 'FC' or 'Conv'"
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     with torch.no_grad():
         with tqdm(total=len(data_loader)) as pbar:
             dl_imgs_latent_mcd_samples = []
@@ -221,10 +226,12 @@ def get_latent_representation_mcd_samples(dnn_model: torch.nn.Module,
     return dl_imgs_latent_mcd_samples_t
 
 
-def probunet_get_ls_mcd_samples(model_module: pl.LightningModule,
-                                dataloader: DataLoader,
-                                mcd_nro_samples: int,
-                                hook_dropout_layer: Hook) -> Tensor:
+def probunet_get_ls_mcd_samples(
+    model_module: pl.LightningModule,
+    dataloader: DataLoader,
+    mcd_nro_samples: int,
+    hook_dropout_layer: Hook,
+) -> Tensor:
     """
     Get Monte-Carlo samples form ProbUNet DNN Dropout Layer
 
@@ -239,7 +246,7 @@ def probunet_get_ls_mcd_samples(model_module: pl.LightningModule,
     :return: Monte-Carlo Dropout samples for the input dataloader
     :rtype: Tensor
     """
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     with torch.no_grad():
         dl_imgs_latent_mcd_samples = []
         for i, (image, label) in enumerate(dataloader):
@@ -287,17 +294,17 @@ def get_dl_h_z(dl_z_samples: Tensor, mcd_samples_nro: int = 32) -> Tuple[np.ndar
     # Choose correctly the number of neighbors for the entropy calculations:
     # It has to be smaller than the mcd_samples_nro by at least 1
     k_neighbors = 5 if mcd_samples_nro > 5 else mcd_samples_nro - 1
-    dl_h_mvn_z_samples_ls = [continuous.get_h(s, k=k_neighbors, norm='max', min_dist=1e-5) for s in z_samples_np_ls]
+    dl_h_mvn_z_samples_ls = [continuous.get_h(s, k=k_neighbors, norm="max", min_dist=1e-5) for s in z_samples_np_ls]
     dl_h_mvn_z_samples_np = np.array(dl_h_mvn_z_samples_ls)
     dl_h_mvn_z_samples_np = np.expand_dims(dl_h_mvn_z_samples_np, axis=1)
     # ic(dl_h_mvn_z_samples_np.shape)
     # Get dataloader entropy $h(z_i)$ for each value of Z, from mcd_samples
     dl_h_z_samples = []
-    for input_mcd_samples in tqdm(z_samples_np_ls, desc='Calculating entropy'):
+    for input_mcd_samples in tqdm(z_samples_np_ls, desc="Calculating entropy"):
         h_z_batch = []
         for z_val_i in range(input_mcd_samples.shape[1]):
             # h_z_i = continuous.get_h(input_mcd_samples[:, z_val_i], k=5)  # old
-            h_z_i = continuous.get_h(input_mcd_samples[:, z_val_i], k=k_neighbors, norm='max', min_dist=1e-5)
+            h_z_i = continuous.get_h(input_mcd_samples[:, z_val_i], k=k_neighbors, norm="max", min_dist=1e-5)
             h_z_batch.append(h_z_i)
         h_z_batch_np = np.asarray(h_z_batch)
         dl_h_z_samples.append(h_z_batch_np)
@@ -314,4 +321,3 @@ def probunet_apply_dropout(m):
 def deeplabv3p_apply_dropout(m):
     if type(m) == torch.nn.Dropout or type(m) == DropBlock2D:
         m.train()
-

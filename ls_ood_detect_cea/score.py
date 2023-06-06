@@ -6,10 +6,10 @@ from .detectors import DetectorKDE
 from torch.autograd import grad
 
 
-def get_hz_scores(hz_detector: DetectorKDE,
-                  samples: np.ndarray):
+def get_hz_scores(hz_detector: DetectorKDE, samples: np.ndarray):
     scores = hz_detector.get_density_scores(samples)
     return scores
+
 
 def get_msp_score(inputs, model, forward_func, method_args, logits=None):
     """
@@ -48,10 +48,10 @@ def get_godin_score(inputs, model, forward_func, method_args):
     :return:
     :rtype:
     """
-    noiseMagnitude1 = method_args['magnitude']
+    noiseMagnitude1 = method_args["magnitude"]
 
     criterion = nn.CrossEntropyLoss()
-    inputs = torch.autograd.Variable(inputs, requires_grad = True)
+    inputs = torch.autograd.Variable(inputs, requires_grad=True)
     # outputs = model(inputs)
     outputs, _, _ = forward_func(inputs, model)
 
@@ -62,11 +62,11 @@ def get_godin_score(inputs, model, forward_func, method_args):
     loss.backward()
 
     # Normalizing the gradient to binary in {0, 1}
-    gradient =  torch.ge(inputs.grad.data, 0)
+    gradient = torch.ge(inputs.grad.data, 0)
     gradient = (gradient.float() - 0.5) * 2
 
     # Adding small perturbations to images
-    tempInputs = torch.add(inputs.data,  -noiseMagnitude1, gradient)
+    tempInputs = torch.add(inputs.data, -noiseMagnitude1, gradient)
     # outputs = model(Variable(tempInputs))
     with torch.no_grad():
         _, hx, _ = forward_func(tempInputs, model)

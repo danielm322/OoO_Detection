@@ -24,7 +24,7 @@ In all the above cases, the DNNs were slightly modified to capture _epistemic_ u
 
 
 ## Requirements
-See `requirements.txt`
+Use python 3.8, then install the `requirements.txt`
 
 ## Installation
 Install requirements, then in the base folder of the repo do `pip install .`

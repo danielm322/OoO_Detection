@@ -11,7 +11,7 @@ stages:
   - Static Analysis
   - Test
 #defines the job in Static Analysis
-pylint:
+black:
   stage: Static Analysis
   script:
-  - pylint -d C0301 ls_ood_detect_cea/*.py
+  - black .

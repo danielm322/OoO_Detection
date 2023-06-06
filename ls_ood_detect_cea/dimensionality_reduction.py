@@ -5,11 +5,13 @@ import pacmap
 from sklearn.decomposition import PCA
 
 
-def apply_pca_ds(train_samples: np.ndarray,
-                 test_samples: np.ndarray,
-                 nro_components: int = 16,
-                 svd_solver: str = 'randomized',
-                 whiten: bool = True) -> Tuple[np.ndarray, np.ndarray, PCA]:
+def apply_pca_ds(
+    train_samples: np.ndarray,
+    test_samples: np.ndarray,
+    nro_components: int = 16,
+    svd_solver: str = "randomized",
+    whiten: bool = True,
+) -> Tuple[np.ndarray, np.ndarray, PCA]:
     """
     Applies PCA dimensionality reduction to a dataset
 
@@ -32,10 +34,12 @@ def apply_pca_ds(train_samples: np.ndarray,
     return train_ds, test_ds, pca_dim_red
 
 
-def apply_pca_ds_split(samples: np.ndarray,
-                       nro_components: int = 16,
-                       svd_solver: str = 'randomized',
-                       whiten: bool = True) -> Tuple[np.ndarray, PCA]:
+def apply_pca_ds_split(
+    samples: np.ndarray,
+    nro_components: int = 16,
+    svd_solver: str = "randomized",
+    whiten: bool = True,
+) -> Tuple[np.ndarray, PCA]:
     """
     Applies PCA dimensionality reduction to a dataset split
 
@@ -55,19 +59,19 @@ def apply_pca_ds_split(samples: np.ndarray,
     return dataset_dim_red, pca_dim_red
 
 
-def apply_pca_transform(samples: np.ndarray,
-                        pca_transform: PCA) -> np.ndarray:
-
+def apply_pca_transform(samples: np.ndarray, pca_transform: PCA) -> np.ndarray:
     samples_dim_red = pca_transform.transform(samples)
     return samples_dim_red
 
 
-def plot_samples_pacmap(samples_ind: np.ndarray,
-                        samples_ood: np.ndarray,
-                        neighbors: int = 25,
-                        components: int = 2,
-                        title: str = "Plot Title",
-                        return_figure: bool = False) -> Union[None, plt.scatter]:
+def plot_samples_pacmap(
+    samples_ind: np.ndarray,
+    samples_ood: np.ndarray,
+    neighbors: int = 25,
+    components: int = 2,
+    title: str = "Plot Title",
+    return_figure: bool = False,
+) -> Union[None, plt.scatter]:
     """
     In-Distribution vs Out-of-Distribution Data Projection 2D Plot using PaCMAP algorithm.
 
@@ -96,19 +100,25 @@ def plot_samples_pacmap(samples_ind: np.ndarray,
     # visualize the embedding
     # ToDo: Add Axis Names and plot legend
     fig, axes = plt.subplots()
-    scatter = axes.scatter(samples_transformed[:, 0], samples_transformed[:, 1], cmap="brg", c=labels, s=1.5)
+    scatter = axes.scatter(
+        samples_transformed[:, 0],
+        samples_transformed[:, 1],
+        cmap="brg",
+        c=labels,
+        s=1.5,
+    )
     axes.set_title(title)
-    axes.legend(handles=scatter.legend_elements()[0], labels=["In-Distribution", "Out-of-Distribution"])
+    axes.legend(
+        handles=scatter.legend_elements()[0],
+        labels=["In-Distribution", "Out-of-Distribution"],
+    )
     if return_figure:
         return fig
     else:
         plt.show()
 
 
-def fit_pacmap(samples_ind: np.array,
-               neighbors: int = 25,
-               components: int = 2
-               ) -> Tuple[np.array, pacmap.PaCMAP]:
+def fit_pacmap(samples_ind: np.array, neighbors: int = 25, components: int = 2) -> Tuple[np.array, pacmap.PaCMAP]:
     """
     In-Distribution vs Out-of-Distribution Data Projection 2D Plot using PaCMAP algorithm.
 
@@ -126,7 +136,5 @@ def fit_pacmap(samples_ind: np.array,
     return samples_transformed, embedding
 
 
-def apply_pacmap_transform(new_samples: np.array,
-                           original_samples: np.array,
-                           pm_instance: pacmap.PaCMAP) -> np.array:
+def apply_pacmap_transform(new_samples: np.array, original_samples: np.array, pm_instance: pacmap.PaCMAP) -> np.array:
     return pm_instance.transform(X=new_samples, basis=original_samples)
