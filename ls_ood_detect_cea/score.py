@@ -1,3 +1,11 @@
+# (c) 2023, CEA LIST
+#
+# All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+# Contributors
+#    Fabio Arnez
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
