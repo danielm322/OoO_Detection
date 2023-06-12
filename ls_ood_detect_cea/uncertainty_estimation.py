@@ -7,7 +7,7 @@
 #    Based on https://github.com/fregu856/deeplabv3
 #    Fabio Arnez, probabilistic adaptation
 
-from typing import Tuple
+from typing import Tuple, List
 import numpy as np
 import torch
 from torch import Tensor
@@ -170,6 +170,54 @@ def deeplabv3p_get_ls_mcd_samples(model_module: pl.LightningModule,
 
     return dl_imgs_latent_mcd_samples_t
 
+
+def get_latent_represent_mcd_samples(dnn_model: torch.nn.Module,
+                                     dataloader: DataLoader,
+                                     mcd_nro_samples: int,
+                                     layer_hook: Hook,
+                                     get_2d_rep_mean:bool = True) -> Tensor:
+    """
+    Get latent representations Monte-Carlo samples froom DNN using a layer hook
+
+    :param model_module: Neural Network Lightning Module
+    :type model_module: pl.LightningModule
+    :param dataloader: Input samples (torch) Dataloader
+    :type dataloader: DataLoader
+    :param mcd_nro_samples: Number of Monte-Carlo Samples
+    :type mcd_nro_samples: int
+    :param layer_hook: DNN layer hook
+    :type layer_hook: Hook
+    :param get_2d_rep_mean: Take the mean of 2D representations, i.e. HxW mean, defaults to True
+    :type get_2d_rep_mean: bool, optional
+    :return: Input dataloader latent representations MC samples tensor
+    :rtype: Tensor
+    """   
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    with torch.no_grad():
+        dl_imgs_latent_mcd_samples = []
+        for i, (image, label) in enumerate(dataloader):
+            image = image.to(device)
+            img_mcd_samples = []
+            for s in range(mcd_nro_samples):
+                pred_img = dnn_model(image)      
+                latent_mcd_sample = layer_hook.output
+                
+                if get_2d_rep_mean:
+                    # Get image HxW mean:
+                    latent_mcd_sample = torch.mean(latent_mcd_sample, dim=2, keepdim=True)
+                    latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
+                    # Remove useless dimensions:
+                    latent_mcd_sample = torch.squeeze(latent_mcd_sample, dim=2)
+                    latent_mcd_sample = torch.squeeze(latent_mcd_sample, dim=2)
+
+                img_mcd_samples.append(latent_mcd_sample)
+
+            img_mcd_samples_t = torch.cat(img_mcd_samples, dim=0)
+            dl_imgs_latent_mcd_samples.append(img_mcd_samples_t)
+
+        dl_imgs_latent_mcd_samples_t = torch.cat(dl_imgs_latent_mcd_samples, dim=0)
+
+    return dl_imgs_latent_mcd_samples_t
 
 
 def probunet_get_ls_mcd_samples(model_module: pl.LightningModule,

@@ -17,7 +17,7 @@ def apply_pca_ds(train_samples: np.ndarray,
                  test_samples: np.ndarray,
                  nro_components: int = 16,
                  svd_solver: str = 'randomized',
-                 whiten: bool = True) -> Tuple[np.ndarray, np.ndarray]:
+                 whiten: bool = True) -> Tuple[np.ndarray, np.ndarray, PCA]:
     """
     Applies PCA dimensionality reduction to a dataset
 
@@ -37,7 +37,37 @@ def apply_pca_ds(train_samples: np.ndarray,
     pca_dim_red = PCA(n_components=nro_components, svd_solver=svd_solver, whiten=whiten)
     train_ds = pca_dim_red.fit_transform(train_samples)
     test_ds = pca_dim_red.transform(test_samples)
-    return train_ds, test_ds
+    return train_ds, test_ds, pca_dim_red
+
+
+def apply_pca_ds_split(samples: np.ndarray,
+                       nro_components: int = 16,
+                       svd_solver: str = 'randomized',
+                       whiten: bool = True) -> Tuple[np.ndarray, PCA]:
+    """
+    Applies PCA dimensionality reduction to a dataset split
+
+    :param samples: dataset split samples
+    :type samples: np.ndarray
+    :param nro_components: PCA nnumber of components, defaults to 16
+    :type nro_components: int, optional
+    :param svd_solver: PCA SVD solver, defaults to 'randomized'
+    :type svd_solver: str, optional
+    :param whiten: PCA whiten value, defaults to True
+    :type whiten: bool, optional
+    :return: dataset samples with reduced dimensionality, PCA transformation object
+    :rtype: Tuple[np.ndarray, PCA]
+    """
+    pca_dim_red = PCA(n_components=nro_components, svd_solver=svd_solver, whiten=whiten)
+    dataset_dim_red = pca_dim_red.fit_transform(samples)
+    return dataset_dim_red, pca_dim_red
+
+
+def apply_pca_transform(samples: np.ndarray,
+                        pca_transform: PCA) -> np.ndarray:
+
+    samples_dim_red = pca_transform.transform(samples)
+    return samples_dim_red
 
 
 def plot_samples_pacmap(samples_ind: np.ndarray,
