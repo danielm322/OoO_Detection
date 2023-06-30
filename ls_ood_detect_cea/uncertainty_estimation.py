@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple
 import numpy as np
 import torch
 from torch import Tensor
@@ -8,6 +8,7 @@ import pytorch_lightning as pl
 from entropy_estimators import continuous
 from icecream import ic
 from tqdm import tqdm
+
 # from joblib import Parallel, delayed
 from tqdm.contrib.concurrent import process_map
 
@@ -289,9 +290,9 @@ def single_image_entropy_calculation(sample: np.array, neighbors: int):
     return h_z_batch_np
 
 
-def get_dl_h_z(dl_z_samples: Tensor,
-               mcd_samples_nro: int = 32,
-               parallel_run: bool = False) -> Tuple[np.ndarray, np.ndarray]:
+def get_dl_h_z(
+    dl_z_samples: Tensor, mcd_samples_nro: int = 32, parallel_run: bool = False
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Get dataloader Entropy $h(.)$ for Z, from Monte Carlo Dropout (MCD) samples
 
@@ -327,8 +328,9 @@ def get_dl_h_z(dl_z_samples: Tensor,
             h_z_batch_np = np.asarray(h_z_batch)
             dl_h_z_samples.append(h_z_batch_np)
     else:
-        dl_h_z_samples = process_map(single_image_entropy_calculation, z_samples_np_ls,
-                                    [k_neighbors] * len(z_samples_np_ls))
+        dl_h_z_samples = process_map(
+            single_image_entropy_calculation, z_samples_np_ls, [k_neighbors] * len(z_samples_np_ls), chunksize=1
+        )
         # dl_h_z_samples = Parallel(n_jobs=4)(delayed(single_image_entropy_calculation)(i, k_neighbors) for i in z_samples_np_ls)
     dl_h_z_samples_np = np.asarray(dl_h_z_samples)
     # ic(dl_h_z_samples_np.shape)
