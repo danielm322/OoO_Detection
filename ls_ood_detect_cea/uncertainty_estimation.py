@@ -3,12 +3,13 @@ import numpy as np
 import torch
 from torch import Tensor
 from torch.utils.data import DataLoader
-from torch.distributions.multivariate_normal import MultivariateNormal
 from dropblock import DropBlock2D
 import pytorch_lightning as pl
 from entropy_estimators import continuous
 from icecream import ic
 from tqdm import tqdm
+# from joblib import Parallel, delayed
+from tqdm.contrib.concurrent import process_map
 
 
 def get_ls_samples_priornet(prob_module: pl.LightningModule, dataloader: DataLoader):
@@ -192,7 +193,7 @@ def get_latent_representation_mcd_samples(
     assert layer_type in ("FC", "Conv"), "Layer type must be either 'FC' or 'Conv'"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     with torch.no_grad():
-        with tqdm(total=len(data_loader)) as pbar:
+        with tqdm(total=len(dataloader)) as pbar:
             dl_imgs_latent_mcd_samples = []
             for i, (image, label) in enumerate(dataloader):
                 image = image.to(device)
@@ -274,7 +275,23 @@ def probunet_get_ls_mcd_samples(
     return dl_imgs_latent_mcd_samples_t
 
 
-def get_dl_h_z(dl_z_samples: Tensor, mcd_samples_nro: int = 32) -> Tuple[np.ndarray, np.ndarray]:
+def single_image_entropy_calculation(sample: np.array, neighbors: int):
+    """
+    Function used to calculate the entropy values of a single image. Used to calculate entropy in parallel
+
+    """
+    h_z_batch = []
+    for z_val_i in range(sample.shape[1]):
+        # h_z_i = continuous.get_h(input_mcd_samples[:, z_val_i], k=5)  # old
+        h_z_i = continuous.get_h(sample[:, z_val_i], k=neighbors, norm="max", min_dist=1e-5)
+        h_z_batch.append(h_z_i)
+    h_z_batch_np = np.asarray(h_z_batch)
+    return h_z_batch_np
+
+
+def get_dl_h_z(dl_z_samples: Tensor,
+               mcd_samples_nro: int = 32,
+               parallel_run: bool = False) -> Tuple[np.ndarray, np.ndarray]:
     """
     Get dataloader Entropy $h(.)$ for Z, from Monte Carlo Dropout (MCD) samples
 
@@ -299,15 +316,20 @@ def get_dl_h_z(dl_z_samples: Tensor, mcd_samples_nro: int = 32) -> Tuple[np.ndar
     dl_h_mvn_z_samples_np = np.expand_dims(dl_h_mvn_z_samples_np, axis=1)
     # ic(dl_h_mvn_z_samples_np.shape)
     # Get dataloader entropy $h(z_i)$ for each value of Z, from mcd_samples
-    dl_h_z_samples = []
-    for input_mcd_samples in tqdm(z_samples_np_ls, desc="Calculating entropy"):
-        h_z_batch = []
-        for z_val_i in range(input_mcd_samples.shape[1]):
-            # h_z_i = continuous.get_h(input_mcd_samples[:, z_val_i], k=5)  # old
-            h_z_i = continuous.get_h(input_mcd_samples[:, z_val_i], k=k_neighbors, norm="max", min_dist=1e-5)
-            h_z_batch.append(h_z_i)
-        h_z_batch_np = np.asarray(h_z_batch)
-        dl_h_z_samples.append(h_z_batch_np)
+    if not parallel_run:
+        dl_h_z_samples = []
+        for input_mcd_samples in tqdm(z_samples_np_ls, desc="Calculating entropy"):
+            h_z_batch = []
+            for z_val_i in range(input_mcd_samples.shape[1]):
+                # h_z_i = continuous.get_h(input_mcd_samples[:, z_val_i], k=5)  # old
+                h_z_i = continuous.get_h(input_mcd_samples[:, z_val_i], k=k_neighbors, norm="max", min_dist=1e-5)
+                h_z_batch.append(h_z_i)
+            h_z_batch_np = np.asarray(h_z_batch)
+            dl_h_z_samples.append(h_z_batch_np)
+    else:
+        dl_h_z_samples = process_map(single_image_entropy_calculation, z_samples_np_ls,
+                                    [k_neighbors] * len(z_samples_np_ls))
+        # dl_h_z_samples = Parallel(n_jobs=4)(delayed(single_image_entropy_calculation)(i, k_neighbors) for i in z_samples_np_ls)
     dl_h_z_samples_np = np.asarray(dl_h_z_samples)
     # ic(dl_h_z_samples_np.shape)
     return dl_h_mvn_z_samples_np, dl_h_z_samples_np

@@ -140,11 +140,11 @@ def get_ood_detector_results(classifier_name: str, classifier_ood, samples_test_
 def plot_roc_ood_detector(results_table, legend_title: str = "Legend Title", plot_title: str = "Plot Title"):
     fig = plt.figure(figsize=(8, 6))
     for i in results_table.index:
-        print(i)
+        # print(i)
         plt.plot(
             results_table.loc[i]["fpr"],
             results_table.loc[i]["tpr"],
-            label=legend_title + ", AUROC={:.4f}".format(results_table.loc[i]["auroc"]),
+            label=i + ", AUROC={:.4f}".format(results_table.loc[i]["auroc"]),
         )
 
     plt.plot([0, 1], [0, 1], color="orange", linestyle="--")
