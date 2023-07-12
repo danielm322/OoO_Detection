@@ -26,8 +26,9 @@ class DetectorKDE():
     
     def get_density_scores(self, test_embeddings):
         density_scores = self.density.score_samples(test_embeddings)
-        norm = np.linalg.norm(-density_scores)
-        return -density_scores/norm
+        return density_scores
+        # norm = np.linalg.norm(-density_scores)
+        # return -density_scores/norm
 
 class KDEClassifier(BaseEstimator, ClassifierMixin):
     """Bayesian classifier for OoD Detection
