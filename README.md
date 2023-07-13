@@ -24,10 +24,10 @@ In all the above cases, the DNNs were slightly modified to capture _epistemic_ u
 
 
 ## Requirements
-ToDo!
+See `requirements.txt`
 
 ## Installation
-ToDo!
+Install requirements, then in the base folder of the repo do `pip install .`
 
 ## Usage
 For detailed usage, check this [document](./ls_ood_detect_cea/CEA-LSEA-OoD%20Detection%20DNN%20Latent%20Space.md)
