@@ -1,3 +1,11 @@
+# (c) 2023, CEA LIST
+#
+# All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+# Contributors
+#    Fabio Arnez
+
 from typing import Tuple
 import torch
 from torch import Tensor

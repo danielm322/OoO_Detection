@@ -1,3 +1,11 @@
+# (c) 2023, CEA LIST
+#
+# All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+# Contributors
+#    Fabio Arnez
+
 from typing import Tuple
 import numpy as np
 import matplotlib.pyplot as plt
@@ -81,9 +89,9 @@ def plot_samples_pacmap(samples_ind: np.ndarray,
     :rtype: None
     """
     samples_concat = np.concatenate((samples_ind, samples_ood))
-    label_normal = np.zeros((samples_ind.shape[0], 1))
-    label_anomaly = np.ones((samples_ood.shape[0], 1))
-    labels = np.concatenate((label_normal, label_anomaly))
+    label_ind = np.ones((samples_ind.shape[0], 1)) # normal is the positive class 1
+    label_ood = np.zeros((samples_ood.shape[0], 1)) # anomal is the positive class 0
+    labels = np.concatenate((label_ind, label_ood))
     print(samples_concat.shape)
     print(labels.shape)
     embedding = pacmap.PaCMAP(n_components=2, n_neighbors=neighbors, MN_ratio=0.5, FP_ratio=2.0)
@@ -94,5 +102,6 @@ def plot_samples_pacmap(samples_ind: np.ndarray,
     # ToDo: Add Axis Names and plot legend
     scatter = plt.scatter(samples_transformed[:, 0], samples_transformed[:, 1], cmap="brg", c=labels, s=1.5)
     plt.title(title)
-    plt.legend(handles=scatter.legend_elements()[0], labels=["In-Distribution", "Out-of-Distribution"])
+    # plt.legend(handles=scatter.legend_elements()[0], labels=["In-Distribution", "Out-of-Distribution"])
+    plt.legend(handles=scatter.legend_elements()[0], labels=["Out-of-Distribution", "In-Distribution"])
     plt.show()
