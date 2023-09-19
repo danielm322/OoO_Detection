@@ -28,9 +28,7 @@ class DetectorKDE:
         """
         Transforms the scores from a second distribution while normalizing the scores
         """
-        density_scores = self.density.score_samples(test_embeddings)
-        norm = np.linalg.norm(-density_scores)
-        return -density_scores / norm
+        return self.density.score_samples(test_embeddings)
 
 
 class KDEClassifier(BaseEstimator, ClassifierMixin):

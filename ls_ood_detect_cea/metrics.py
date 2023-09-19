@@ -7,6 +7,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
 from sklearn.metrics import auc
 import torchmetrics.functional as tmf
+import seaborn as sns
 
 
 def get_hz_detector_results(
@@ -198,3 +199,46 @@ def plot_auprc_ood_detector(
     plt.title(plot_title, fontweight="bold", fontsize=15)
     plt.legend(prop={"size": 12}, loc="lower right")
     plt.show()
+
+
+def save_scores_plots(scores_gtsrb, scores_gtsrb_anomal, scores_stl10, scores_cifar10):
+    df_scores_gtsrb = pd.DataFrame(scores_gtsrb, columns=["Entropy score"])
+    df_scores_gtsrb_anomal = pd.DataFrame(scores_gtsrb_anomal, columns=["Entropy score"])
+    df_scores_stl10 = pd.DataFrame(scores_stl10, columns=["Entropy score"])
+    df_scores_cifar10 = pd.DataFrame(scores_cifar10, columns=["Entropy score"])
+
+    df_scores_gtsrb.insert(0, "Dataset", "")
+    df_scores_gtsrb.loc[:, "Dataset"] = "gtsrb"
+
+    df_scores_gtsrb_anomal.insert(0, "Dataset", "")
+    df_scores_gtsrb_anomal.loc[:, "Dataset"] = "gtsrb-anomal"
+
+    df_scores_stl10.insert(0, "Dataset", "")
+    df_scores_stl10.loc[:, "Dataset"] = "stl10"
+
+    df_scores_cifar10.insert(0, "Dataset", "")
+    df_scores_cifar10.loc[:, "Dataset"] = "cifar10"
+
+    df_h_z_valid_scores = pd.concat([df_scores_gtsrb,
+                                     df_scores_stl10,
+                                     df_scores_cifar10]).reset_index(drop=True)
+
+    gsc = sns.displot(df_h_z_valid_scores, x="Entropy score", hue="Dataset", kind="hist", fill=True)
+
+
+    df_h_z_valid_scores = pd.concat([df_scores_gtsrb,
+                                     df_scores_gtsrb_anomal]).reset_index(drop=True)
+
+    gga = sns.displot(df_h_z_valid_scores, x="Entropy score", hue="Dataset", kind="hist", fill=True)
+
+
+    df_h_z_valid_scores = pd.concat([df_scores_gtsrb,
+                                     df_scores_cifar10]).reset_index(drop=True)
+
+    gc = sns.displot(df_h_z_valid_scores, x="Entropy score", hue="Dataset", kind="hist", fill=True)
+
+    df_h_z_valid_scores = pd.concat([df_scores_gtsrb,
+                                     df_scores_stl10]).reset_index(drop=True)
+
+    gs = sns.displot(df_h_z_valid_scores, x="Entropy score", hue="Dataset", kind="hist", fill=True)
+    return gsc, gga, gc, gs
