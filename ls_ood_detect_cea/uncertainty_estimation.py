@@ -434,8 +434,12 @@ class MCDSamplesExtractor:
 
     def _get_mcd_samples_one_image_baselines(self, image):
         img_mcd_samples = []
+        if self.return_raw_predictions:
+            raw_predictions = []
         for s in range(self.mcd_nro_samples):
             pred_img = self.model(image)
+            if self.return_raw_predictions:
+                raw_predictions.append(pred_img)
             # pred = torch.argmax(pred_img, dim=1)
             latent_mcd_sample = self.hook_dropout_layer.output
             if self.layer_type == "Conv":
@@ -597,7 +601,7 @@ class MCDSamplesExtractor:
         else:
             img_mcd_samples_t = torch.stack(img_mcd_samples, dim=0)
         if self.return_raw_predictions:
-            return img_mcd_samples_t, pred_img
+            return img_mcd_samples_t, raw_predictions
         else:
             return img_mcd_samples_t
 
@@ -693,7 +697,7 @@ def get_msp_score(dnn_model: torch.nn.Module, input_dataloader: DataLoader):
     dl_preds_msp_scores = []
 
     with torch.no_grad():
-        for i, (image, label) in enumerate(tqdm(input_dataloader)):
+        for i, (image, label) in enumerate(tqdm(input_dataloader, desc="Getting MSP score")):
             image = image.to(device)
             pred_logits = dnn_model(image)
 
@@ -720,7 +724,7 @@ def get_energy_score(dnn_model: torch.nn.Module, input_dataloader: DataLoader):
     dl_preds_energy_scores = []
 
     with torch.no_grad():
-        for i, (image, label) in enumerate(tqdm(input_dataloader)):
+        for i, (image, label) in enumerate(tqdm(input_dataloader, desc="Getting energy score")):
             image = image.to(device)
             pred_logits = dnn_model(image)
 
@@ -764,7 +768,7 @@ class MDSPostprocessor:
             dnn_model.to(device)
             # get features:
             with torch.no_grad():
-                for i, (image, label) in enumerate(tqdm(ind_dataloader)):
+                for i, (image, label) in enumerate(tqdm(ind_dataloader, desc="Setting MDist")):
                     image = image.to(device)
                     # label = label.to(device)
                     pred_logits = dnn_model(image)
@@ -805,7 +809,7 @@ class MDSPostprocessor:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         dnn_model.to(device)
 
-        for i, (image, label) in enumerate(tqdm(dataloader)):
+        for i, (image, label) in enumerate(tqdm(dataloader, desc="Calculating MDist")):
             image = image.to(device)
             pred_logits = dnn_model(image)
             # latent_rep = layer_hook.output
@@ -847,7 +851,7 @@ class KNNPostprocessor:
             dnn_model.to(device)
 
             with torch.no_grad():
-                for i, (image, label) in enumerate(ind_dataloader):
+                for i, (image, label) in enumerate(tqdm(ind_dataloader, desc="Setting kNN")):
                     image = image.to(device)
                     pred_logits = dnn_model(image)
 
@@ -869,7 +873,7 @@ class KNNPostprocessor:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         dnn_model.to(device)
 
-        for i, (image, label) in enumerate(dataloader):
+        for i, (image, label) in enumerate(tqdm(dataloader, desc="Calculating kNN scores")):
             image = image.to(device)
             pred_logits = dnn_model(image)
             # ic(layer_hook.output)
