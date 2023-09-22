@@ -9,6 +9,9 @@ import pytorch_lightning as pl
 from entropy_estimators import continuous
 from icecream import ic
 from tqdm import tqdm
+from sklearn.covariance import EmpiricalCovariance
+from copy import deepcopy
+import faiss
 
 # from joblib import Parallel, delayed
 from tqdm.contrib.concurrent import process_map
@@ -361,10 +364,10 @@ class MCDSamplesExtractor:
         reduction_method: str,
         input_size: int,
         original_resnet_architecture: bool = False,
+        return_raw_predictions: bool = False,
     ):
         """
         Get Monte-Carlo samples from any torch model Dropout or Dropblock Layer
-            THIS CLASS SHOULD BE ADDED INTO THE LS OOD DETECTION LIBRARY
         :param model: Torch model
         :type model: torch.nn.Module
         :param mcd_nro_samples: Number of Monte-Carlo Samples
@@ -375,6 +378,10 @@ class MCDSamplesExtractor:
         :type: str
         :param architecture: The model architecture: either small or resnet
         :param location: Location of the hook. This can be useful to select different latent sample catching layers
+        :param reduction_method: Whether to use fullmean, mean, or
+            avgpool to reduce dimensionality of hooked representation
+        :type reduction_method: str
+        :param return_raw_predictions: Return or not network outputs
         :return: Monte-Carlo Dropout samples for the input dataloader
         :rtype: Tensor
         """
@@ -399,20 +406,31 @@ class MCDSamplesExtractor:
         self.reduction_method = reduction_method
         self.input_size = input_size
         self.original_resnet_architecture = original_resnet_architecture
+        self.return_raw_predictions = return_raw_predictions
 
     def get_ls_mcd_samples_baselines(self, data_loader: torch.utils.data.dataloader.DataLoader):
         with torch.no_grad():
             with tqdm(total=len(data_loader), desc="Extracting MCD samples") as pbar:
                 dl_imgs_latent_mcd_samples = []
+                if self.return_raw_predictions:
+                    raw_predictions = []
                 for i, (image, label) in enumerate(data_loader):
                     # image = image.view(1, 1, 28, 28).to(device)
                     image = image.to(self.device)
-                    dl_imgs_latent_mcd_samples.append(self._get_mcd_samples_one_image_baselines(image=image))
+                    if self.return_raw_predictions:
+                        latent_samples, raw_preds = self._get_mcd_samples_one_image_baselines(image=image)
+                        dl_imgs_latent_mcd_samples.append(latent_samples)
+                        raw_predictions.append(raw_preds)
+                    else:
+                        dl_imgs_latent_mcd_samples.append(self._get_mcd_samples_one_image_baselines(image=image))
                     # Update progress bar
                     pbar.update(1)
             dl_imgs_latent_mcd_samples_t = torch.cat(dl_imgs_latent_mcd_samples, dim=0)
         print("MCD N_samples: ", dl_imgs_latent_mcd_samples_t.shape[1])
-        return dl_imgs_latent_mcd_samples_t
+        if self.return_raw_predictions:
+            return dl_imgs_latent_mcd_samples_t, torch.cat(raw_predictions, dim=0)
+        else:
+            return dl_imgs_latent_mcd_samples_t
 
     def _get_mcd_samples_one_image_baselines(self, image):
         img_mcd_samples = []
@@ -578,5 +596,302 @@ class MCDSamplesExtractor:
             img_mcd_samples_t = torch.cat(img_mcd_samples, dim=0)
         else:
             img_mcd_samples_t = torch.stack(img_mcd_samples, dim=0)
+        if self.return_raw_predictions:
+            return img_mcd_samples_t, pred_img
+        else:
+            return img_mcd_samples_t
 
-        return img_mcd_samples_t
+
+def get_mcd_pred_uncertainty_score(dnn_model: torch.nn.Module, input_dataloader: DataLoader, mcd_nro_samples: int = 2):
+    """
+    This function calculates the predictive uncertainty, the mutual information, and returns the predictions,
+    given a model, a dataloader and a number of MCD steps
+    :param dnn_model: Trained model
+    :type dnn_model: torch.nn.Module
+    :param input_dataloader: Data Loader
+    :type input_dataloader: DataLoader
+    :param mcd_nro_samples: Number of samples for MCD dropout
+    :type mcd_nro_samples: int
+    """
+    softmax_fn = torch.nn.Softmax(dim=1)
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # gtsrb_model.to(device)
+    with torch.no_grad():
+        # dl_imgs_latent_mcd_samples = []
+        # dl_pred_mcd_samples = []
+        img_pred_mcd_samples = []
+
+        for i, (image, label) in enumerate(tqdm(input_dataloader)):
+            image = image.to(device)
+
+            for sample in range(mcd_nro_samples):
+                pred_img = dnn_model(image)
+
+                img_pred_mcd_samples.append(pred_img)
+
+        img_pred_mcd_samples_t = torch.cat(img_pred_mcd_samples, dim=0)
+        # ic(img_pred_mcd_samples_t.shape)
+
+        # compute softmax output - normalized output:
+        img_pred_softmax_mcd_samples_t = softmax_fn(img_pred_mcd_samples_t)
+
+        dl_pred_mcd_samples = torch.split(img_pred_softmax_mcd_samples_t, mcd_nro_samples)
+        # Get dataloader mcd predictions:
+        dl_pred_mcd_samples_t = torch.stack(dl_pred_mcd_samples)
+
+        # get predictive entropy:
+        expect_preds = torch.mean(dl_pred_mcd_samples_t, dim=1)
+        pred_h_t = -torch.sum((expect_preds * torch.log(expect_preds)), dim=1)
+        # get expected entropy:
+        preds_h = -torch.sum(dl_pred_mcd_samples_t * torch.log(dl_pred_mcd_samples_t), dim=-1)
+        expected_h_preds_t = torch.mean(preds_h, dim=1)
+        # get mutual information:
+        mi_t = pred_h_t - expected_h_preds_t
+
+    return dl_pred_mcd_samples_t, pred_h_t, mi_t
+
+
+def get_predictive_uncertainty_score(input_samples: Tensor, mcd_nro_samples: int):
+    """
+    This function calculates the predictive uncertainty, the mutual information, and returns the predictions,
+    given a model, a dataloader and a number of MCD steps
+    :param input_samples: Already calculated outputs from a model with the given MCD steps
+    :param mcd_nro_samples: Number of samples for MCD dropout
+    :type mcd_nro_samples: int
+    :return: predictive uncertainty, mutual information
+    """
+    softmax_fn = torch.nn.Softmax(dim=1)
+    # compute softmax output - normalized output:
+    img_pred_softmax_mcd_samples_t = softmax_fn(input_samples)
+
+    dl_pred_mcd_samples = torch.split(img_pred_softmax_mcd_samples_t, mcd_nro_samples)
+    # Get dataloader mcd predictions:
+    dl_pred_mcd_samples_t = torch.stack(dl_pred_mcd_samples)
+
+    # get predictive entropy:
+    expect_preds = torch.mean(dl_pred_mcd_samples_t, dim=1)
+    pred_h_t = -torch.sum((expect_preds * torch.log(expect_preds)), dim=1)
+    # get expected entropy:
+    preds_h = -torch.sum(dl_pred_mcd_samples_t * torch.log(dl_pred_mcd_samples_t), dim=-1)
+    expected_h_preds_t = torch.mean(preds_h, dim=1)
+    # get mutual information:
+    mi_t = pred_h_t - expected_h_preds_t
+
+    return pred_h_t, mi_t
+
+
+def get_msp_score(dnn_model: torch.nn.Module, input_dataloader: DataLoader):
+    """
+    Calculates the Maximum softmax probability score
+    """
+    softmax_fn = torch.nn.Softmax(dim=1)
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # gtsrb_model.to(device)
+    dl_preds_msp_scores = []
+
+    with torch.no_grad():
+        for i, (image, label) in enumerate(tqdm(input_dataloader)):
+            image = image.to(device)
+            pred_logits = dnn_model(image)
+
+            pred_score = torch.max(softmax_fn(pred_logits), dim=1)
+            # ic(pred_score.shape)
+            # get the max values:
+            dl_preds_msp_scores.append(pred_score[0])
+
+        dl_preds_msp_scores_t = torch.cat(dl_preds_msp_scores, dim=0)
+        # ic(dl_preds_msp_scores_t.shape)
+        # pred = np.max(softmax_fn(pred_logits).detach().cpu().numpy(), axis=1)
+        dl_preds_msp_scores = dl_preds_msp_scores_t.detach().cpu().numpy()
+
+    return dl_preds_msp_scores
+
+
+def get_energy_score(dnn_model: torch.nn.Module, input_dataloader: DataLoader):
+    """
+    Calculates the energy uncertainty score
+    """
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # gtsrb_det_model.to(device)
+
+    dl_preds_energy_scores = []
+
+    with torch.no_grad():
+        for i, (image, label) in enumerate(tqdm(input_dataloader)):
+            image = image.to(device)
+            pred_logits = dnn_model(image)
+
+            pred_energy_score = torch.logsumexp(pred_logits, dim=1)
+
+            dl_preds_energy_scores.append(pred_energy_score)
+
+        dl_preds_energy_scores_t = torch.cat(dl_preds_energy_scores, dim=0)
+
+        dl_preds_energy_scores = dl_preds_energy_scores_t.detach().cpu().numpy()
+
+    return dl_preds_energy_scores
+
+
+class MDSPostprocessor:
+    """
+    Mahalanobis Distance Score uncertainty estimator class
+    """
+
+    def __init__(self, num_classes: int = 43, setup_flag: bool = False):
+        """
+        :param num_classes: Number of In-distribution samples
+        :type num_classes: int
+        :param setup_flag: Whether the postprocessor is already trained
+        :type setup_flag: bool
+        """
+        # self.config = config
+        # self.num_classes = num_classes_dict[self.config.dataset.name]
+        self.num_classes = num_classes
+        self.setup_flag = setup_flag
+
+    def setup(self, dnn_model: torch.nn.Module, ind_dataloader, layer_hook):
+        if not self.setup_flag:
+            # estimate mean and variance from training set
+            print("\n Estimating mean and variance from training set...")
+            all_feats = []
+            all_labels = []
+            all_preds = []
+            # get features/representations:
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            dnn_model.to(device)
+            # get features:
+            with torch.no_grad():
+                for i, (image, label) in enumerate(tqdm(ind_dataloader)):
+                    image = image.to(device)
+                    # label = label.to(device)
+                    pred_logits = dnn_model(image)
+                    latent_rep = torch.flatten(layer_hook.output, 1)  # latent representation sample
+                    all_feats.append(latent_rep.cpu())
+                    all_labels.append(deepcopy(label))
+                    all_preds.append(pred_logits.argmax(1).cpu())
+
+            all_feats = torch.cat(all_feats)
+            all_labels = torch.cat(all_labels)
+            all_preds = torch.cat(all_preds)
+            # compute class-conditional statistics:
+            self.class_mean = []
+            centered_data = []
+            for c in range(self.num_classes):
+                class_samples = all_feats[all_labels.eq(c)].data
+                self.class_mean.append(class_samples.mean(0))
+                centered_data.append(class_samples - self.class_mean[c].view(1, -1))
+
+            self.class_mean = torch.stack(self.class_mean)  # shape [#classes, feature dim]
+
+            # group_lasso = sklearn.covariance.EmpiricalCovariance(
+            #     assume_centered=False)
+
+            group_lasso = EmpiricalCovariance(assume_centered=False)
+
+            group_lasso.fit(torch.cat(centered_data).cpu().numpy().astype(np.float32))
+            # inverse of covariance
+            self.precision = torch.from_numpy(group_lasso.precision_).float()
+            self.setup_flag = True
+        else:
+            pass
+
+    @torch.no_grad()
+    def postprocess(self, dnn_model: torch.nn.Module, dataloader: DataLoader, layer_hook):
+        all_preds = []
+        all_conf_score = []
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        dnn_model.to(device)
+
+        for i, (image, label) in enumerate(tqdm(dataloader)):
+            image = image.to(device)
+            pred_logits = dnn_model(image)
+            # latent_rep = layer_hook.output
+            latent_rep = torch.flatten(layer_hook.output, 1)
+            pred = pred_logits.argmax(1)
+
+            all_preds.append(pred)
+
+            class_scores = torch.zeros((pred_logits.shape[0], self.num_classes))
+            for c in range(self.num_classes):
+                tensor = latent_rep.cpu() - self.class_mean[c].view(1, -1)
+                class_scores[:, c] = -torch.matmul(torch.matmul(tensor, self.precision), tensor.t()).diag()
+
+            conf = torch.max(class_scores, dim=1)[0]
+
+            all_conf_score.append(conf)
+
+        all_preds_t = torch.cat(all_preds)
+        all_conf_score_t = torch.cat(all_conf_score)
+
+        return all_preds_t, all_conf_score_t
+
+
+normalizer = lambda x: x / (np.linalg.norm(x, ord=2, axis=-1, keepdims=True) + 1e-10)
+
+
+class KNNPostprocessor:
+    def __init__(self, K: int = 50, setup_flag: bool = False):
+        self.K = K
+        self.activation_log = None
+        self.setup_flag = setup_flag
+        self.index = None
+
+    def setup(self, dnn_model: torch.nn.Module, ind_dataloader, layer_hook, get_2d_rep_mean: bool = False):
+        if not self.setup_flag:
+            print("\n Get latent embeddings z from training set...")
+            activation_log = []
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            dnn_model.to(device)
+
+            with torch.no_grad():
+                for i, (image, label) in enumerate(ind_dataloader):
+                    image = image.to(device)
+                    pred_logits = dnn_model(image)
+
+                    latent_rep = torch.flatten(layer_hook.output, 1)  # latent representation sample
+                    # ic(layer_hook.output)
+                    activation_log.append(normalizer(latent_rep.data.cpu().numpy()))
+
+            self.activation_log = np.concatenate(activation_log, axis=0)
+            self.index = faiss.IndexFlatL2(latent_rep.shape[1])
+            self.index.add(self.activation_log)
+            self.setup_flag = True
+        else:
+            pass
+
+    @torch.no_grad()
+    def postprocess(self, dnn_model: torch.nn.Module, dataloader: DataLoader, layer_hook):
+        all_preds = []
+        all_kth_dist_score = []
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        dnn_model.to(device)
+
+        for i, (image, label) in enumerate(dataloader):
+            image = image.to(device)
+            pred_logits = dnn_model(image)
+            # ic(layer_hook.output)
+            latent_rep = torch.flatten(layer_hook.output, 1)  # latent representation sample
+
+            pred = torch.max(torch.softmax(pred_logits, dim=1), dim=1)
+            latent_rep_normed = normalizer(latent_rep.data.cpu().numpy())
+
+            D, _ = self.index.search(latent_rep_normed, self.K)
+            kth_dist = -D[:, -1]
+
+            all_preds.append(pred[0])
+            all_kth_dist_score.append(kth_dist)
+
+        all_preds_t = torch.cat(all_preds)
+        # all_kth_dist_score_t = torch.cat(all_kth_dist_score)
+        all_kth_dist_score_np = np.concatenate(all_kth_dist_score, axis=0)
+
+        return all_preds_t, all_kth_dist_score_np
+
+    def set_K_hyperparam(self, hyperparam: int = 50):
+        self.K = hyperparam
+
+    def get_K_hyperparam(self):
+        return self.K

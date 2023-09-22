@@ -219,26 +219,44 @@ def save_scores_plots(scores_gtsrb, scores_gtsrb_anomal, scores_stl10, scores_ci
     df_scores_cifar10.insert(0, "Dataset", "")
     df_scores_cifar10.loc[:, "Dataset"] = "cifar10"
 
-    df_h_z_valid_scores = pd.concat([df_scores_gtsrb,
-                                     df_scores_stl10,
-                                     df_scores_cifar10]).reset_index(drop=True)
-
+    df_h_z_valid_scores = pd.concat([df_scores_gtsrb, df_scores_stl10, df_scores_cifar10]).reset_index(drop=True)
     gsc = sns.displot(df_h_z_valid_scores, x="Entropy score", hue="Dataset", kind="hist", fill=True)
 
-
-    df_h_z_valid_scores = pd.concat([df_scores_gtsrb,
-                                     df_scores_gtsrb_anomal]).reset_index(drop=True)
-
+    df_h_z_valid_scores = pd.concat([df_scores_gtsrb, df_scores_gtsrb_anomal]).reset_index(drop=True)
     gga = sns.displot(df_h_z_valid_scores, x="Entropy score", hue="Dataset", kind="hist", fill=True)
 
-
-    df_h_z_valid_scores = pd.concat([df_scores_gtsrb,
-                                     df_scores_cifar10]).reset_index(drop=True)
-
+    df_h_z_valid_scores = pd.concat([df_scores_gtsrb, df_scores_cifar10]).reset_index(drop=True)
     gc = sns.displot(df_h_z_valid_scores, x="Entropy score", hue="Dataset", kind="hist", fill=True)
 
-    df_h_z_valid_scores = pd.concat([df_scores_gtsrb,
-                                     df_scores_stl10]).reset_index(drop=True)
-
+    df_h_z_valid_scores = pd.concat([df_scores_gtsrb, df_scores_stl10]).reset_index(drop=True)
     gs = sns.displot(df_h_z_valid_scores, x="Entropy score", hue="Dataset", kind="hist", fill=True)
     return gsc, gga, gc, gs
+
+
+def get_pred_scores_plots_gtsrb(
+    ind_gtsrb_pred_score, gtsrb_anomal_pred_score, stl10_pred_score, cifar10_pred_score, title: str, x_axis_name: str
+):
+    df_pred_h_scores_gtsrb = pd.DataFrame(ind_gtsrb_pred_score, columns=[x_axis_name])
+    df_pred_h_scores_gtsrb_anomal = pd.DataFrame(gtsrb_anomal_pred_score, columns=[x_axis_name])
+    df_pred_h_scores_stl10 = pd.DataFrame(stl10_pred_score, columns=[x_axis_name])
+    df_pred_h_scores_cifar10 = pd.DataFrame(cifar10_pred_score, columns=[x_axis_name])
+
+    df_pred_h_scores_gtsrb.insert(0, "Dataset", "")
+    df_pred_h_scores_gtsrb.loc[:, "Dataset"] = "gtsrb"
+
+    df_pred_h_scores_gtsrb_anomal.insert(0, "Dataset", "")
+    df_pred_h_scores_gtsrb_anomal.loc[:, "Dataset"] = "gtsrb-anomal"
+
+    df_pred_h_scores_stl10.insert(0, "Dataset", "")
+    df_pred_h_scores_stl10.loc[:, "Dataset"] = "stl10"
+
+    df_pred_h_scores_cifar10.insert(0, "Dataset", "")
+    df_pred_h_scores_cifar10.loc[:, "Dataset"] = "cifar10"
+
+    df_pred_h_scores = pd.concat(
+        [df_pred_h_scores_gtsrb, df_pred_h_scores_gtsrb_anomal, df_pred_h_scores_stl10, df_pred_h_scores_cifar10]
+    ).reset_index(drop=True)
+
+    ax = sns.displot(df_pred_h_scores, x="Predictive H score", hue="Dataset", kind="hist", fill=True)
+    ax.set_title(title)
+    return ax
