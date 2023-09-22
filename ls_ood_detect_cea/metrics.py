@@ -257,6 +257,5 @@ def get_pred_scores_plots_gtsrb(
         [df_pred_h_scores_gtsrb, df_pred_h_scores_gtsrb_anomal, df_pred_h_scores_stl10, df_pred_h_scores_cifar10]
     ).reset_index(drop=True)
 
-    ax = sns.displot(df_pred_h_scores, x="Predictive H score", hue="Dataset", kind="hist", fill=True)
-    ax.set_title(title)
+    ax = sns.displot(df_pred_h_scores, x="Predictive H score", hue="Dataset", kind="hist", fill=True).set(title=title)
     return ax
