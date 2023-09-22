@@ -420,7 +420,7 @@ class MCDSamplesExtractor:
                     if self.return_raw_predictions:
                         latent_samples, raw_preds = self._get_mcd_samples_one_image_baselines(image=image)
                         dl_imgs_latent_mcd_samples.append(latent_samples)
-                        raw_predictions.append(raw_preds)
+                        raw_predictions.extend(raw_preds)
                     else:
                         dl_imgs_latent_mcd_samples.append(self._get_mcd_samples_one_image_baselines(image=image))
                     # Update progress bar
