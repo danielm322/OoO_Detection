@@ -843,7 +843,7 @@ class KNNPostprocessor:
         self.setup_flag = setup_flag
         self.index = None
 
-    def setup(self, dnn_model: torch.nn.Module, ind_dataloader, layer_hook, get_2d_rep_mean: bool = False):
+    def setup(self, dnn_model: torch.nn.Module, ind_dataloader, layer_hook):
         if not self.setup_flag:
             print("\n Get latent embeddings z from training set...")
             activation_log = []
@@ -899,3 +899,37 @@ class KNNPostprocessor:
 
     def get_K_hyperparam(self):
         return self.K
+
+
+class LaREMPostprocessor:
+    def __init__(self, setup_flag: bool = False):
+        self.setup_flag = setup_flag
+        self.feats_mean = None
+        self.precision = None
+
+    def setup(self, ind_feats: np.ndarray):
+        if not self.setup_flag:
+            # estimate mean and variance from training set
+            print("\n Estimating mean and variance from training set...")
+
+            self.feats_mean = ind_feats.mean(0)
+            self.feats_mean = np.mean(ind_feats, 0, keepdims=True)
+
+            self.centered_data = ind_feats - self.feats_mean
+
+            group_lasso = EmpiricalCovariance(assume_centered=False)
+            group_lasso.fit(self.centered_data)
+
+            self.precision = group_lasso.precision_
+
+            self.setup_flag = True
+            # we need to use:
+            # self.feats_mean & self.precision
+        else:
+            pass
+
+    def postprocess(self, ood_feats: np.ndarray):
+        diff = ood_feats - self.feats_mean
+        conf_score = -np.diag(np.matmul(np.matmul(diff, self.precision), np.transpose(diff)))
+
+        return conf_score
