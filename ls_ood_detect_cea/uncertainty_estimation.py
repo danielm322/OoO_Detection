@@ -491,15 +491,31 @@ class MCDSamplesExtractor:
                                     )
                         # Input size 64
                         elif self.input_size == 64:
-                            assert latent_mcd_sample.shape == torch.Size([1, 128, 32, 32])
-                            if self.reduction_method == "mean":
-                                latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
-                                latent_mcd_sample = latent_mcd_sample.reshape(1, 128, 8, -1)
-                                latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
-                                latent_mcd_sample = torch.squeeze(latent_mcd_sample)
+                            if self.original_resnet_architecture:
+                                assert latent_mcd_sample.shape == torch.Size([1, 128, 8, 8])
+                                if self.reduction_method == "mean":
+                                    latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
+                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
+                                elif self.reduction_method == "fullmean":
+                                    latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
+                                    latent_mcd_sample = torch.mean(latent_mcd_sample, dim=2, keepdim=True)
+                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
+                                # Avg pool
+                                else:
+                                    # Perform average pooling over latent representations
+                                    # For input of size 32
+                                    raise NotImplementedError
+                            # Modified Lightning arch
                             else:
-                                # For input of size 64
-                                latent_mcd_sample = avg_pool2d(latent_mcd_sample, kernel_size=16, stride=12, padding=4)
+                                assert latent_mcd_sample.shape == torch.Size([1, 128, 32, 32])
+                                if self.reduction_method == "mean":
+                                    latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
+                                    latent_mcd_sample = latent_mcd_sample.reshape(1, 128, 8, -1)
+                                    latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
+                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
+                                else:
+                                    # For input of size 64
+                                    latent_mcd_sample = avg_pool2d(latent_mcd_sample, kernel_size=16, stride=12, padding=4)
                         # Input size 128
                         else:
                             if self.original_resnet_architecture:
