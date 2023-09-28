@@ -1,6 +1,7 @@
 from typing import Union, Tuple
 import numpy as np
 import torch
+import mlflow
 import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.metrics import roc_auc_score
@@ -8,6 +9,11 @@ from sklearn.metrics import roc_curve
 from sklearn.metrics import auc
 import torchmetrics.functional as tmf
 import seaborn as sns
+from tqdm import tqdm
+
+from .detectors import DetectorKDE
+from .uncertainty_estimation import LaREMPostprocessor
+from .score import get_hz_scores
 
 
 def get_hz_detector_results(
@@ -259,3 +265,79 @@ def get_pred_scores_plots_gtsrb(
 
     ax = sns.displot(df_pred_h_scores, x=x_axis_name, hue="Dataset", kind="hist", fill=True).set(title=title)
     return ax
+
+
+def log_evaluate_lared_larem(ind_train_h_z: np.array,
+                             ind_test_h_z: np.array,
+                             ood_anomal_h_z: np.array,
+                             ood_cifar10_h_z: np.array,
+                             ood_stl10_h_z: np.array,
+                             experiment_name_extension: str = "",
+                             return_density_scores: bool = False,
+                             log_step: Union[int, None] = None):
+    # Initialize df to store all the results
+    overall_metrics_df = pd.DataFrame(columns=['auroc', 'fpr@95', 'aupr',
+                                               'fpr', 'tpr', 'roc_thresholds',
+                                               'precision', 'recall', 'pr_thresholds'])
+
+    gtsrb_ds_shift_detector = DetectorKDE(train_embeddings=ind_train_h_z)
+    # Extract Density scores
+    scores_gtsrb = get_hz_scores(gtsrb_ds_shift_detector, ind_test_h_z)
+    scores_gtsrb_anomal = get_hz_scores(gtsrb_ds_shift_detector, ood_anomal_h_z)
+    scores_cifar10 = get_hz_scores(gtsrb_ds_shift_detector, ood_cifar10_h_z)
+    scores_stl10 = get_hz_scores(gtsrb_ds_shift_detector, ood_stl10_h_z)
+
+    ######################################################
+    # Evaluate OoD detection method LaREM
+    ######################################################
+    gtsrb_rn18_larem_detector = LaREMPostprocessor()
+    gtsrb_rn18_larem_detector.setup(ind_train_h_z)
+    ind_gtsrb_larem_score = gtsrb_rn18_larem_detector.postprocess(ind_test_h_z)
+    ood_gtsrb_anomal_larem_score = gtsrb_rn18_larem_detector.postprocess(ood_anomal_h_z)
+    ood_cifar10_larem_score = gtsrb_rn18_larem_detector.postprocess(ood_cifar10_h_z)
+    ood_stl10_larem_score = gtsrb_rn18_larem_detector.postprocess(ood_stl10_h_z)
+
+    #########################
+    # Log results
+    la_red_la_rem_experiments = {
+        "anomal LaRED": {
+            "InD": scores_gtsrb,
+            "OoD": scores_gtsrb_anomal
+        },
+        "cifar10 LaRED": {
+            "InD": scores_gtsrb,
+            "OoD": scores_cifar10
+        },
+        "stl10 LaRED": {
+            "InD": scores_gtsrb,
+            "OoD": scores_stl10
+        },
+        "anomal LaREM": {
+            "InD": ind_gtsrb_larem_score,
+            "OoD": ood_gtsrb_anomal_larem_score
+        },
+        "cifar10 LaREM": {
+            "InD": ind_gtsrb_larem_score,
+            "OoD": ood_cifar10_larem_score
+        },
+        "stl10 LaREM": {
+            "InD": ind_gtsrb_larem_score,
+            "OoD": ood_stl10_larem_score
+        }
+    }
+    # Log Results
+    for experiment_name, experiment in la_red_la_rem_experiments.items():
+        experiment_name = experiment_name + experiment_name_extension
+        r_df, r_mlflow = get_hz_detector_results(detect_exp_name=experiment_name,
+                                                 ind_samples_scores=experiment["InD"],
+                                                 ood_samples_scores=experiment["OoD"],
+                                                 return_results_for_mlflow=True)
+        # Add OoD dataset to metrics name
+        r_mlflow = dict([(f"{experiment_name}_{k}", v) for k, v in r_mlflow.items()])
+        mlflow.log_metrics(r_mlflow, step=log_step)
+        overall_metrics_df = overall_metrics_df.append(r_df)
+
+    if return_density_scores:
+        return overall_metrics_df, scores_gtsrb, scores_gtsrb_anomal, scores_stl10, scores_cifar10
+    else:
+        return overall_metrics_df

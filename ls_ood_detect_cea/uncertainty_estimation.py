@@ -351,6 +351,127 @@ def deeplabv3p_apply_dropout(m):
         m.train()
 
 
+def get_mean_or_fullmean_ls_sample(latent_sample: Tensor, method: str):
+    assert method in ("mean", "fullmean")
+    if method == "mean":
+        latent_sample = torch.mean(latent_sample, dim=3, keepdim=True)
+        latent_sample = torch.squeeze(latent_sample)
+    # fullmean
+    else:
+        latent_sample = torch.mean(latent_sample, dim=3, keepdim=True)
+        latent_sample = torch.mean(latent_sample, dim=2, keepdim=True)
+        latent_sample = torch.squeeze(latent_sample)
+    return latent_sample
+
+
+class MCDSamplesExtractorLenet:
+    def __init__(
+        self,
+        model,
+        mcd_nro_samples: int,
+        hooked_layer: Hook,
+        layer_type: str,
+        device: str,
+        location: int,
+        reduction_method: str,
+        input_size: int,
+        return_raw_predictions: bool = False,
+    ):
+        """
+        Get Monte-Carlo samples from any torch model Dropout or Dropblock Layer
+        :param model: Torch model
+        :type model: torch.nn.Module
+        :param mcd_nro_samples: Number of Monte-Carlo Samples
+        :type mcd_nro_samples: int
+        :param hook_dropout_layer: Hook at the Dropout Layer from the Neural Network Module
+        :type hook_dropout_layer: Hook
+        :param layer_type: Type of layer that will get the MC samples. Either FC (Fully Connected) or Conv (Convolutional)
+        :type: str
+        :param architecture: The model architecture: either small or resnet
+        :param location: Location of the hook. This can be useful to select different latent sample catching layers
+        :param reduction_method: Whether to use fullmean, mean, or
+            avgpool to reduce dimensionality of hooked representation
+        :type reduction_method: str
+        :param return_raw_predictions: Return or not network outputs
+        :return: Monte-Carlo Dropout samples for the input dataloader
+        :rtype: Tensor
+        """
+
+        assert layer_type in ("FC", "Conv"), "Layer type must be either 'FC' or 'Conv'"
+        assert location in (1, 2)
+        self.model = model
+        self.mcd_nro_samples = mcd_nro_samples
+        self.hooked_layer = hooked_layer
+        self.layer_type = layer_type
+        self.device = device
+        self.location = location
+        self.reduction_method = reduction_method
+        self.input_size = input_size
+        self.return_raw_predictions = return_raw_predictions
+
+    def get_ls_mcd_samples(self, data_loader: torch.utils.data.dataloader.DataLoader):
+        with torch.no_grad():
+            with tqdm(total=len(data_loader), desc="Extracting MCD samples") as pbar:
+                dl_imgs_latent_mcd_samples = []
+                if self.return_raw_predictions:
+                    raw_predictions = []
+                for i, (image, label) in enumerate(data_loader):
+                    # image = image.view(1, 1, 28, 28).to(device)
+                    image = image.to(self.device)
+                    if self.return_raw_predictions:
+                        latent_samples, raw_preds = self._get_mcd_samples_one_image(image=image)
+                        dl_imgs_latent_mcd_samples.append(latent_samples)
+                        raw_predictions.extend(raw_preds)
+                    else:
+                        dl_imgs_latent_mcd_samples.append(self._get_mcd_samples_one_image(image=image))
+                    # Update progress bar
+                    pbar.update(1)
+            dl_imgs_latent_mcd_samples_t = torch.cat(dl_imgs_latent_mcd_samples, dim=0)
+        print("MCD N_samples: ", dl_imgs_latent_mcd_samples_t.shape[1])
+        if self.return_raw_predictions:
+            return dl_imgs_latent_mcd_samples_t, torch.cat(raw_predictions, dim=0)
+        else:
+            return dl_imgs_latent_mcd_samples_t
+
+    def _get_mcd_samples_one_image(self, image):
+        img_mcd_samples = []
+        if self.return_raw_predictions:
+            raw_predictions = []
+        for s in range(self.mcd_nro_samples):
+            pred_img = self.model(image)
+            if self.return_raw_predictions:
+                raw_predictions.append(pred_img)
+            # pred = torch.argmax(pred_img, dim=1)
+            latent_mcd_sample = self.hooked_layer.output
+            if self.layer_type == "Conv":
+                if self.location == 1 or self.location == 2:
+                    assert latent_mcd_sample.shape in (torch.Size([1, 6, 14, 14]), torch.Size([1, 16, 5, 5]))
+                    if self.reduction_method == "mean" or self.reduction_method == "fullmean":
+                        latent_mcd_sample = get_mean_or_fullmean_ls_sample(
+                            latent_mcd_sample,
+                            self.reduction_method
+                        )
+                    # Avg pool
+                    else:
+                        raise NotImplementedError
+            # FC
+            else:
+                # It is already a 1d tensor
+                # latent_mcd_sample = dropout_ext(latent_mcd_sample)
+                latent_mcd_sample = torch.squeeze(latent_mcd_sample)
+            img_mcd_samples.append(latent_mcd_sample)
+
+        if self.layer_type == "Conv":
+            img_mcd_samples_t = torch.cat(img_mcd_samples, dim=0)
+        else:
+            img_mcd_samples_t = torch.stack(img_mcd_samples, dim=0)
+        if self.return_raw_predictions:
+            return img_mcd_samples_t, raw_predictions
+        else:
+            return img_mcd_samples_t
+
+
+
 class MCDSamplesExtractor:
     def __init__(
         self,
@@ -926,8 +1047,6 @@ class LaREMPostprocessor:
     def setup(self, ind_feats: np.ndarray):
         if not self.setup_flag:
             # estimate mean and variance from training set
-            print("\n Estimating mean and variance from training set...")
-
             self.feats_mean = ind_feats.mean(0)
             self.feats_mean = np.mean(ind_feats, 0, keepdims=True)
 
