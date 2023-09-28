@@ -333,7 +333,10 @@ def log_evaluate_lared_larem(ind_train_h_z: np.array,
                                                  ood_samples_scores=experiment["OoD"],
                                                  return_results_for_mlflow=True)
         # Add OoD dataset to metrics name
-        r_mlflow = dict([(f"{experiment_name}_{k}", v) for k, v in r_mlflow.items()])
+        if "PCA" in experiment_name:
+            r_mlflow = dict([(f"{' '.join(experiment_name.split()[:-1])}_{k}", v) for k, v in r_mlflow.items()])
+        else:
+            r_mlflow = dict([(f"{experiment_name}_{k}", v) for k, v in r_mlflow.items()])
         mlflow.log_metrics(r_mlflow, step=log_step)
         overall_metrics_df = overall_metrics_df.append(r_df)
 
