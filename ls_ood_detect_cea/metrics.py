@@ -207,131 +207,128 @@ def plot_auprc_ood_detector(
     plt.show()
 
 
-def save_scores_plots(scores_gtsrb, scores_gtsrb_anomal, scores_stl10, scores_cifar10):
-    df_scores_gtsrb = pd.DataFrame(scores_gtsrb, columns=["Entropy score"])
-    df_scores_gtsrb_anomal = pd.DataFrame(scores_gtsrb_anomal, columns=["Entropy score"])
-    df_scores_stl10 = pd.DataFrame(scores_stl10, columns=["Entropy score"])
-    df_scores_cifar10 = pd.DataFrame(scores_cifar10, columns=["Entropy score"])
-
-    df_scores_gtsrb.insert(0, "Dataset", "")
-    df_scores_gtsrb.loc[:, "Dataset"] = "gtsrb"
-
-    df_scores_gtsrb_anomal.insert(0, "Dataset", "")
-    df_scores_gtsrb_anomal.loc[:, "Dataset"] = "gtsrb-anomal"
-
-    df_scores_stl10.insert(0, "Dataset", "")
-    df_scores_stl10.loc[:, "Dataset"] = "stl10"
-
-    df_scores_cifar10.insert(0, "Dataset", "")
-    df_scores_cifar10.loc[:, "Dataset"] = "cifar10"
-
-    df_h_z_valid_scores = pd.concat([df_scores_gtsrb, df_scores_stl10, df_scores_cifar10]).reset_index(drop=True)
-    gsc = sns.displot(df_h_z_valid_scores, x="Entropy score", hue="Dataset", kind="hist", fill=True)
-
-    df_h_z_valid_scores = pd.concat([df_scores_gtsrb, df_scores_gtsrb_anomal]).reset_index(drop=True)
-    gga = sns.displot(df_h_z_valid_scores, x="Entropy score", hue="Dataset", kind="hist", fill=True)
-
-    df_h_z_valid_scores = pd.concat([df_scores_gtsrb, df_scores_cifar10]).reset_index(drop=True)
-    gc = sns.displot(df_h_z_valid_scores, x="Entropy score", hue="Dataset", kind="hist", fill=True)
-
-    df_h_z_valid_scores = pd.concat([df_scores_gtsrb, df_scores_stl10]).reset_index(drop=True)
-    gs = sns.displot(df_h_z_valid_scores, x="Entropy score", hue="Dataset", kind="hist", fill=True)
-    return gsc, gga, gc, gs
-
-
-def get_pred_scores_plots_gtsrb(
-    ind_gtsrb_pred_score, gtsrb_anomal_pred_score, stl10_pred_score, cifar10_pred_score, title: str, x_axis_name: str
+def save_scores_plots(
+    scores_ind: np.ndarray, ood_lared_scores_dict: dict, ood_datasets_list: list, ind_dataset_name: str
 ):
-    df_pred_h_scores_gtsrb = pd.DataFrame(ind_gtsrb_pred_score, columns=[x_axis_name])
-    df_pred_h_scores_gtsrb_anomal = pd.DataFrame(gtsrb_anomal_pred_score, columns=[x_axis_name])
-    df_pred_h_scores_stl10 = pd.DataFrame(stl10_pred_score, columns=[x_axis_name])
-    df_pred_h_scores_cifar10 = pd.DataFrame(cifar10_pred_score, columns=[x_axis_name])
+    """
+    InD and OoD agnostic function that takes as input the InD numpy ndarray with the LaRED scores, a dicitonary of OoD
+    LaRED scores, a list of the names of the OoD dataset,a nd the name of the InD dataset, and returns a histogram of
+    pairwise comparisons, that can be saved to a file or shown in screen
+    :param scores_ind: InD LaRED scores as numpy ndarray
+    :param ood_lared_scores_dict: Dictionary keys as ood datasets names and values as ndarrays of LaRED scores per each
+    :param ood_datasets_list: List of OoD datasets names
+    :param ind_dataset_name: String with the name of the InD dataset
+    """
+    df_scores_ind = pd.DataFrame(scores_ind, columns=["Entropy score"])
+    df_scores_ind.insert(0, "Dataset", "")
+    df_scores_ind.loc[:, "Dataset"] = ind_dataset_name
+    ood_df_dict = {}
+    for ood_dataset_name in ood_datasets_list:
+        ood_df_dict[ood_dataset_name] = pd.DataFrame(ood_lared_scores_dict[ood_dataset_name], columns=["Entropy score"])
+        ood_df_dict[ood_dataset_name].insert(0, "Dataset", "")
+        ood_df_dict[ood_dataset_name].loc[:, "Dataset"] = ood_dataset_name
 
-    df_pred_h_scores_gtsrb.insert(0, "Dataset", "")
-    df_pred_h_scores_gtsrb.loc[:, "Dataset"] = "gtsrb"
+    plots_dict = {}
+    for ood_dataset_name in ood_datasets_list:
+        df_h_z_scores = pd.concat([df_scores_ind, ood_df_dict[ood_dataset_name]]).reset_index(drop=True)
+        plots_dict[ood_dataset_name + "_lared_scores"] = sns.displot(
+            df_h_z_scores, x="Entropy score", hue="Dataset", kind="hist", fill=True
+        )
 
-    df_pred_h_scores_gtsrb_anomal.insert(0, "Dataset", "")
-    df_pred_h_scores_gtsrb_anomal.loc[:, "Dataset"] = "gtsrb-anomal"
+    return plots_dict
 
-    df_pred_h_scores_stl10.insert(0, "Dataset", "")
-    df_pred_h_scores_stl10.loc[:, "Dataset"] = "stl10"
 
-    df_pred_h_scores_cifar10.insert(0, "Dataset", "")
-    df_pred_h_scores_cifar10.loc[:, "Dataset"] = "cifar10"
+def get_pred_scores_plots(experiment: dict, ood_datasets_list: list, title: str, ind_dataset_name: str):
+    """
+    Function that takes as input an experiment dictioonary, a list od ood datasets, a plot title, and the InD
+    dataset name and returns a plot of the predictive score density
+    :param experiment: Dictionary with keys 'InD':ndarray, 'x_axis':str, and 'plot_name':str and other keys as
+     ood dataset names with values as ndarray
+    :param ood_datasets_list: List with OoD datasets names
+    :param title: Title of the plot
+    :param ind_dataset_name: String with the name of the InD dataset
+    """
+    df_pred_h_scores_ind = pd.DataFrame(experiment["InD"], columns=[experiment["x_axis"]])
+    df_pred_h_scores_ind.insert(0, "Dataset", "")
+    df_pred_h_scores_ind.loc[:, "Dataset"] = ind_dataset_name
+    ood_df_dict = {}
+    for ood_dataset_name in ood_datasets_list:
+        ood_df_dict[ood_dataset_name] = pd.DataFrame(experiment[ood_dataset_name], columns=[experiment["x_axis"]])
+        ood_df_dict[ood_dataset_name].insert(0, "Dataset", "")
+        ood_df_dict[ood_dataset_name].loc[:, "Dataset"] = ood_dataset_name
 
-    df_pred_h_scores = pd.concat(
-        [df_pred_h_scores_gtsrb, df_pred_h_scores_gtsrb_anomal, df_pred_h_scores_stl10, df_pred_h_scores_cifar10]
-    ).reset_index(drop=True)
+    all_dfs = [df_pred_h_scores_ind]
+    all_dfs.extend(list(ood_df_dict.values()))
+    df_pred_h_scores = pd.concat(all_dfs).reset_index(drop=True)
 
-    ax = sns.displot(df_pred_h_scores, x=x_axis_name, hue="Dataset", kind="hist", fill=True).set(title=title)
+    ax = sns.displot(df_pred_h_scores, x=experiment["x_axis"], hue="Dataset", kind="hist", fill=True).set(title=title)
     return ax
 
 
-def log_evaluate_lared_larem(ind_train_h_z: np.array,
-                             ind_test_h_z: np.array,
-                             ood_anomal_h_z: np.array,
-                             ood_cifar10_h_z: np.array,
-                             ood_stl10_h_z: np.array,
-                             experiment_name_extension: str = "",
-                             return_density_scores: bool = False,
-                             log_step: Union[int, None] = None):
+def log_evaluate_lared_larem(
+    ind_train_h_z: np.array,
+    ind_test_h_z: np.array,
+    ood_h_z_dict: dict,
+    experiment_name_extension: str = "",
+    return_density_scores: bool = False,
+    log_step: Union[int, None] = None,
+):
+    """
+    Function that takes as input numpy arrays of entropies and logs to and existing mlflow experiment
+    the evaluation results, and returns such results in the form of a pandas dataframe
+    :param ind_train_h_z: InD training samples for both LaRED and LaREM as numpy ndarray
+    :param ind_test_h_z: InD test samples as numpy ndarray
+    :param ood_h_z_dict: OoD dictionary where keys are the OoD datasets and the values are the ndarrays of entropies
+    :param experiment_name_extension: Extra string to add to the default experiment name, useful for PCA experiments
+    :param return_density_scores: return LaRED density scores for further analysis
+    :param log_step: optional step useful for PCA experiments. None if not performing PCA with several components
+    """
     # Initialize df to store all the results
-    overall_metrics_df = pd.DataFrame(columns=['auroc', 'fpr@95', 'aupr',
-                                               'fpr', 'tpr', 'roc_thresholds',
-                                               'precision', 'recall', 'pr_thresholds'])
-
+    overall_metrics_df = pd.DataFrame(
+        columns=["auroc", "fpr@95", "aupr", "fpr", "tpr", "roc_thresholds", "precision", "recall", "pr_thresholds"]
+    )
+    ######################################################
+    # Evaluate OoD detection method LaRED
+    ######################################################
     gtsrb_ds_shift_detector = DetectorKDE(train_embeddings=ind_train_h_z)
     # Extract Density scores
-    scores_gtsrb = get_hz_scores(gtsrb_ds_shift_detector, ind_test_h_z)
-    scores_gtsrb_anomal = get_hz_scores(gtsrb_ds_shift_detector, ood_anomal_h_z)
-    scores_cifar10 = get_hz_scores(gtsrb_ds_shift_detector, ood_cifar10_h_z)
-    scores_stl10 = get_hz_scores(gtsrb_ds_shift_detector, ood_stl10_h_z)
+    ind_lared_score = get_hz_scores(gtsrb_ds_shift_detector, ind_test_h_z)
+    ood_lared_scores_dict = {}
+    for dataset_name, ood_dataset in ood_h_z_dict.items():
+        ood_lared_scores_dict[dataset_name] = get_hz_scores(gtsrb_ds_shift_detector, ood_dataset)
 
     ######################################################
     # Evaluate OoD detection method LaREM
     ######################################################
-    gtsrb_rn18_larem_detector = LaREMPostprocessor()
-    gtsrb_rn18_larem_detector.setup(ind_train_h_z)
-    ind_gtsrb_larem_score = gtsrb_rn18_larem_detector.postprocess(ind_test_h_z)
-    ood_gtsrb_anomal_larem_score = gtsrb_rn18_larem_detector.postprocess(ood_anomal_h_z)
-    ood_cifar10_larem_score = gtsrb_rn18_larem_detector.postprocess(ood_cifar10_h_z)
-    ood_stl10_larem_score = gtsrb_rn18_larem_detector.postprocess(ood_stl10_h_z)
+    rn18_larem_detector = LaREMPostprocessor()
+    rn18_larem_detector.setup(ind_train_h_z)
+    ind_larem_score = rn18_larem_detector.postprocess(ind_test_h_z)
+    ood_larem_scores_dict = {}
+    for dataset_name, ood_dataset in ood_h_z_dict.items():
+        ood_larem_scores_dict[dataset_name] = rn18_larem_detector.postprocess(ood_dataset)
 
     #########################
-    # Log results
-    la_red_la_rem_experiments = {
-        "anomal LaRED": {
-            "InD": scores_gtsrb,
-            "OoD": scores_gtsrb_anomal
-        },
-        "cifar10 LaRED": {
-            "InD": scores_gtsrb,
-            "OoD": scores_cifar10
-        },
-        "stl10 LaRED": {
-            "InD": scores_gtsrb,
-            "OoD": scores_stl10
-        },
-        "anomal LaREM": {
-            "InD": ind_gtsrb_larem_score,
-            "OoD": ood_gtsrb_anomal_larem_score
-        },
-        "cifar10 LaREM": {
-            "InD": ind_gtsrb_larem_score,
-            "OoD": ood_cifar10_larem_score
-        },
-        "stl10 LaREM": {
-            "InD": ind_gtsrb_larem_score,
-            "OoD": ood_stl10_larem_score
+    # Prepare logging of results
+    lared_larem_experiments = {}
+    for dataset_name, ood_dataset in ood_h_z_dict.items():
+        lared_larem_experiments[f"{dataset_name} LaRED"] = {
+            "InD": ind_lared_score,
+            "OoD": ood_lared_scores_dict[dataset_name],
         }
-    }
+        lared_larem_experiments[f"{dataset_name} LaREM"] = {
+            "InD": ind_larem_score,
+            "OoD": ood_larem_scores_dict[dataset_name],
+        }
+
     # Log Results
-    for experiment_name, experiment in la_red_la_rem_experiments.items():
+    for experiment_name, experiment in lared_larem_experiments.items():
         experiment_name = experiment_name + experiment_name_extension
-        r_df, r_mlflow = get_hz_detector_results(detect_exp_name=experiment_name,
-                                                 ind_samples_scores=experiment["InD"],
-                                                 ood_samples_scores=experiment["OoD"],
-                                                 return_results_for_mlflow=True)
+        r_df, r_mlflow = get_hz_detector_results(
+            detect_exp_name=experiment_name,
+            ind_samples_scores=experiment["InD"],
+            ood_samples_scores=experiment["OoD"],
+            return_results_for_mlflow=True,
+        )
         # Add OoD dataset to metrics name
         if "PCA" in experiment_name:
             r_mlflow = dict([(f"{' '.join(experiment_name.split()[:-1])}_{k}", v) for k, v in r_mlflow.items()])
@@ -341,6 +338,6 @@ def log_evaluate_lared_larem(ind_train_h_z: np.array,
         overall_metrics_df = overall_metrics_df.append(r_df)
 
     if return_density_scores:
-        return overall_metrics_df, scores_gtsrb, scores_gtsrb_anomal, scores_stl10, scores_cifar10
+        return overall_metrics_df, ind_lared_score, ood_lared_scores_dict
     else:
         return overall_metrics_df

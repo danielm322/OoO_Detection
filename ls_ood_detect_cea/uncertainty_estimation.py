@@ -447,10 +447,7 @@ class MCDSamplesExtractorLenet:
                 if self.location == 1 or self.location == 2:
                     assert latent_mcd_sample.shape in (torch.Size([1, 6, 14, 14]), torch.Size([1, 16, 5, 5]))
                     if self.reduction_method == "mean" or self.reduction_method == "fullmean":
-                        latent_mcd_sample = get_mean_or_fullmean_ls_sample(
-                            latent_mcd_sample,
-                            self.reduction_method
-                        )
+                        latent_mcd_sample = get_mean_or_fullmean_ls_sample(latent_mcd_sample, self.reduction_method)
                     # Avg pool
                     else:
                         raise NotImplementedError
@@ -469,7 +466,6 @@ class MCDSamplesExtractorLenet:
             return img_mcd_samples_t, raw_predictions
         else:
             return img_mcd_samples_t
-
 
 
 class MCDSamplesExtractor:
@@ -636,11 +632,15 @@ class MCDSamplesExtractor:
                                     latent_mcd_sample = torch.squeeze(latent_mcd_sample)
                                 else:
                                     # For input of size 64
-                                    latent_mcd_sample = avg_pool2d(latent_mcd_sample, kernel_size=16, stride=12, padding=4)
+                                    latent_mcd_sample = avg_pool2d(
+                                        latent_mcd_sample, kernel_size=16, stride=12, padding=4
+                                    )
                         # Input size 128
                         else:
                             if self.original_resnet_architecture:
-                                assert latent_mcd_sample.shape == torch.Size([1, 128, 16, 16])
+                                assert latent_mcd_sample.shape == torch.Size(
+                                    [1, 128, 16, 16]
+                                ), f"got {latent_mcd_sample.shape}"
                                 if self.reduction_method == "mean":
                                     latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
                                     latent_mcd_sample = torch.squeeze(latent_mcd_sample)
