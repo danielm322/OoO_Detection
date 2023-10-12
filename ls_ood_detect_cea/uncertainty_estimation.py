@@ -1070,18 +1070,21 @@ class LaREMPostprocessor:
         return conf_score
 
 
-def get_dice_feat_mean(dnn_model: torch.nn.Module, ind_dataloader):
+def get_dice_feat_mean_react_percentile(
+        dnn_model: torch.nn.Module,
+        ind_dataloader: DataLoader,
+        react_percentile: int = 90
+):
     feat_log = []
     dnn_model.eval()
     assert dnn_model.dice_precompute
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    for (inputs, targets) in tqdm(ind_dataloader, desc="Setting up DICE"):
+    for (inputs, targets) in tqdm(ind_dataloader, desc="Setting up DICE/ReAct"):
         inputs, targets = inputs.to(device), targets.to(device)
-
         outputs = dnn_model(inputs)
         out = adaptive_avg_pool2d(outputs, 1)
         out = out.view(out.size(0), -1)
         # score = dnn_model.fc(out)
         feat_log.append(out.data.cpu().numpy())
-
-    return np.array(feat_log).squeeze().mean(0)
+    feat_log_array = np.array(feat_log).squeeze()
+    return feat_log_array.mean(0), np.percentile(feat_log_array, react_percentile)
