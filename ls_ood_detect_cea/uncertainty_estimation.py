@@ -3,7 +3,7 @@ import numpy as np
 import torch
 from torch import Tensor
 from torch.utils.data import DataLoader
-from torch.nn.functional import avg_pool2d
+from torch.nn.functional import avg_pool2d, adaptive_avg_pool2d
 from dropblock import DropBlock2D
 import pytorch_lightning as pl
 from entropy_estimators import continuous
@@ -1068,3 +1068,20 @@ class LaREMPostprocessor:
         conf_score = -np.diag(np.matmul(np.matmul(diff, self.precision), np.transpose(diff)))
 
         return conf_score
+
+
+def get_dice_feat_mean(dnn_model: torch.nn.Module, ind_dataloader):
+    feat_log = []
+    dnn_model.eval()
+    assert dnn_model.dice_precompute
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    for (inputs, targets) in tqdm(ind_dataloader, desc="Setting up DICE"):
+        inputs, targets = inputs.to(device), targets.to(device)
+
+        outputs = dnn_model(inputs)
+        out = adaptive_avg_pool2d(outputs, 1)
+        out = out.view(out.size(0), -1)
+        # score = dnn_model.fc(out)
+        feat_log.append(out.data.cpu().numpy())
+
+    return np.array(feat_log).squeeze().mean(0)

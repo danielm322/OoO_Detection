@@ -22,7 +22,7 @@ def get_hz_detector_results(
     ood_samples_scores: np.ndarray,
     return_results_for_mlflow: bool = False,
 ) -> Union[pd.DataFrame, Tuple[pd.DataFrame, dict]]:
-    labels_ind_test = np.ones((ind_samples_scores.shape[0], 1))  # postive class
+    labels_ind_test = np.ones((ind_samples_scores.shape[0], 1))  # positive class
     labels_ood_test = np.zeros((ood_samples_scores.shape[0], 1))  # negative class
 
     ind_samples_scores = np.expand_dims(ind_samples_scores, 1)
@@ -48,6 +48,13 @@ def get_hz_detector_results(
     )
 
     roc_auc = tmf.auroc(torch.from_numpy(scores), torch.from_numpy(labels))
+    # Make sure of always getting a positive ROC curve, by inverting the labels
+    if roc_auc < 0.5:
+        labels_ind_test = np.zeros((ind_samples_scores.shape[0], 1))  # positive class
+        labels_ood_test = np.ones((ood_samples_scores.shape[0], 1))  # negative class
+        labels = np.vstack((labels_ind_test, labels_ood_test))
+        labels = labels.astype("int32")
+        roc_auc = tmf.auroc(torch.from_numpy(scores), torch.from_numpy(labels))
 
     fpr, tpr, roc_thresholds = tmf.roc(torch.from_numpy(scores), torch.from_numpy(labels))
 
@@ -167,11 +174,20 @@ def plot_roc_ood_detector(results_table, legend_title: str = "Legend Title", plo
 def save_roc_ood_detector(results_table: pd.DataFrame, plot_title: str = "Plot Title") -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 6))
     for i in results_table.index:
-        ax.plot(
-            results_table.loc[i]["fpr"],
-            results_table.loc[i]["tpr"],
-            label=i + ", AUROC={:.4f}".format(results_table.loc[i]["auroc"]),
-        )
+        if "LaRED" in i or "LaREM" in i:
+            ax.plot(
+                results_table.loc[i]["fpr"],
+                results_table.loc[i]["tpr"],
+                label=i + ", AUROC={:.4f}".format(results_table.loc[i]["auroc"]),
+                linestyle="solid", linewidth=3.0
+            )
+        else:
+            ax.plot(
+                results_table.loc[i]["fpr"],
+                results_table.loc[i]["tpr"],
+                label=i + ", AUROC={:.4f}".format(results_table.loc[i]["auroc"]),
+                linestyle="dashed", linewidth=1.7
+            )
 
     ax.plot([0, 1], [0, 1], color="orange", linestyle="--")
     ax.set_xticks(np.arange(0.0, 1.1, step=0.1))
