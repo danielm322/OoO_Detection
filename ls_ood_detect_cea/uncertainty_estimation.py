@@ -180,11 +180,11 @@ def get_latent_representation_mcd_samples(
     layer_type: str,
 ) -> Tensor:
     """
-    Get latent representations Monte-Carlo samples froom DNN using a layer hook
+    Get latent representations Monte-Carlo samples from DNN using a layer hook
 
-    :param model_module: Neural Network Lightning Module
-    :type model_module: pl.LightningModule
-    :param dataloader: Input samples (torch) Dataloader
+    :param dnn_model: Neural Network Lightning Module
+    :type dnn_model: pl.LightningModule
+    :param dataloader: Input samples (torch) Data loader
     :type dataloader: DataLoader
     :param mcd_nro_samples: Number of Monte-Carlo Samples
     :type mcd_nro_samples: int
@@ -383,8 +383,8 @@ class MCDSamplesExtractorLenet:
         :type model: torch.nn.Module
         :param mcd_nro_samples: Number of Monte-Carlo Samples
         :type mcd_nro_samples: int
-        :param hook_dropout_layer: Hook at the Dropout Layer from the Neural Network Module
-        :type hook_dropout_layer: Hook
+        :param hooked_layer: Hook at the Dropout Layer from the Neural Network Module
+        :type hooked_layer: Hook
         :param layer_type: Type of layer that will get the MC samples. Either FC (Fully Connected) or Conv (Convolutional)
         :type: str
         :param architecture: The model architecture: either small or resnet
@@ -1088,3 +1088,38 @@ def get_dice_feat_mean_react_percentile(
         feat_log.append(out.data.cpu().numpy())
     feat_log_array = np.array(feat_log).squeeze()
     return feat_log_array.mean(0), np.percentile(feat_log_array, react_percentile)
+
+"""
+DICE Code taken from https://github.com/deeplearning-wisc/dice/blob/master/models/route.py
+All credits to authors
+"""
+
+class RouteDICE(torch.nn.Linear):
+
+    def __init__(self, in_features, out_features, bias=True, p=90, conv1x1=False, info=None):
+        super(RouteDICE, self).__init__(in_features, out_features, bias)
+        if conv1x1:
+            self.weight = torch.nn.Parameter(torch.Tensor(out_features, in_features, 1, 1))
+        self.p = p
+        self.info = info
+        self.masked_w = None
+
+    def calculate_mask_weight(self):
+        self.contrib = self.info[None, :] * self.weight.data.cpu().numpy()
+        # self.contrib = np.abs(self.contrib)
+        # self.contrib = np.random.rand(*self.contrib.shape)
+        # self.contrib = self.info[None, :]
+        # self.contrib = np.random.rand(*self.info[None, :].shape)
+        self.thresh = np.percentile(self.contrib, self.p)
+        mask = torch.Tensor((self.contrib > self.thresh))
+        self.masked_w = (self.weight.squeeze().cpu() * mask).cuda()
+
+    def forward(self, input):
+        if self.masked_w is None:
+            self.calculate_mask_weight()
+        vote = input[:, None, :] * self.masked_w.cuda()
+        if self.bias is not None:
+            out = vote.sum(2) + self.bias
+        else:
+            out = vote.sum(2)
+        return out
