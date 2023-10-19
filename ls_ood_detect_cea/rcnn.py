@@ -175,6 +175,6 @@ def get_ls_mcd_samples_rcnn(model: torch.nn.Module,
             dl_imgs_latent_mcd_samples_t = torch.cat(dl_imgs_latent_mcd_samples, dim=0)
 
     if return_raw_predictions:
-        return dl_imgs_latent_mcd_samples_t, torch.cat(raw_predictions, dim=0)
+        return dl_imgs_latent_mcd_samples_t, torch.stack(raw_predictions, dim=0)
     else:
         return dl_imgs_latent_mcd_samples_t
