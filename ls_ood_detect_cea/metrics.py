@@ -357,3 +357,129 @@ def log_evaluate_lared_larem(
         return overall_metrics_df, ind_lared_score, ood_lared_scores_dict
     else:
         return overall_metrics_df
+
+
+def select_and_log_best_lared_larem(overall_metrics_df, n_pca_components_list, technique: str):
+    assert technique in ("LaRED", "LaREM")
+    means_df = pd.DataFrame(columns=['auroc', 'fpr@95', 'aupr'])
+    temp_df = pd.DataFrame(columns=['auroc', 'fpr@95', 'aupr'])
+    for row_name in overall_metrics_df.index:
+        if technique in row_name and "anomalies" not in row_name and "PCA" not in row_name:
+            temp_df = temp_df.append(overall_metrics_df.loc[row_name, ['auroc', 'fpr@95', 'aupr']])
+    temp_df = temp_df.mean()
+    means_df = means_df.append(pd.DataFrame(dict(temp_df), index=[technique]))
+    for n_components in n_pca_components_list:
+        temp_df = pd.DataFrame(columns=['auroc', 'fpr@95', 'aupr'])
+        for row_name in overall_metrics_df.index:
+            if technique in row_name and "anomalies" not in row_name and f"PCA {n_components}" in row_name:
+                temp_df = temp_df.append(overall_metrics_df.loc[row_name, ['auroc', 'fpr@95', 'aupr']])
+        temp_df = temp_df.mean()
+        means_df = means_df.append(pd.DataFrame(dict(temp_df), index=[f"{technique} PCA {n_components}"]))
+    best_index = means_df[means_df.auroc == means_df.auroc.max()].index[0]
+    mlflow.log_metric(f"{best_index}_auroc_mean", means_df.loc[best_index, "auroc"])
+    mlflow.log_metric(f"{best_index}_aupr_mean", means_df.loc[best_index, "aupr"])
+    mlflow.log_metric(f"{best_index}_fpr95_mean", means_df.loc[best_index, "fpr@95"])
+
+
+baseline_name_dict = {
+    "pred_h": {
+        "plot_title": "Predictive H distribution",
+        "x_axis": "Predictive H score",
+        "plot_name": "pred_h"
+    },
+    "mi": {
+        "plot_title": "Predictive MI distribution",
+        "x_axis": "Predictive MI score",
+        "plot_name": "pred_mi"
+    },
+    "msp": {
+        "plot_title": "Predictive MSP distribution",
+        "x_axis": "Predictive MSP score",
+        "plot_name": "pred_msp"
+    },
+    "energy": {
+        "plot_title": "Predictive energy score distribution",
+        "x_axis": "Predictive energy score",
+        "plot_name": "pred_energy"
+    },
+    "mdist": {
+        "plot_title": "Mahalanobis Distance distribution",
+        "x_axis": "Mahalanobis Distance score",
+        "plot_name": "pred_mdist"
+    },
+    "knn": {
+        "plot_title": "kNN distance distribution",
+        "x_axis": "kNN Distance score",
+        "plot_name": "pred_knn"
+    },
+    "ash": {
+        "plot_title": "ASH score distribution",
+        "x_axis": "ASH score",
+        "plot_name": "ash_score"
+    },
+    "dice": {
+        "plot_title": "DICE score distribution",
+        "x_axis": "DICE score",
+        "plot_name": "dice_score"
+    },
+    "react": {
+        "plot_title": "ReAct score distribution",
+        "x_axis": "ReAct score",
+        "plot_name": "react_score"
+    },
+    "dice_react": {
+        "plot_title": "DICE + ReAct score distribution",
+        "x_axis": "DICE + ReAct score",
+        "plot_name": "dice_react_score"
+    },
+    "filtered_energy": {
+        "plot_title": "Predictive filtered energy score distribution",
+        "x_axis": "Predictive filtered energy score",
+        "plot_name": "pred_filtered_energy"
+    },
+    "filtered_ash": {
+        "plot_title": "ASH filtered score distribution",
+        "x_axis": "ASH filtered score",
+        "plot_name": "filtered_ash_score"
+    },
+    "filtered_react": {
+        "plot_title": "ReAct filtered score distribution",
+        "x_axis": "Filtered ReAct score",
+        "plot_name": "filtered_react_score"
+    },
+    "filtered_dice": {
+        "plot_title": "DICE filtered score distribution",
+        "x_axis": "DICE filtered score",
+        "plot_name": "filtered_dice_score"
+    },
+    "filtered_dice_react": {
+        "plot_title": "DICE + ReAct filtered score distribution",
+        "x_axis": "DICE + ReAct filtered score",
+        "plot_name": "filtered_dice_react_score"
+    },
+    "raw_energy": {
+        "plot_title": "Predictive raw energy score distribution",
+        "x_axis": "Predictive raw energy score",
+        "plot_name": "pred_raw_energy"
+    },
+    "raw_ash": {
+        "plot_title": "ASH raw score distribution",
+        "x_axis": "ASH raw score",
+        "plot_name": "raw_ash_score"
+    },
+    "raw_react": {
+        "plot_title": "ReAct raw score distribution",
+        "x_axis": "raw ReAct score",
+        "plot_name": "raw_react_score"
+    },
+    "raw_dice": {
+        "plot_title": "DICE raw score distribution",
+        "x_axis": "DICE raw score",
+        "plot_name": "raw_dice_score"
+    },
+    "raw_dice_react": {
+        "plot_title": "DICE + ReAct raw score distribution",
+        "x_axis": "DICE + ReAct raw score",
+        "plot_name": "raw_dice_react_score"
+    }
+}
