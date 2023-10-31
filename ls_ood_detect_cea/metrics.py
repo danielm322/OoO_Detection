@@ -17,10 +17,10 @@ from .score import get_hz_scores
 
 
 def get_hz_detector_results(
-    detect_exp_name: str,
-    ind_samples_scores: np.ndarray,
-    ood_samples_scores: np.ndarray,
-    return_results_for_mlflow: bool = False,
+        detect_exp_name: str,
+        ind_samples_scores: np.ndarray,
+        ood_samples_scores: np.ndarray,
+        return_results_for_mlflow: bool = False,
 ) -> Union[pd.DataFrame, Tuple[pd.DataFrame, dict]]:
     labels_ind_test = np.ones((ind_samples_scores.shape[0], 1))  # positive class
     labels_ood_test = np.zeros((ood_samples_scores.shape[0], 1))  # negative class
@@ -200,10 +200,10 @@ def save_roc_ood_detector(results_table: pd.DataFrame, plot_title: str = "Plot T
 
 
 def plot_auprc_ood_detector(
-    results_table: pd.DataFrame,
-    legend_title: str = "Legend Title",
-    plot_title: str = "Plot Title",
-):
+        results_table: pd.DataFrame,
+        legend_title: str = "Legend Title",
+        plot_title: str = "Plot Title",
+) -> None:
     fig = plt.figure(figsize=(8, 6))
     for i in results_table.index:
         print(i)
@@ -224,8 +224,11 @@ def plot_auprc_ood_detector(
 
 
 def save_scores_plots(
-    scores_ind: np.ndarray, ood_lared_scores_dict: dict, ood_datasets_list: list, ind_dataset_name: str
-):
+        scores_ind: np.ndarray,
+        ood_lared_scores_dict: dict,
+        ood_datasets_list: list,
+        ind_dataset_name: str
+) -> dict:
     """
     InD and OoD agnostic function that takes as input the InD numpy ndarray with the LaRED scores, a dicitonary of OoD
     LaRED scores, a list of the names of the OoD dataset,a nd the name of the InD dataset, and returns a histogram of
@@ -256,7 +259,7 @@ def save_scores_plots(
 
 def get_pred_scores_plots(experiment: dict, ood_datasets_list: list, title: str, ind_dataset_name: str):
     """
-    Function that takes as input an experiment dictioonary, a list od ood datasets, a plot title, and the InD
+    Function that takes as input an experiment dictionary, a list od ood datasets, a plot title, and the InD
     dataset name and returns a plot of the predictive score density
     :param experiment: Dictionary with keys 'InD':ndarray, 'x_axis':str, and 'plot_name':str and other keys as
      ood dataset names with values as ndarray
@@ -282,13 +285,14 @@ def get_pred_scores_plots(experiment: dict, ood_datasets_list: list, title: str,
 
 
 def log_evaluate_lared_larem(
-    ind_train_h_z: np.array,
-    ind_test_h_z: np.array,
-    ood_h_z_dict: dict,
-    experiment_name_extension: str = "",
-    return_density_scores: bool = False,
-    log_step: Union[int, None] = None,
-):
+        ind_train_h_z: np.array,
+        ind_test_h_z: np.array,
+        ood_h_z_dict: dict,
+        experiment_name_extension: str = "",
+        return_density_scores: bool = False,
+        log_step: Union[int, None] = None,
+        mlflow_logging: bool = False
+) -> Union[pd.DataFrame, Tuple[pd.DataFrame, np.array, dict]]:
     """
     Function that takes as input numpy arrays of entropies and logs to and existing mlflow experiment
     the evaluation results, and returns such results in the form of a pandas dataframe
@@ -298,6 +302,8 @@ def log_evaluate_lared_larem(
     :param experiment_name_extension: Extra string to add to the default experiment name, useful for PCA experiments
     :param return_density_scores: return LaRED density scores for further analysis
     :param log_step: optional step useful for PCA experiments. None if not performing PCA with several components
+    :param mlflow_logging: Optionally log to an existing mlflow run
+    :return: Pandas datframe with results, optionally LaRED density score
     """
     # Initialize df to store all the results
     overall_metrics_df = pd.DataFrame(
@@ -350,7 +356,8 @@ def log_evaluate_lared_larem(
             r_mlflow = dict([(f"{' '.join(experiment_name.split()[:-1])}_{k}", v) for k, v in r_mlflow.items()])
         else:
             r_mlflow = dict([(f"{experiment_name}_{k}", v) for k, v in r_mlflow.items()])
-        mlflow.log_metrics(r_mlflow, step=log_step)
+        if mlflow_logging:
+            mlflow.log_metrics(r_mlflow, step=log_step)
         overall_metrics_df = overall_metrics_df.append(r_df)
 
     if return_density_scores:
@@ -359,7 +366,18 @@ def log_evaluate_lared_larem(
         return overall_metrics_df
 
 
-def select_and_log_best_lared_larem(overall_metrics_df, n_pca_components_list, technique: str):
+def select_and_log_best_lared_larem(
+        overall_metrics_df: pd.DataFrame,
+        n_pca_components_list: list,
+        technique: str
+) -> None:
+    """
+    Takes as input a Dataframe with the columns 'auroc', 'aupr' and 'fpr@95', a list of PCA number of components,
+    and the name of the technique: either 'LaRED' or 'LaREM', and logs to and existing mlflow run the best metrics
+    :param overall_metrics_df: Pandas DataFrame with the LaRED or LaREM experiments results
+    :param n_pca_components_list: List with the numbers of PCA components
+    :param technique: Either 'LaRED' or 'LaREM'
+    """
     assert technique in ("LaRED", "LaREM")
     means_df = pd.DataFrame(columns=['auroc', 'fpr@95', 'aupr'])
     temp_df = pd.DataFrame(columns=['auroc', 'fpr@95', 'aupr'])
