@@ -380,23 +380,34 @@ def select_and_log_best_lared_larem(
     """
     assert technique in ("LaRED", "LaREM")
     means_df = pd.DataFrame(columns=['auroc', 'fpr@95', 'aupr'])
+    stds_df = pd.DataFrame(columns=['auroc', 'fpr@95', 'aupr'])
     temp_df = pd.DataFrame(columns=['auroc', 'fpr@95', 'aupr'])
+    # Calculate mean of no PCA run
     for row_name in overall_metrics_df.index:
         if technique in row_name and "anomalies" not in row_name and "PCA" not in row_name:
             temp_df = temp_df.append(overall_metrics_df.loc[row_name, ['auroc', 'fpr@95', 'aupr']])
-    temp_df = temp_df.mean()
-    means_df = means_df.append(pd.DataFrame(dict(temp_df), index=[technique]))
+    means_temp_df = temp_df.mean()
+    stds_temp_df = temp_df.std()
+    means_df = means_df.append(pd.DataFrame(dict(means_temp_df), index=[technique]))
+    stds_df = stds_df.append(pd.DataFrame(dict(stds_temp_df), index=[technique]))
+    # Calculate means of PCA runs
     for n_components in n_pca_components_list:
         temp_df = pd.DataFrame(columns=['auroc', 'fpr@95', 'aupr'])
         for row_name in overall_metrics_df.index:
             if technique in row_name and "anomalies" not in row_name and f"PCA {n_components}" in row_name:
                 temp_df = temp_df.append(overall_metrics_df.loc[row_name, ['auroc', 'fpr@95', 'aupr']])
-        temp_df = temp_df.mean()
-        means_df = means_df.append(pd.DataFrame(dict(temp_df), index=[f"{technique} PCA {n_components}"]))
+        means_temp_df = temp_df.mean()
+        stds_temp_df = temp_df.std()
+        means_df = means_df.append(pd.DataFrame(dict(means_temp_df), index=[f"{technique} PCA {n_components}"]))
+        stds_df = stds_df.append(pd.DataFrame(dict(stds_temp_df), index=[f"{technique} PCA {n_components}"]))
+
     best_index = means_df[means_df.auroc == means_df.auroc.max()].index[0]
     mlflow.log_metric(f"{best_index}_auroc_mean", means_df.loc[best_index, "auroc"])
+    mlflow.log_metric(f"{best_index}_auroc_std", stds_df.loc[best_index, "auroc"])
     mlflow.log_metric(f"{best_index}_aupr_mean", means_df.loc[best_index, "aupr"])
+    mlflow.log_metric(f"{best_index}_aupr_std", stds_df.loc[best_index, "aupr"])
     mlflow.log_metric(f"{best_index}_fpr95_mean", means_df.loc[best_index, "fpr@95"])
+    mlflow.log_metric(f"{best_index}_fpr95_std", stds_df.loc[best_index, "fpr@95"])
 
 
 baseline_name_dict = {
