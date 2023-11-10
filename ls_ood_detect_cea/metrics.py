@@ -405,13 +405,19 @@ def select_and_log_best_lared_larem(
         stds_df = stds_df.append(pd.DataFrame(dict(stds_temp_df), index=[f"{technique} PCA {n_components}"]))
 
     best_index = means_df[means_df.auroc == means_df.auroc.max()].index[0]
+    if "PCA" in best_index:
+        best_technique_name = f"PCA {best_index.split('_')[-1]}"
+    else:
+        best_technique_name = "raw"
+
     if log_mlflow:
-        mlflow.log_metric(f"{best_index}_auroc_mean", means_df.loc[best_index, "auroc"])
-        mlflow.log_metric(f"{best_index}_auroc_std", stds_df.loc[best_index, "auroc"])
-        mlflow.log_metric(f"{best_index}_aupr_mean", means_df.loc[best_index, "aupr"])
-        mlflow.log_metric(f"{best_index}_aupr_std", stds_df.loc[best_index, "aupr"])
-        mlflow.log_metric(f"{best_index}_fpr95_mean", means_df.loc[best_index, "fpr@95"])
-        mlflow.log_metric(f"{best_index}_fpr95_std", stds_df.loc[best_index, "fpr@95"])
+        mlflow.log_metric(f"{technique}_auroc_mean", means_df.loc[best_index, "auroc"])
+        mlflow.log_metric(f"{technique}_auroc_std", stds_df.loc[best_index, "auroc"])
+        mlflow.log_metric(f"{technique}_aupr_mean", means_df.loc[best_index, "aupr"])
+        mlflow.log_metric(f"{technique}_aupr_std", stds_df.loc[best_index, "aupr"])
+        mlflow.log_metric(f"{technique}_fpr95_mean", means_df.loc[best_index, "fpr@95"])
+        mlflow.log_metric(f"{technique}_fpr95_std", stds_df.loc[best_index, "fpr@95"])
+        mlflow.log_metric(f"Best {technique}", best_technique_name)
     return means_df.loc[best_index, "auroc"], means_df.loc[best_index, "aupr"], means_df.loc[best_index, "fpr@95"]
 
 
