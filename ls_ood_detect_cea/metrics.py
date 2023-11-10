@@ -407,7 +407,7 @@ def select_and_log_best_lared_larem(
     best_index = means_df[means_df.auroc == means_df.auroc.max()].index[0]
     # Here we assume the convention that 0 PCA components would mean the no PCA case
     if "PCA" in best_index:
-        best_n_comps = int(best_index.split('_')[-1])
+        best_n_comps = int(best_index.split()[-1])
     else:
         best_n_comps = 0
 
