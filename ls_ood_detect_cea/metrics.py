@@ -405,10 +405,11 @@ def select_and_log_best_lared_larem(
         stds_df = stds_df.append(pd.DataFrame(dict(stds_temp_df), index=[f"{technique} PCA {n_components}"]))
 
     best_index = means_df[means_df.auroc == means_df.auroc.max()].index[0]
+    # Here we assume the convention that 0 PCA components would mean the no PCA case
     if "PCA" in best_index:
-        best_technique_name = f"PCA {best_index.split('_')[-1]}"
+        best_n_comps = int(best_index.split('_')[-1])
     else:
-        best_technique_name = "raw"
+        best_n_comps = 0
 
     if log_mlflow:
         mlflow.log_metric(f"{technique}_auroc_mean", means_df.loc[best_index, "auroc"])
@@ -417,7 +418,7 @@ def select_and_log_best_lared_larem(
         mlflow.log_metric(f"{technique}_aupr_std", stds_df.loc[best_index, "aupr"])
         mlflow.log_metric(f"{technique}_fpr95_mean", means_df.loc[best_index, "fpr@95"])
         mlflow.log_metric(f"{technique}_fpr95_std", stds_df.loc[best_index, "fpr@95"])
-        mlflow.log_metric(f"Best {technique}", best_technique_name)
+        mlflow.log_metric(f"Best {technique}", best_n_comps)
     return means_df.loc[best_index, "auroc"], means_df.loc[best_index, "aupr"], means_df.loc[best_index, "fpr@95"]
 
 
