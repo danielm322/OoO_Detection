@@ -721,7 +721,7 @@ class MCDSamplesExtractor:
                             # latent_mcd_sample = latent_mcd_sample.reshape(1, 128, 4, -1)
                         elif self.input_size == 128:
                             assert self.original_resnet_architecture, "Not implemented otherwise"
-                            assert latent_mcd_sample.shape == torch.Size([1, 64, 8, 8])
+                            assert latent_mcd_sample.shape == torch.Size([1, 256, 8, 8]), f"got {latent_mcd_sample.shape}"
                             if self.reduction_method == "mean":
                                 latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
                                 latent_mcd_sample = torch.squeeze(latent_mcd_sample)
