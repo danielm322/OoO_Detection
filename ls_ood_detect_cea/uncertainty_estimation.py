@@ -670,12 +670,17 @@ class MCDSamplesExtractor:
 
                         latent_mcd_sample = latent_mcd_sample.reshape(1, -1)
                     elif self.location == 1:
+                        assert self.input_size == 128, f"Input size: {self.input_size}"
                         assert latent_mcd_sample.shape == torch.Size([1, 64, 32, 32])
                         # latent_mcd_sample = latent_mcd_sample.reshape(1, 128, 4, -1)
                         if self.reduction_method == "mean":
                             latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
                             latent_mcd_sample = latent_mcd_sample.reshape(1, 64, 16, -1)
                             latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
+                            latent_mcd_sample = torch.squeeze(latent_mcd_sample)
+                        elif self.reduction_method == "fullmean":
+                            latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
+                            latent_mcd_sample = torch.mean(latent_mcd_sample, dim=2, keepdim=True)
                             latent_mcd_sample = torch.squeeze(latent_mcd_sample)
                         # Avg pool
                         else:
@@ -714,6 +719,19 @@ class MCDSamplesExtractor:
                                     )
                                 latent_mcd_sample = latent_mcd_sample.reshape(1, -1)
                             # latent_mcd_sample = latent_mcd_sample.reshape(1, 128, 4, -1)
+                        elif self.input_size == 128:
+                            assert self.original_resnet_architecture, "Not implemented otherwise"
+                            assert latent_mcd_sample.shape == torch.Size([1, 64, 8, 8])
+                            if self.reduction_method == "mean":
+                                latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
+                                latent_mcd_sample = torch.squeeze(latent_mcd_sample)
+                            elif self.reduction_method == "fullmean":
+                                latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
+                                latent_mcd_sample = torch.mean(latent_mcd_sample, dim=2, keepdim=True)
+                                latent_mcd_sample = torch.squeeze(latent_mcd_sample)
+                            # Avg pool
+                            else:
+                                raise NotImplementedError
                         else:
                             raise NotImplementedError
                         latent_mcd_sample = latent_mcd_sample.reshape(1, -1)
