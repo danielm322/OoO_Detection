@@ -43,17 +43,27 @@ def build_ood_detection_ds(
     test_ds = np.vstack((ind_test_data, ood_test_data))
 
     if apply_pca:
-        train_ds, test_ds, pca_dim_red = apply_pca_ds(train_ds, test_ds, pca_nro_comp, pca_svd_solver, pca_whiten)
+        train_ds, test_ds, pca_dim_red = apply_pca_ds(
+            train_ds, test_ds, pca_nro_comp, pca_svd_solver, pca_whiten
+        )
 
     # labels
-    label_train_ind_ds = np.ones((ind_valid_data.shape[0], 1))  # 1: In-Distribution is the positive class
-    label_train_ood_ds = np.zeros((ood_valid_data.shape[0], 1))  # 0: Out-of-Distribution/Anomaly is the negative class
+    label_train_ind_ds = np.ones(
+        (ind_valid_data.shape[0], 1)
+    )  # 1: In-Distribution is the positive class
+    label_train_ood_ds = np.zeros(
+        (ood_valid_data.shape[0], 1)
+    )  # 0: Out-of-Distribution/Anomaly is the negative class
     labels_train_ds = np.vstack((label_train_ind_ds, label_train_ood_ds))
     labels_train_ds = labels_train_ds.astype("int32")
     labels_train_ds = np.squeeze(labels_train_ds)
 
-    label_test_ind_ds = np.ones((ind_test_data.shape[0], 1))  # 1: In-Distribution is the positive class
-    label_test_ood_ds = np.zeros((ood_test_data.shape[0], 1))  # 0: Out-of-Distribution/Anomaly is the negative class
+    label_test_ind_ds = np.ones(
+        (ind_test_data.shape[0], 1)
+    )  # 1: In-Distribution is the positive class
+    label_test_ood_ds = np.zeros(
+        (ood_test_data.shape[0], 1)
+    )  # 0: Out-of-Distribution/Anomaly is the negative class
     labels_test_ds = np.vstack((label_test_ind_ds, label_test_ood_ds))
     labels_test_ds = labels_test_ds.astype("int32")
     labels_test_ds = np.squeeze(labels_test_ds)
@@ -103,7 +113,9 @@ def build_ood_detection_train_split(
 
     # labels:
     label_ind_ds = np.ones((ind_data.shape[0], 1))  # 1: In-Distribution is the positive class
-    label_ood_ds = np.zeros((ood_data.shape[0], 1))  # 0: Out-of-Distribution/Anomaly is the negative class
+    label_ood_ds = np.zeros(
+        (ood_data.shape[0], 1)
+    )  # 0: Out-of-Distribution/Anomaly is the negative class
 
     labels = np.vstack((label_ind_ds, label_ood_ds))
     labels = labels.astype("int32")
@@ -138,7 +150,9 @@ def build_ood_detection_test_split(
 
     # labels:
     label_ind_ds = np.ones((ind_data.shape[0], 1))  # 1: In-Distribution is the positive class
-    label_ood_ds = np.zeros((ood_data.shape[0], 1))  # 0: Out-of-Distribution/Anomaly is the negative class
+    label_ood_ds = np.zeros(
+        (ood_data.shape[0], 1)
+    )  # 0: Out-of-Distribution/Anomaly is the negative class
 
     labels = np.vstack((label_ind_ds, label_ood_ds))
     labels = labels.astype("int32")
