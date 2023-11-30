@@ -21,7 +21,9 @@ class DetectorKDE:
         """
         Fit the KDE Estimator
         """
-        density = KernelDensity(kernel=self.kernel, bandwidth=self.bandwidth).fit(self.train_embeddings)
+        density = KernelDensity(kernel=self.kernel, bandwidth=self.bandwidth).fit(
+            self.train_embeddings
+        )
         return density
 
     def get_density_scores(self, test_embeddings):
@@ -61,7 +63,10 @@ class KDEClassifier(BaseEstimator, ClassifierMixin):
 
         training_sets = [X[y == yi] for yi in self.classes_]
 
-        self.models_ = [KernelDensity(bandwidth=self.bandwidth, kernel=self.kernel).fit(Xi) for Xi in training_sets]
+        self.models_ = [
+            KernelDensity(bandwidth=self.bandwidth, kernel=self.kernel).fit(Xi)
+            for Xi in training_sets
+        ]
 
         self.logpriors_ = [np.log(Xi.shape[0] / X.shape[0]) for Xi in training_sets]
         return self

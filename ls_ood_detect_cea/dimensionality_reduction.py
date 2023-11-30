@@ -94,7 +94,9 @@ def plot_samples_pacmap(
     label_normal = np.zeros((samples_ind.shape[0], 1))
     label_anomaly = np.ones((samples_ood.shape[0], 1))
     labels = np.concatenate((label_normal, label_anomaly))
-    embedding = pacmap.PaCMAP(n_components=components, n_neighbors=neighbors, MN_ratio=0.5, FP_ratio=2.0)
+    embedding = pacmap.PaCMAP(
+        n_components=components, n_neighbors=neighbors, MN_ratio=0.5, FP_ratio=2.0
+    )
     samples_transformed = embedding.fit_transform(samples_concat, init="pca")
 
     # visualize the embedding
@@ -118,7 +120,9 @@ def plot_samples_pacmap(
         plt.show()
 
 
-def fit_pacmap(samples_ind: np.array, neighbors: int = 25, components: int = 2) -> Tuple[np.array, pacmap.PaCMAP]:
+def fit_pacmap(
+    samples_ind: np.array, neighbors: int = 25, components: int = 2
+) -> Tuple[np.array, pacmap.PaCMAP]:
     """
     In-Distribution vs Out-of-Distribution Data Projection 2D Plot using PaCMAP algorithm.
 
@@ -131,10 +135,14 @@ def fit_pacmap(samples_ind: np.array, neighbors: int = 25, components: int = 2) 
     :return:
     :rtype: None
     """
-    embedding = pacmap.PaCMAP(n_components=components, n_neighbors=neighbors, MN_ratio=0.5, FP_ratio=2.0)
+    embedding = pacmap.PaCMAP(
+        n_components=components, n_neighbors=neighbors, MN_ratio=0.5, FP_ratio=2.0
+    )
     samples_transformed = embedding.fit_transform(samples_ind, init="pca")
     return samples_transformed, embedding
 
 
-def apply_pacmap_transform(new_samples: np.array, original_samples: np.array, pm_instance: pacmap.PaCMAP) -> np.array:
+def apply_pacmap_transform(
+    new_samples: np.array, original_samples: np.array, pm_instance: pacmap.PaCMAP
+) -> np.array:
     return pm_instance.transform(X=new_samples, basis=original_samples)
