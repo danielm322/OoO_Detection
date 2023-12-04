@@ -7,10 +7,30 @@ from sklearn.neighbors import KernelDensity
 
 class DetectorKDE:
     """
-    Instantiates a Kernel Density Estimation Estimator
+    Instantiates a Kernel Density Estimation Estimator. See
+    https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KernelDensity.html for
+    more details
+
+    Args:
+        train_embeddings: Samples to train the estimator
+        save_path: Optional path to save the estimator
+        kernel: Kernel. Default='gaussian'
+        bandwidth: Bandwidth of the estimator.
     """
 
     def __init__(self, train_embeddings, save_path=None, kernel="gaussian", bandwidth=1.0) -> None:
+        """
+        Instantiates a Kernel Density Estimation Estimator. See
+        https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KernelDensity.html for
+        more details
+
+        Args:
+            train_embeddings: Samples to train the estimator
+            save_path: Optional path to save the estimator
+            kernel: Kernel. Default='gaussian'
+            bandwidth: Bandwidth of the estimator.
+        """
+        assert isinstance(train_embeddings, np.ndarray), "train_embeddings must be a numpy array"
         self.kernel = kernel
         self.bandwidth = bandwidth
         self.train_embeddings = train_embeddings

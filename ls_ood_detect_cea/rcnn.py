@@ -9,7 +9,7 @@ from .uncertainty_estimation import Hook
 dropblock_ext = DropBlock2D(drop_prob=0.4, block_size=1)
 
 
-def get_msp_score_rcnn(dnn_model: torch.nn.Module, input_dataloader: DataLoader) -> np.array:
+def get_msp_score_rcnn(dnn_model: torch.nn.Module, input_dataloader: DataLoader) -> np.ndarray:
     """
     Calculates the Maximum softmax probability score from an RCNN architecture coded with the
     Detectron 2 library, where the results are the first element of the output of the network,
@@ -20,8 +20,10 @@ def get_msp_score_rcnn(dnn_model: torch.nn.Module, input_dataloader: DataLoader)
         input_dataloader (DataLoader): The Dataloader
 
     Returns:
-        np.array: The MSP scores
+        np.ndarray: The MSP scores
     """
+    assert isinstance(dnn_model, torch.nn.Module), "dnn_model must be a pytorch model"
+    assert isinstance(input_dataloader, DataLoader), "input_dataloader must be a DataLoader"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # gtsrb_model.to(device)
     dl_preds_msp_scores = []
@@ -48,7 +50,7 @@ def get_msp_score_rcnn(dnn_model: torch.nn.Module, input_dataloader: DataLoader)
 
 def get_dice_feat_mean_react_percentile_rcnn(
     dnn_model: torch.nn.Module, ind_dataloader: DataLoader, react_percentile: int = 90
-) -> Tuple[np.array, float]:
+) -> Tuple[np.ndarray, float]:
     """
     Get the DICE and ReAct thresholds for sparsifying and clipping from an RCNN architecture, where
     the output has been modified to return the previous-to-last layer activations.
@@ -58,8 +60,12 @@ def get_dice_feat_mean_react_percentile_rcnn(
         react_percentile: Desired percentile for ReAct
 
     Returns:
-        Tuple[np.array, float]: The DICE expected values, and the ReAct threshold
+        Tuple[np.ndarray, float]: The DICE expected values, and the ReAct threshold
     """
+    assert isinstance(dnn_model, torch.nn.Module), "dnn_model must be a pytorch model"
+    assert isinstance(ind_dataloader, DataLoader), "ind_dataloader must be a DataLoader"
+    assert isinstance(react_percentile, int), "react_percentile must be an integer"
+    assert 0 < react_percentile < 100, "react_percentile must be greater than 0 and less than 100"
     feat_log = []
     dnn_model.model.eval()
     assert dnn_model.dice_react_precompute
@@ -83,10 +89,10 @@ def get_energy_score_rcnn(dnn_model: torch.nn.Module, input_dataloader: DataLoad
         input_dataloader: The Data loader
 
     Returns:
-        Tuple[np.array, np.array]: Energy scores from the Raw and the filtered outputs
+        Tuple[np.ndarray, np.ndarray]: Energy scores from the Raw and the filtered outputs
     """
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # gtsrb_det_model.to(device)
+    assert isinstance(dnn_model, torch.nn.Module), "dnn_model must be a pytorch model"
+    assert isinstance(input_dataloader, DataLoader), "input_dataloader must be a DataLoader"
 
     # Here we take the enrgy as a mean of the whole 1000 proposals
     raw_preds_energy_scores = []
@@ -153,9 +159,16 @@ def get_ls_mcd_samples_rcnn(
     Returns:
         Monte-Carlo Dropout samples for the input dataloader
     """
-    assert layer_type in ("FC", "Conv", "RPN", "backbone"), (
-        "Layer type must be either 'FC','backbone', 'RPN' or 'Conv'"
-    )
+    assert isinstance(model, torch.nn.Module), "model must be a pytorch model"
+    assert isinstance(mcd_nro_samples, int), "mcd_nro_samples must be an integer"
+    assert isinstance(data_loader, DataLoader)
+    assert isinstance(hook_dropout_layer, Hook), "hook_dropout_layer must be an Hook"
+    assert layer_type in (
+        "FC",
+        "Conv",
+        "RPN",
+        "backbone",
+    ), "Layer type must be either 'FC','backbone', 'RPN' or 'Conv'"
     with torch.no_grad():
         with tqdm(total=len(data_loader), desc="Extracting MCD samples") as pbar:
             dl_imgs_latent_mcd_samples = []

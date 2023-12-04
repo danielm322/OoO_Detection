@@ -4,12 +4,9 @@ import torch
 import mlflow
 import matplotlib.pyplot as plt
 import pandas as pd
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import roc_curve
 from sklearn.metrics import auc
 import torchmetrics.functional as tmf
 import seaborn as sns
-from tqdm import tqdm
 
 from .detectors import DetectorKDE
 from .uncertainty_estimation import LaREMPostprocessor
@@ -39,6 +36,12 @@ def get_hz_detector_results(
         (pd.Dataframe): Results in a pandas dataframe format and optionally a dictionary with
             results for mlflow
     """
+    assert isinstance(detect_exp_name, str), "detect_exp_name must be a string"
+    assert isinstance(ind_samples_scores, np.ndarray), "ind_samples_scores must be a numpy array"
+    assert isinstance(ood_samples_scores, np.ndarray), "ood_samples_scores must be a numpy array"
+    assert isinstance(
+        return_results_for_mlflow, bool
+    ), "return_results_for_mlflow must be a boolean"
     labels_ind_test = np.ones((ind_samples_scores.shape[0], 1))  # positive class
     labels_ood_test = np.zeros((ood_samples_scores.shape[0], 1))  # negative class
 
@@ -146,6 +149,8 @@ def save_roc_ood_detector(
     Returns:
         (plt.Figure): A figure to be saved or logged with mlflow
     """
+    assert isinstance(results_table, pd.DataFrame), "results_table must be a pandas dataframe"
+    assert isinstance(plot_title, str), "plot_title must be a string"
     fig, ax = plt.subplots(figsize=(8, 6))
     for i in results_table.index:
         if "LaRED" in i or "LaREM" in i:
@@ -190,13 +195,20 @@ def save_scores_plots(
     Args:
         scores_ind: InD LaRED scores as numpy ndarray
         ood_lared_scores_dict: Dictionary keys as ood datasets names and values as ndarrays of
-        LaRED scores per each
+            LaRED scores per each
         ood_datasets_list: List of OoD datasets names
         ind_dataset_name: String with the name of the InD dataset
 
     Returns:
         Dictionary of plots where the keys are the plot names and the values are the figures
     """
+    assert isinstance(scores_ind, np.ndarray), "scores_ind must be a numpy array"
+    assert isinstance(ood_lared_scores_dict, dict), "ood_lared_scores_dict must be a dictionary"
+    assert hasattr(ood_datasets_list, "__iter__"), "ood_datasets_list must be an iterable"
+    assert all(isinstance(item, str) for item in ood_datasets_list), (
+        "ood_datasets_list items must" " be strings"
+    )
+    assert isinstance(ind_dataset_name, str), "ind_dataset_name must be a string"
     df_scores_ind = pd.DataFrame(scores_ind, columns=["Entropy score"])
     df_scores_ind.insert(0, "Dataset", "")
     df_scores_ind.loc[:, "Dataset"] = ind_dataset_name
@@ -230,7 +242,7 @@ def get_pred_scores_plots(
 
     Args:
         experiment: Dictionary with keys 'InD':ndarray, 'x_axis':str, and 'plot_name':str and other
-        keys as ood dataset names with values as ndarray
+            keys as ood dataset names with values as ndarray
         ood_datasets_list: List with OoD datasets names
         title: Title of the plot
         ind_dataset_name: String with the name of the InD dataset
@@ -238,6 +250,13 @@ def get_pred_scores_plots(
     Returns:
         Figure with the density scores of the InD and the OoD datasets
     """
+    assert isinstance(experiment, dict)
+    assert hasattr(ood_datasets_list, "__iter__"), "ood_datasets_list must be an iterable"
+    assert all(isinstance(item, str) for item in ood_datasets_list), (
+        "ood_datasets_list items must" " be strings"
+    )
+    assert isinstance(title, str)
+    assert isinstance(ind_dataset_name, str)
     df_pred_h_scores_ind = pd.DataFrame(experiment["InD"], columns=[experiment["x_axis"]])
     df_pred_h_scores_ind.insert(0, "Dataset", "")
     df_pred_h_scores_ind.loc[:, "Dataset"] = ind_dataset_name
@@ -260,14 +279,14 @@ def get_pred_scores_plots(
 
 
 def log_evaluate_lared_larem(
-    ind_train_h_z: np.array,
-    ind_test_h_z: np.array,
+    ind_train_h_z: np.ndarray,
+    ind_test_h_z: np.ndarray,
     ood_h_z_dict: dict,
     experiment_name_extension: str = "",
     return_density_scores: bool = False,
     log_step: Union[int, None] = None,
     mlflow_logging: bool = False,
-) -> Union[pd.DataFrame, Tuple[pd.DataFrame, np.array, dict]]:
+) -> Union[pd.DataFrame, Tuple[pd.DataFrame, np.ndarray, dict]]:
     """
     Function that takes as input InD numpy arrays of entropies and one dictionary for all OoD
     datasets and returns LaRED and LaREM results in the form of a pandas dataframe.
@@ -277,17 +296,26 @@ def log_evaluate_lared_larem(
         ind_train_h_z: InD training samples for both LaRED and LaREM as numpy ndarray
         ind_test_h_z: InD test samples as numpy ndarray
         ood_h_z_dict: OoD dictionary where keys are the OoD datasets and the values are the
-        ndarrays of entropies
+            ndarrays of entropies
         experiment_name_extension: Extra string to add to the default experiment name, useful for
-        PCA experiments
+            PCA experiments
         return_density_scores: return LaRED density scores for further analysis
         log_step: optional step useful for PCA experiments. None if not performing PCA with
-        several components
+            several components
         mlflow_logging: Optionally log to an existing mlflow run
 
     Returns:
         Pandas dataframe with results, optionally LaRED density score
     """
+    assert isinstance(ind_train_h_z, np.ndarray)
+    assert isinstance(ind_test_h_z, np.ndarray)
+    assert isinstance(ood_h_z_dict, dict)
+    assert isinstance(experiment_name_extension, str)
+    assert isinstance(return_density_scores, bool)
+    if log_step is not None:
+        assert isinstance(log_step, int), "log_step is either None or an integer"
+    assert isinstance(mlflow_logging, bool)
+
     # Initialize df to store all the results
     overall_metrics_df = pd.DataFrame(
         columns=[
@@ -381,6 +409,9 @@ def select_and_log_best_lared_larem(
     Returns:
         Tuple with the best auroc, aupr and fpr
     """
+    assert isinstance(overall_metrics_df, pd.DataFrame)
+    assert hasattr(n_pca_components_list, "__iter__")
+    assert isinstance(log_mlflow, bool)
     assert technique in ("LaRED", "LaREM"), f"Got {technique}"
     means_df = pd.DataFrame(columns=["auroc", "fpr@95", "aupr"])
     stds_df = pd.DataFrame(columns=["auroc", "fpr@95", "aupr"])

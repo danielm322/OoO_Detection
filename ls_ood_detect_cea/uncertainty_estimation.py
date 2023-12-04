@@ -34,6 +34,8 @@ class Hook:
             module (torch.nn.Module): Layer block from Neural Network Module
             backward (bool): backward-poss hook
         """
+        assert isinstance(module, torch.nn.Module), "module must be a pytorch module"
+        assert isinstance(backward, bool), "backward must be a boolean"
         self.input = None
         self.output = None
         if not backward:
@@ -67,6 +69,10 @@ def deeplabv3p_get_ls_mcd_samples(
     Returns:
         (Tensor): Monte-Carlo Dropout samples for the input dataloader
     """
+    assert isinstance(model_module, torch.nn.Module), "model_module must be a pytorch model"
+    assert isinstance(dataloader, DataLoader), "dataloader must be a DataLoader"
+    assert isinstance(mcd_nro_samples, int), "mcd_nro_samples must be an integer"
+    assert isinstance(hook_dropout_layer, Hook), "hook_dropout_layer must be an Hook"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     with torch.no_grad():
         dl_imgs_latent_mcd_samples = []
@@ -115,6 +121,10 @@ def get_latent_representation_mcd_samples(
     Returns:
         Input dataloader latent representations MC samples tensor
     """
+    assert isinstance(dnn_model, torch.nn.Module), "dnn_model must be a pytorch model"
+    assert isinstance(dataloader, DataLoader), "dataloader must be a DataLoader"
+    assert isinstance(mcd_nro_samples, int), "mcd_nro_samples must be an integer"
+    assert isinstance(layer_hook, Hook), "layer_hook must be an Hook"
     assert layer_type in ("FC", "Conv"), "Layer type must be either 'FC' or 'Conv'"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     with torch.no_grad():
@@ -153,7 +163,7 @@ def get_latent_representation_mcd_samples(
     return dl_imgs_latent_mcd_samples_t
 
 
-def single_image_entropy_calculation(sample: np.array, neighbors: int) -> np.array:
+def single_image_entropy_calculation(sample: np.ndarray, neighbors: int) -> np.ndarray:
     """
     Function used to calculate the entropy values of a single image. Used to calculate entropy
     in parallel
@@ -161,7 +171,7 @@ def single_image_entropy_calculation(sample: np.array, neighbors: int) -> np.arr
     Args:
         sample: MCD samples for a single image
         neighbors: Number of neighbors to perform calculation. By default 5 seems ok, but should
-        be n-1 if n<=5
+            be n-1 if n<=5
 
     Returns:
         Entropy of the activations for a single image
@@ -189,6 +199,9 @@ def get_dl_h_z(
     Returns:
         Latent vector multivariate normal entropy $h(Z)$, Latent vector value entropy $h(z_i)$
     """
+    assert isinstance(dl_z_samples, Tensor), "dl_z_samples must be a Tensor"
+    assert isinstance(mcd_samples_nro, int), "mcd_samples_nro must be an integer"
+    assert isinstance(parallel_run, bool), "parallel_run must be a boolean"
     # Get dataloader mvn h(z), from mcd_samples
     z_samples_ls = [i for i in dl_z_samples.split(mcd_samples_nro)]
     # ic(z_samples_ls[0].shape)
@@ -230,11 +243,21 @@ def get_dl_h_z(
 
 
 def probunet_apply_dropout(m):
+    """
+    Activate Dropout or Dropblock layers.
+    Args:
+        m: Pytorch module
+    """
     if type(m) == torch.nn.Dropout or type(m) == DropBlock2D:
         m.train()
 
 
 def deeplabv3p_apply_dropout(m):
+    """
+    Activate Dropout or Dropblock layers.
+    Args:
+        m: Pytorch module
+    """
     if type(m) == torch.nn.Dropout or type(m) == DropBlock2D:
         m.train()
 
@@ -275,6 +298,7 @@ class MCDSamplesExtractor:
     Returns:
         Monte-Carlo Dropout samples for the input dataloader
     """
+
     def __init__(
         self,
         model,
@@ -322,6 +346,9 @@ class MCDSamplesExtractor:
                 "fullmean",
                 "avgpool",
             ), "Only mean, fullmean and avg pool reduction method supported for resnet"
+        assert isinstance(model, torch.nn.Module), "model must be a pytorch model"
+        assert isinstance(mcd_nro_samples, int), "mcd_nro_samples must be an integer"
+        assert isinstance(hook_dropout_layer, Hook), "hook_dropout_layer must be an Hook"
         self.model = model
         self.mcd_nro_samples = mcd_nro_samples
         self.hook_dropout_layer = hook_dropout_layer
@@ -335,9 +362,17 @@ class MCDSamplesExtractor:
         self.return_raw_predictions = return_raw_predictions
 
     def get_ls_mcd_samples_baselines(
-            self,
-            data_loader: torch.utils.data.dataloader.DataLoader
+        self, data_loader: DataLoader
     ) -> Union[Tuple[Tensor, Tensor], Tensor]:
+        """
+        Perform the Monte Carlo Dropout inference given a dataloader
+        Args:
+            data_loader: DataLoader
+
+        Returns:
+            Latent MCD samples and optionally the raw inference results
+        """
+        assert isinstance(data_loader, DataLoader)
         with torch.no_grad():
             with tqdm(total=len(data_loader), desc="Extracting MCD samples") as pbar:
                 dl_imgs_latent_mcd_samples = []
@@ -420,9 +455,7 @@ class MCDSamplesExtractor:
                                     latent_mcd_sample = torch.mean(
                                         latent_mcd_sample, dim=3, keepdim=True
                                     )
-                                    latent_mcd_sample = latent_mcd_sample.reshape(
-                                        1, 128, 8, -1
-                                    )
+                                    latent_mcd_sample = latent_mcd_sample.reshape(1, 128, 8, -1)
                                     latent_mcd_sample = torch.mean(
                                         latent_mcd_sample, dim=3, keepdim=True
                                     )
@@ -463,9 +496,7 @@ class MCDSamplesExtractor:
                                     latent_mcd_sample = torch.mean(
                                         latent_mcd_sample, dim=3, keepdim=True
                                     )
-                                    latent_mcd_sample = latent_mcd_sample.reshape(
-                                        1, 128, 8, -1
-                                    )
+                                    latent_mcd_sample = latent_mcd_sample.reshape(1, 128, 8, -1)
                                     latent_mcd_sample = torch.mean(
                                         latent_mcd_sample, dim=3, keepdim=True
                                     )
@@ -509,9 +540,7 @@ class MCDSamplesExtractor:
                                     latent_mcd_sample = torch.mean(
                                         latent_mcd_sample, dim=3, keepdim=True
                                     )
-                                    latent_mcd_sample = latent_mcd_sample.reshape(
-                                        1, 128, 8, -1
-                                    )
+                                    latent_mcd_sample = latent_mcd_sample.reshape(1, 128, 8, -1)
                                     latent_mcd_sample = torch.mean(
                                         latent_mcd_sample, dim=3, keepdim=True
                                     )
@@ -569,9 +598,7 @@ class MCDSamplesExtractor:
                                     latent_mcd_sample = torch.mean(
                                         latent_mcd_sample, dim=3, keepdim=True
                                     )
-                                    latent_mcd_sample = latent_mcd_sample.reshape(
-                                        1, 256, 4, -1
-                                    )
+                                    latent_mcd_sample = latent_mcd_sample.reshape(1, 256, 4, -1)
                                     latent_mcd_sample = torch.mean(
                                         latent_mcd_sample, dim=3, keepdim=True
                                     )
@@ -649,6 +676,9 @@ def get_mcd_pred_uncertainty_score(
     Returns:
         MCD samples, predictive entropy and mutual information scores
     """
+    assert isinstance(dnn_model, torch.nn.Module), "dnn_model must be a pytorch model"
+    assert isinstance(input_dataloader, DataLoader), "input_dataloader must be a DataLoader"
+    assert isinstance(mcd_nro_samples, int), "mcd_nro_samples must be an integer"
     softmax_fn = torch.nn.Softmax(dim=1)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -687,8 +717,9 @@ def get_mcd_pred_uncertainty_score(
     return dl_pred_mcd_samples_t, pred_h_t, mi_t
 
 
-def get_predictive_uncertainty_score(input_samples: Tensor,
-                                     mcd_nro_samples: int) -> Tuple[Tensor, Tensor]:
+def get_predictive_uncertainty_score(
+    input_samples: Tensor, mcd_nro_samples: int
+) -> Tuple[Tensor, Tensor]:
     """
     This function calculates the predictive uncertainty and the mutual information given some
     already calculated activations for a number of MCD steps.
@@ -700,6 +731,12 @@ def get_predictive_uncertainty_score(input_samples: Tensor,
     Returns:
         Predictive uncertainty, mutual information
     """
+    # Check correct dimensions
+    assert isinstance(input_samples, Tensor), "input_samples must be a pytorch Tensor"
+    assert input_samples.shape[0] % mcd_nro_samples == 0, (
+        "Input tensor first dimension must be " "divisible by the mcd_nro_samples"
+    )
+    assert isinstance(mcd_nro_samples, int), "mcd_nro_samples must be an integer"
     softmax_fn = torch.nn.Softmax(dim=1)
     # compute softmax output - normalized output:
     img_pred_softmax_mcd_samples_t = softmax_fn(input_samples)
@@ -720,7 +757,7 @@ def get_predictive_uncertainty_score(input_samples: Tensor,
     return pred_h_t, mi_t
 
 
-def get_msp_score(dnn_model: torch.nn.Module, input_dataloader: DataLoader) -> np.array :
+def get_msp_score(dnn_model: torch.nn.Module, input_dataloader: DataLoader) -> np.ndarray:
     """
     Calculates the Maximum softmax probability score given a model and a dataloader
 
@@ -731,6 +768,9 @@ def get_msp_score(dnn_model: torch.nn.Module, input_dataloader: DataLoader) -> n
     Returns:
         MSP scores
     """
+    assert isinstance(dnn_model, torch.nn.Module), "dnn_model must be a pytorch model"
+    assert isinstance(input_dataloader, DataLoader), "input_dataloader must be a DataLoader"
+
     softmax_fn = torch.nn.Softmax(dim=1)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -755,7 +795,7 @@ def get_msp_score(dnn_model: torch.nn.Module, input_dataloader: DataLoader) -> n
     return dl_preds_msp_scores
 
 
-def get_energy_score(dnn_model: torch.nn.Module, input_dataloader: DataLoader) -> np.array:
+def get_energy_score(dnn_model: torch.nn.Module, input_dataloader: DataLoader) -> np.ndarray:
     """
     Calculates the energy uncertainty score
 
@@ -766,6 +806,9 @@ def get_energy_score(dnn_model: torch.nn.Module, input_dataloader: DataLoader) -
     Returns:
         Energy scores
     """
+    assert isinstance(dnn_model, torch.nn.Module), "dnn_model must be a pytorch model"
+    assert isinstance(input_dataloader, DataLoader), "input_dataloader must be a DataLoader"
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # gtsrb_det_model.to(device)
 
@@ -804,12 +847,30 @@ class MDSPostprocessor:
             num_classes: Number of In-distribution samples
             setup_flag: Whether the postprocessor is already trained
         """
+        assert isinstance(num_classes, int), "num_classes must be an integer"
+        assert isinstance(setup_flag, bool), "setup_flag must be a boolean"
+
         # self.config = config
         # self.num_classes = num_classes_dict[self.config.dataset.name]
         self.num_classes = num_classes
         self.setup_flag = setup_flag
 
-    def setup(self, dnn_model: torch.nn.Module, ind_dataloader, layer_hook):
+    def setup(
+        self, dnn_model: torch.nn.Module, ind_dataloader: DataLoader, layer_hook: Hook
+    ) -> None:
+        """
+        Estimate the parameters of a multivariate normal distribution from a set of data
+
+        Args:
+            dnn_model: Trained torch or lightning model
+            ind_dataloader: Dataloader
+            layer_hook: Hook to the layer to take samples from
+
+        """
+        assert isinstance(dnn_model, torch.nn.Module), "dnn_model must be a pytorch model"
+        assert isinstance(ind_dataloader, DataLoader), "input_dataloader must be a DataLoader"
+        assert isinstance(layer_hook, Hook), "layer_hook must be a Hook"
+
         if not self.setup_flag:
             # estimate mean and variance from training set
             print("\n Estimating mean and variance from training set...")
@@ -856,7 +917,25 @@ class MDSPostprocessor:
             pass
 
     @torch.no_grad()
-    def postprocess(self, dnn_model: torch.nn.Module, dataloader: DataLoader, layer_hook):
+    def postprocess(
+        self, dnn_model: torch.nn.Module, dataloader: DataLoader, layer_hook: Hook
+    ) -> Tuple[Tensor, Tensor]:
+        """
+        Perform inference with the set up estimator, i.e. for each sample in the Data Loader
+        estimate if it belongs to the InD distribution
+
+        Args:
+            dnn_model: Trained torch or lightning model
+            dataloader: Dataloader
+            layer_hook: Hook to the layer to take samples from
+
+        Returns:
+            (tuple): Model predictions and confidence scores
+        """
+        assert isinstance(dnn_model, torch.nn.Module), "dnn_model must be a pytorch model"
+        assert isinstance(dataloader, DataLoader), "dataloader must be a DataLoader"
+        assert isinstance(layer_hook, Hook), "layer_hook must be a Hook"
+
         all_preds = []
         all_conf_score = []
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -899,6 +978,7 @@ class KNNPostprocessor:
         K: Number of neighbors for calculations
         setup_flag: Whether the postprocessor is already trained
     """
+
     def __init__(self, K: int = 50, setup_flag: bool = False):
         """
         kNN Distance Score uncertainty estimator class
@@ -907,12 +987,29 @@ class KNNPostprocessor:
             K: Number of neighbors for calculations
             setup_flag: Whether the postprocessor is already trained
         """
+        assert isinstance(K, int), "K must be an integer"
+        assert isinstance(setup_flag, bool), "setup_flag must be a boolean"
         self.K = K
         self.activation_log = None
         self.setup_flag = setup_flag
         self.index = None
 
-    def setup(self, dnn_model: torch.nn.Module, ind_dataloader, layer_hook):
+    def setup(
+        self, dnn_model: torch.nn.Module, ind_dataloader: DataLoader, layer_hook: Hook
+    ) -> None:
+        """
+        Estimate the parameters of a kNN estimator
+
+        Args:
+            dnn_model: Trained torch or lightning model
+            ind_dataloader: Dataloader
+            layer_hook: Hook to the layer to take samples from
+
+        """
+        assert isinstance(dnn_model, torch.nn.Module), "dnn_model must be a pytorch model"
+        assert isinstance(ind_dataloader, DataLoader), "ind_dataloader must be a DataLoader"
+        assert isinstance(layer_hook, Hook), "layer_hook must be a Hook"
+
         if not self.setup_flag:
             print("\n Get latent embeddings z from training set...")
             activation_log = []
@@ -936,7 +1033,25 @@ class KNNPostprocessor:
             pass
 
     @torch.no_grad()
-    def postprocess(self, dnn_model: torch.nn.Module, dataloader: DataLoader, layer_hook):
+    def postprocess(
+        self, dnn_model: torch.nn.Module, dataloader: DataLoader, layer_hook: Hook
+    ) -> Tuple[Tensor, np.ndarray]:
+        """
+        Perform inference with the set-up estimator, i.e. for each sample in the Data Loader
+        estimate if it belongs to the InD distribution
+
+        Args:
+            dnn_model: Trained torch or lightning model
+            dataloader: Dataloader
+            layer_hook: Hook to the layer to take samples from
+
+        Returns:
+            (tuple): Model predictions and confidence scores
+        """
+        assert isinstance(dnn_model, torch.nn.Module), "dnn_model must be a pytorch model"
+        assert isinstance(dataloader, DataLoader), "dataloader must be a DataLoader"
+        assert isinstance(layer_hook, Hook), "layer_hook must be a Hook"
+
         all_preds = []
         all_kth_dist_score = []
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -977,6 +1092,7 @@ class LaREMPostprocessor:
     Args:
         setup_flag: Whether the postprocessor is already trained
     """
+
     def __init__(self, setup_flag: bool = False):
         """
         LaREM Distance Score uncertainty estimator class
@@ -984,11 +1100,21 @@ class LaREMPostprocessor:
         Args:
             setup_flag: Whether the postprocessor is already trained
         """
+        assert isinstance(setup_flag, bool), "setup_flag must be a boolean"
         self.setup_flag = setup_flag
         self.feats_mean = None
         self.precision = None
 
     def setup(self, ind_feats: np.ndarray):
+        """
+        Estimate the parameters of a multivariate normal distribution from a set of data
+
+        Args:
+            ind_feats: InD features to estimate the distribution
+
+        """
+        assert isinstance(ind_feats, np.ndarray), "ind_feats must be a numpy array"
+        assert ind_feats.ndim == 2, "ind_feats must be 2 dimensional"
         if not self.setup_flag:
             # estimate mean and variance from training set
             self.feats_mean = ind_feats.mean(0)
@@ -1008,6 +1134,19 @@ class LaREMPostprocessor:
             pass
 
     def postprocess(self, ood_feats: np.ndarray):
+        """
+        Perform inference with the set up estimator, i.e. for each sample in the Data Loader
+        estimate if it belongs to the InD distribution
+
+        Args:
+            ood_feats: Features (either InD or OoD) to estimate if they belong to the InD
+                distribution
+
+        Returns:
+            (tuple): Confidence scores
+        """
+        assert isinstance(ood_feats, np.ndarray), "ood_feats must be a numpy array"
+        assert ood_feats.ndim == 2, "ood_feats must be 2 dimensional"
         diff = ood_feats - self.feats_mean
         conf_score = -np.diag(np.matmul(np.matmul(diff, self.precision), np.transpose(diff)))
 
@@ -1016,7 +1155,7 @@ class LaREMPostprocessor:
 
 def get_dice_feat_mean_react_percentile(
     dnn_model: torch.nn.Module, ind_dataloader: DataLoader, react_percentile: int = 90
-) -> Tuple[np.array, float]:
+) -> Tuple[np.ndarray, float]:
     """
     Get the DICE and ReAct thresholds for sparsifying and clipping from a given model.
 
@@ -1026,8 +1165,12 @@ def get_dice_feat_mean_react_percentile(
         react_percentile: Desired percentile for ReAct
 
     Returns:
-        Tuple[np.array, float]: The DICE expected values, and the ReAct threshold
+        Tuple[np.ndarray, float]: The DICE expected values, and the ReAct threshold
     """
+    assert isinstance(dnn_model, torch.nn.Module), "dnn_model must be a pytorch model"
+    assert isinstance(ind_dataloader, DataLoader), "ind_dataloader must be a DataLoader"
+    assert isinstance(react_percentile, int), "react_percentile must be an integer"
+    assert 0 < react_percentile < 100, "react_percentile must be greater than 0 and less than 100"
     feat_log = []
     dnn_model.eval()
     assert dnn_model.dice_precompute
@@ -1061,7 +1204,16 @@ class RouteDICE(torch.nn.Linear):
         conv1x1: Whether using a 1x1 conv layer
         info: The previously calculated expected values
     """
-    def __init__(self, in_features, out_features, bias=True, p=90, conv1x1=False, info=None):
+
+    def __init__(
+        self,
+        in_features: int,
+        out_features: int,
+        bias: bool = True,
+        p: int = 90,
+        conv1x1: bool = False,
+        info: Union[None, np.ndarray] = None,
+    ):
         """
         Class to replace the penultimate fully connected layer of a network in order to use the
         DICE method
@@ -1073,6 +1225,15 @@ class RouteDICE(torch.nn.Linear):
             conv1x1: Whether using a 1x1 conv layer
             info: The previously calculated expected values
         """
+        assert isinstance(in_features, int), "in_features must be an integer"
+        assert isinstance(out_features, int), "out_features must be an integer"
+        assert isinstance(bias, bool), "bias must be a boolean"
+        assert isinstance(p, int), "p must be an integer"
+        assert 0 < p < 100, "p must be greater than 0 and less than 100"
+        assert isinstance(conv1x1, bool), "conv1x1 must be a boolean"
+        if info is not None:
+            assert isinstance(info, np.ndarray), "info must be a numpy array or None"
+
         super(RouteDICE, self).__init__(in_features, out_features, bias)
         if conv1x1:
             self.weight = torch.nn.Parameter(torch.Tensor(out_features, in_features, 1, 1))

@@ -7,25 +7,35 @@ from torch.autograd import grad
 
 
 def get_hz_scores(hz_detector: DetectorKDE, samples: np.ndarray):
+    """
+    Performs inference with an already trained KDE detector
+
+    Args:
+        hz_detector: The trained estimator
+        samples: The new samples to be scored
+
+    Returns:
+        The density scores
+    """
+    assert isinstance(hz_detector, DetectorKDE)
     scores = hz_detector.get_density_scores(samples)
     return scores
 
 
 def get_msp_score(inputs, model, forward_func, method_args, logits=None):
     """
-    taken from https://github.com/deeplearning-wisc/knn-ood/blob/master/util/score.py
-    :param inputs:
-    :type inputs:
-    :param model:
-    :type model:
-    :param forward_func:
-    :type forward_func:
-    :param method_args:
-    :type method_args:
-    :param logits:
-    :type logits:
-    :return:
-    :rtype:
+    MSP score estimator taken from
+     https://github.com/deeplearning-wisc/knn-ood/blob/master/util/score.py
+
+    Args:
+        inputs:
+        model:
+        forward_func:
+        method_args:
+        logits:
+
+    Returns:
+
     """
     if logits is None:
         with torch.no_grad():
