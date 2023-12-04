@@ -1117,7 +1117,6 @@ class LaREMPostprocessor:
         assert ind_feats.ndim == 2, "ind_feats must be 2 dimensional"
         if not self.setup_flag:
             # estimate mean and variance from training set
-            self.feats_mean = ind_feats.mean(0)
             self.feats_mean = np.mean(ind_feats, 0, keepdims=True)
 
             self.centered_data = ind_feats - self.feats_mean
