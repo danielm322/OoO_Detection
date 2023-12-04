@@ -4,6 +4,7 @@ from sklearn.decomposition import PCA
 from .dimensionality_reduction import apply_pca_ds
 from .dimensionality_reduction import apply_pca_ds_split
 from .dimensionality_reduction import apply_pca_transform
+from warnings import warn
 
 
 def build_ood_detection_ds(
@@ -17,26 +18,23 @@ def build_ood_detection_ds(
     pca_whiten: bool = True,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, PCA]:
     """
+    Build OoD detection dataset (Deprecated method)
+    Args:
+        ind_valid_data:
+        ood_valid_data:
+        ind_test_data:
+        ood_test_data:
+        apply_pca:
+        pca_nro_comp:
+        pca_svd_solver:
+        pca_whiten:
 
-    :param ind_valid_data:
-    :type ind_valid_data:
-    :param ood_valid_data:
-    :type ood_valid_data:
-    :param ind_test_data:
-    :type ind_test_data:
-    :param ood_test_data:
-    :type ood_test_data:
-    :param apply_pca:
-    :type apply_pca:
-    :param pca_nro_comp:
-    :type pca_nro_comp:
-    :param pca_svd_solver:
-    :type pca_svd_solver:
-    :param pca_whiten:
-    :type pca_whiten:
-    :return:
-    :rtype:
+    Returns:
+        train_ds, labels_train_ds, test_ds, labels_test_ds, pca_dim_red
     """
+    warn('This method is deprecated. '
+         'Is not guaranteed to work with the rest of the library',
+         DeprecationWarning, stacklevel=2)
     pca_dim_red = None
     # Samples
     train_ds = np.vstack((ind_valid_data, ood_valid_data))
@@ -85,25 +83,24 @@ def build_ood_detection_train_split(
     pca_svd_solver: str = "randomized",
     pca_whiten: bool = True,
 ) -> Tuple[np.ndarray, np.ndarray, PCA]:
-    """_summary_
-
-    :param ind_data: _description_
-    :type ind_data: np.ndarray
-    :param ood_data: _description_
-    :type ood_data: np.ndarray
-    :param pca_transform: _description_, defaults to None
-    :type pca_transform: PCA, optional
-    :param apply_pca: _description_, defaults to True
-    :type apply_pca: bool, optional
-    :param pca_nro_comp: _description_, defaults to 16
-    :type pca_nro_comp: int, optional
-    :param pca_svd_solver: _description_, defaults to 'randomized'
-    :type pca_svd_solver: str, optional
-    :param pca_whiten: _description_, defaults to True
-    :type pca_whiten: bool, optional
-    :return: _description_
-    :rtype: Tuple[np.ndarray, np.ndarray]
     """
+    Applies PCA to some data. Deprecated method
+
+    Args:
+        ind_data: InD data
+        ood_data: OoD data
+        apply_pca: Optionally apply PCA, defaults to True
+        pca_nro_comp: Number of PCA components, defaults to 16
+        pca_svd_solver: PCA solver, defaults to 'randomized'
+        pca_whiten: Whiten PCA, defaults to True
+
+    Returns:
+        samples, labels, PCA estimator
+    """
+    warn('This method is deprecated. '
+         'Is not guaranteed to work with the rest of the library. '
+         'Use the apply_pca_ds_split function instead',
+         DeprecationWarning, stacklevel=2)
     pca_dim_red = None
     # Samples
     samples = np.vstack((ind_data, ood_data))
@@ -130,17 +127,21 @@ def build_ood_detection_train_split(
 def build_ood_detection_test_split(
     ind_data: np.ndarray, ood_data: np.ndarray, pca_transform: PCA = None
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """_summary_
-
-    :param ind_data: _description_
-    :type ind_data: np.ndarray
-    :param ood_data: _description_
-    :type ood_data: np.ndarray
-    :param pca_transform: _description_, defaults to None
-    :type pca_transform: PCA, optional
-    :return: _description_
-    :rtype: Tuple[np.ndarray, np.ndarray]
     """
+    Applies PCA to some data. Deprecated method
+
+    Args:
+        ind_data: InD data
+        ood_data: OoD data
+        pca_transform: PCA estimator already trained
+
+    Returns:
+        Transformed samples and their labels
+    """
+    warn('This method is deprecated. '
+         'Is not guaranteed to work with the rest of the library. '
+         'Use the apply_pca_transform function instead',
+         DeprecationWarning, stacklevel=2)
 
     # Samples
     samples = np.vstack((ind_data, ood_data))

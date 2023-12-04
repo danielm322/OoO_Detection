@@ -3,6 +3,7 @@ import numpy as np
 from scipy.special import logsumexp
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.neighbors import KernelDensity
+from warnings import warn
 
 
 class DetectorKDE:
@@ -54,19 +55,29 @@ class DetectorKDE:
 
 
 class KDEClassifier(BaseEstimator, ClassifierMixin):
-    """Bayesian classifier for OoD Detection
-    based on KDE
-    Taken from: https://jakevdp.github.io/PythonDataScienceHandbook/05.13-kernel-density-estimation.html
+    """
+    Bayesian classifier for OoD Detection based on KDE. Taken from:
+    https://jakevdp.github.io/PythonDataScienceHandbook/05.13-kernel-density-estimation.html.
+    Deprecated method
 
-    Parameters
-    ----------
-    bandwidth : float
-        the kernel bandwidth within each class
-    kernel : str
-        the kernel name, passed to KernelDensity
+    Args:
+        bandwidth: The kernel bandwidth within each class
+        kernel: the kernel name, passed to KernelDensity
     """
 
     def __init__(self, bandwidth=1.0, kernel="gaussian"):
+        """
+        Bayesian classifier for OoD Detection based on KDE. Taken from:
+        https://jakevdp.github.io/PythonDataScienceHandbook/05.13-kernel-density-estimation.html.
+        Deprecated method
+
+        Args:
+            bandwidth: The kernel bandwidth within each class
+            kernel: the kernel name, passed to KernelDensity
+        """
+        warn('This method is deprecated. '
+             'Is not guaranteed to work with the rest of the library',
+             DeprecationWarning, stacklevel=2)
         self.bandwidth = bandwidth
         self.kernel = kernel
         self.classes_ = None
