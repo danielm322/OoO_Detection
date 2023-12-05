@@ -75,9 +75,11 @@ class KDEClassifier(BaseEstimator, ClassifierMixin):
             bandwidth: The kernel bandwidth within each class
             kernel: the kernel name, passed to KernelDensity
         """
-        warn('This method is deprecated. '
-             'Is not guaranteed to work with the rest of the library',
-             DeprecationWarning, stacklevel=2)
+        warn(
+            "This method is deprecated. " "Is not guaranteed to work with the rest of the library",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.bandwidth = bandwidth
         self.kernel = kernel
         self.classes_ = None

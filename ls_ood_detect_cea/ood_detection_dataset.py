@@ -32,9 +32,12 @@ def build_ood_detection_ds(
     Returns:
         train_ds, labels_train_ds, test_ds, labels_test_ds, pca_dim_red
     """
-    warn('This method is deprecated. '
-         'Is not guaranteed to work with the rest of the library',
-         DeprecationWarning, stacklevel=2)
+    warn(
+        "This method is deprecated. "
+        "Is not guaranteed to work with the rest of the library",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     pca_dim_red = None
     # Samples
     train_ds = np.vstack((ind_valid_data, ood_valid_data))
@@ -97,10 +100,13 @@ def build_ood_detection_train_split(
     Returns:
         samples, labels, PCA estimator
     """
-    warn('This method is deprecated. '
-         'Is not guaranteed to work with the rest of the library. '
-         'Use the apply_pca_ds_split function instead',
-         DeprecationWarning, stacklevel=2)
+    warn(
+        "This method is deprecated. "
+        "Is not guaranteed to work with the rest of the library. "
+        "Use the apply_pca_ds_split function instead",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     pca_dim_red = None
     # Samples
     samples = np.vstack((ind_data, ood_data))
@@ -138,10 +144,13 @@ def build_ood_detection_test_split(
     Returns:
         Transformed samples and their labels
     """
-    warn('This method is deprecated. '
-         'Is not guaranteed to work with the rest of the library. '
-         'Use the apply_pca_transform function instead',
-         DeprecationWarning, stacklevel=2)
+    warn(
+        "This method is deprecated. "
+        "Is not guaranteed to work with the rest of the library. "
+        "Use the apply_pca_transform function instead",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     # Samples
     samples = np.vstack((ind_data, ood_data))
