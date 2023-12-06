@@ -3,7 +3,6 @@ from typing import Tuple
 from sklearn.decomposition import PCA
 from .dimensionality_reduction import apply_pca_ds
 from .dimensionality_reduction import apply_pca_ds_split
-from .dimensionality_reduction import apply_pca_transform
 from warnings import warn
 
 
@@ -18,23 +17,23 @@ def build_ood_detection_ds(
     pca_whiten: bool = True,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, PCA]:
     """
-    Build OoD detection dataset (Deprecated method)
+    Adds labels of zeros and ones to some data. Optionally applies PCA to them. Deprecated method.
+
     Args:
-        ind_valid_data:
-        ood_valid_data:
-        ind_test_data:
-        ood_test_data:
-        apply_pca:
-        pca_nro_comp:
-        pca_svd_solver:
-        pca_whiten:
+        ind_valid_data: InD validation set data
+        ood_valid_data: OoD validation set data
+        ind_test_data: InD test set data
+        ood_test_data: OoD test set data
+        apply_pca: Optionally apply PCA, defaults to True
+        pca_nro_comp: Number of PCA components, defaults to 16
+        pca_svd_solver: PCA solver, defaults to 'randomized'
+        pca_whiten: Whiten PCA, defaults to True
 
     Returns:
         train_ds, labels_train_ds, test_ds, labels_test_ds, pca_dim_red
     """
     warn(
-        "This method is deprecated. "
-        "Is not guaranteed to work with the rest of the library",
+        "This method is deprecated. Is not guaranteed to work with the rest of the library",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -87,7 +86,7 @@ def build_ood_detection_train_split(
     pca_whiten: bool = True,
 ) -> Tuple[np.ndarray, np.ndarray, PCA]:
     """
-    Applies PCA to some data. Deprecated method
+    Adds labels of zeros and ones to some data. Optionally applies PCA to them. Deprecated method.
 
     Args:
         ind_data: InD data
@@ -128,47 +127,3 @@ def build_ood_detection_train_split(
     print("Dataset Labels shape: ", labels.shape)
 
     return samples, labels, pca_dim_red
-
-
-def build_ood_detection_test_split(
-    ind_data: np.ndarray, ood_data: np.ndarray, pca_transform: PCA = None
-) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Applies PCA to some data. Deprecated method
-
-    Args:
-        ind_data: InD data
-        ood_data: OoD data
-        pca_transform: PCA estimator already trained
-
-    Returns:
-        Transformed samples and their labels
-    """
-    warn(
-        "This method is deprecated. "
-        "Is not guaranteed to work with the rest of the library. "
-        "Use the apply_pca_transform function instead",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-
-    # Samples
-    samples = np.vstack((ind_data, ood_data))
-
-    if pca_transform is not None:
-        samples = apply_pca_transform(samples, pca_transform)
-
-    # labels:
-    label_ind_ds = np.ones((ind_data.shape[0], 1))  # 1: In-Distribution is the positive class
-    label_ood_ds = np.zeros(
-        (ood_data.shape[0], 1)
-    )  # 0: Out-of-Distribution/Anomaly is the negative class
-
-    labels = np.vstack((label_ind_ds, label_ood_ds))
-    labels = labels.astype("int32")
-    labels = np.squeeze(labels)
-
-    print("Dataset Samples shape: ", samples.shape)
-    print("Dataset Labels shape: ", labels.shape)
-
-    return samples, labels
