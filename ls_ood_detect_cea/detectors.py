@@ -5,6 +5,7 @@
 #
 # Contributors
 #    Fabio Arnez
+#    Daniel Montoya
 
 """Module containing the KDE Detectors"""
 import numpy as np

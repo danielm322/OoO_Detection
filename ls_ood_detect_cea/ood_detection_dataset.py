@@ -5,6 +5,7 @@
 #
 # Contributors
 #    Fabio Arnez
+#    Daniel Montoya
 
 import numpy as np
 from typing import Tuple

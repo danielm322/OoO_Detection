@@ -5,8 +5,8 @@
 #
 # Contributors
 #    Fabio Arnez
+#    Daniel Montoya
 
-from typing import Tuple
 from typing import Tuple, Union
 import numpy as np
 import matplotlib.pyplot as plt

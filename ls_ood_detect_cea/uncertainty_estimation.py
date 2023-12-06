@@ -6,8 +6,8 @@
 # Contributors
 #    Based on https://github.com/fregu856/deeplabv3
 #    Fabio Arnez, probabilistic adaptation
+#    Daniel Montoya
 
-from typing import Tuple, List
 from typing import Tuple, Union
 import numpy as np
 import torch

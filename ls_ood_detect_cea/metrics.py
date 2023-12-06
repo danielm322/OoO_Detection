@@ -5,6 +5,7 @@
 #
 # Contributors
 #    Fabio Arnez
+#    Daniel Montoya
 
 from typing import Union, Tuple
 import numpy as np

@@ -1,3 +1,12 @@
+# (c) 2023, CEA LIST
+#
+# All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+# Contributors
+#    Fabio Arnez
+#    Daniel Montoya
+
 from typing import Tuple
 import torch
 import numpy as np
