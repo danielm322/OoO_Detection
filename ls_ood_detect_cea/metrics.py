@@ -8,9 +8,8 @@ from sklearn.metrics import auc
 import torchmetrics.functional as tmf
 import seaborn as sns
 
-from .detectors import DetectorKDE
+from .detectors import DetectorKDE, get_hz_scores
 from .uncertainty_estimation import LaREMPostprocessor
-from .score import get_hz_scores
 
 
 def get_hz_detector_results(

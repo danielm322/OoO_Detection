@@ -54,6 +54,22 @@ class DetectorKDE:
         return self.density.score_samples(test_embeddings)
 
 
+def get_hz_scores(hz_detector: DetectorKDE, samples: np.ndarray):
+    """
+    Performs inference with an already trained KDE detector
+
+    Args:
+        hz_detector: The trained estimator
+        samples: The new samples to be scored
+
+    Returns:
+        The density scores
+    """
+    assert isinstance(hz_detector, DetectorKDE)
+    scores = hz_detector.get_density_scores(samples)
+    return scores
+
+
 class KDEClassifier(BaseEstimator, ClassifierMixin):
     """
     Bayesian classifier for OoD Detection based on KDE. Taken from:

@@ -3,5 +3,4 @@ from .detectors import *
 from .dimensionality_reduction import *
 from .metrics import *
 from .ood_detection_dataset import *
-from .score import *
 from .rcnn import *

@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from ..ls_ood_detect_cea.dimensionality_reduction import *
 
 #########################################################################
@@ -97,3 +97,7 @@ class Test(TestCase):
             0.0,
             delta=TOL,
         )
+
+
+if __name__ == "__main__":
+    main()

@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from ..ls_ood_detect_cea.uncertainty_estimation import *
 from .tests_architecture import Net
 import torch
@@ -612,3 +612,7 @@ class Test(TestCase):
                 ),
             )
         )
+
+
+if __name__ == "__main__":
+    main()

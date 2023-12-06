@@ -7,13 +7,10 @@ from torch.nn.functional import avg_pool2d, adaptive_avg_pool2d
 from dropblock import DropBlock2D
 import pytorch_lightning as pl
 from entropy_estimators import continuous
-from icecream import ic
 from tqdm import tqdm
 from sklearn.covariance import EmpiricalCovariance
 from copy import deepcopy
 import faiss
-
-# from joblib import Parallel, delayed
 from tqdm.contrib.concurrent import process_map
 
 
