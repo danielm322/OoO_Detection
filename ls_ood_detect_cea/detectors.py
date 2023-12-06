@@ -1,3 +1,11 @@
+# (c) 2023, CEA LIST
+#
+# All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+# Contributors
+#    Fabio Arnez
+
 """Module containing the KDE Detectors"""
 import numpy as np
 from scipy.special import logsumexp
