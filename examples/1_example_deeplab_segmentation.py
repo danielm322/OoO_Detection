@@ -4,16 +4,6 @@
 # In[1]:
 
 
-get_ipython().run_line_magic('load_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
-get_ipython().run_line_magic('reload_ext', 'autoreload')
-get_ipython().system('pip install albumentations==1.3.0')
-get_ipython().system('pip install lightning-bolts==0.5.0')
-
-
-# In[1]:
-
-
 # from collections import namedtuple
 import numpy as np
 # import matplotlib.pyplot as plt
