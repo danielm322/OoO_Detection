@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from ..ls_ood_detect_cea.metrics import *
+from ls_ood_detect_cea.metrics import *
 
 
 #########################################################################

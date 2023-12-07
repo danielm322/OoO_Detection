@@ -1,10 +1,7 @@
 from unittest import TestCase, main
-
-# import torch.utils.data
-
-from ..ls_ood_detect_cea.uncertainty_estimation import *
-from ..ls_ood_detect_cea.metrics import *
-from ..ls_ood_detect_cea.dimensionality_reduction import apply_pca_ds_split, apply_pca_transform
+from ls_ood_detect_cea.uncertainty_estimation import *
+from ls_ood_detect_cea.metrics import *
+from ls_ood_detect_cea.dimensionality_reduction import apply_pca_ds_split, apply_pca_transform
 from .tests_architecture import Net
 import torchvision
 

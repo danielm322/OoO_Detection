@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from ..ls_ood_detect_cea.uncertainty_estimation import *
+from ls_ood_detect_cea.uncertainty_estimation import *
 from .tests_architecture import Net
 import torch
 import torchvision

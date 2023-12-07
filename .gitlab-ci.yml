@@ -6,6 +6,7 @@ image: "python:3.8"
 before_script:
   - python --version
   - pip install -r requirements.txt
+  - pip install .
 # different stages in the pipeline
 stages:
   - Static Analysis
