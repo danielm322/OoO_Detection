@@ -16,15 +16,15 @@ black:
   script:
   - black .
 
-unit-tests:
-  stage: test
+unit-test-job:
+  stage: Test
   script:
     - python ./tests/unit_test_uncertainty_estimation.py
     - python ./tests/unit_test_metrics.py
     - python ./tests/unit_test_dim_reduction.py
     - python ./tests/unit_test_detection_dataset.py
 
-integration-tests:
+integration-tests-job:
   stage: Test
   script:
     - python ./tests/integration_tests.py
