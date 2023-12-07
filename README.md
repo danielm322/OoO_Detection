@@ -1,3 +1,4 @@
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 # CEA-LSEA: Out-of-Distribution Detection using DNN Latent Representations Uncertainty
 
 ## Description
@@ -24,7 +25,7 @@ In all the above cases, the DNNs were slightly modified to capture _epistemic_ u
 
 
 ## Requirements
-See `requirements.txt`
+Use python 3.8, then install the `requirements.txt`
 
 ## Installation
 Install requirements, then in the base folder of the repo do `pip install .`
