@@ -99,3 +99,7 @@ class Test(TestCase):
             ).sum(),
             delta=TOL,
         )
+
+
+if __name__ == "__main__":
+    main()

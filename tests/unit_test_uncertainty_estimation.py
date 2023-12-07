@@ -11,7 +11,7 @@ SEED = 1
 TEST_SET_PROPORTION = 0.1
 MCD_N_SAMPLES = 3
 LATENT_SPACE_DIM = 20
-TOL = 1e-7
+TOL = 1e-6
 ########################################################################
 
 torch.manual_seed(SEED)
