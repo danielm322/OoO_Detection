@@ -83,24 +83,27 @@ def deeplabv3p_get_ls_mcd_samples(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     with torch.no_grad():
         dl_imgs_latent_mcd_samples = []
-        for i, (image, label) in enumerate(dataloader):
-            image = image.to(device)
-            img_mcd_samples = []
-            for s in range(mcd_nro_samples):
-                pred_img = model_module.deeplab_v3plus_model(image)
-                # pred = torch.argmax(pred_img, dim=1)
-                latent_mcd_sample = hook_dropout_layer.output
-                # Get image HxW mean:
-                latent_mcd_sample = torch.mean(latent_mcd_sample, dim=2, keepdim=True)
-                latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
-                # Remove useless dimensions:
-                latent_mcd_sample = torch.squeeze(latent_mcd_sample, dim=2)
-                latent_mcd_sample = torch.squeeze(latent_mcd_sample, dim=2)
+        with tqdm(total=len(dataloader), desc="Extracting MCD samples") as pbar:
+            for i, (image, label) in enumerate(dataloader):
+                image = image.to(device)
+                img_mcd_samples = []
+                for s in range(mcd_nro_samples):
+                    pred_img = model_module.deeplab_v3plus_model(image)
+                    # pred = torch.argmax(pred_img, dim=1)
+                    latent_mcd_sample = hook_dropout_layer.output
+                    # Get image HxW mean:
+                    latent_mcd_sample = torch.mean(latent_mcd_sample, dim=2, keepdim=True)
+                    latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
+                    # Remove useless dimensions:
+                    latent_mcd_sample = torch.squeeze(latent_mcd_sample, dim=2)
+                    latent_mcd_sample = torch.squeeze(latent_mcd_sample, dim=2)
 
-                img_mcd_samples.append(latent_mcd_sample)
+                    img_mcd_samples.append(latent_mcd_sample)
 
-            img_mcd_samples_t = torch.cat(img_mcd_samples, dim=0)
-            dl_imgs_latent_mcd_samples.append(img_mcd_samples_t)
+                img_mcd_samples_t = torch.cat(img_mcd_samples, dim=0)
+                dl_imgs_latent_mcd_samples.append(img_mcd_samples_t)
+
+            pbar.update(1)
 
         dl_imgs_latent_mcd_samples_t = torch.cat(dl_imgs_latent_mcd_samples, dim=0)
 

@@ -31,7 +31,7 @@ mnist_data = torchvision.datasets.MNIST(
     transform=transforms,
 )
 emnist_data = torchvision.datasets.EMNIST(
-    "./emanist-data", split="letters", train=False, download=True, transform=transforms
+    "./emnist-data", split="letters", train=False, download=True, transform=transforms
 )
 # Subset InD dataset
 ind_subset_ds_len = int(len(mnist_data) * TEST_SET_PROPORTION)
