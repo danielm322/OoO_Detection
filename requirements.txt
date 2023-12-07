@@ -1,4 +1,4 @@
-black==23.1.0
+black==22.12.0
 dropblock==0.3.0
 entropy-estimators==0.0.1
 faiss-gpu==1.7.2
