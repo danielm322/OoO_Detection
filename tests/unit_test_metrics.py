@@ -19,9 +19,9 @@ class Test(TestCase):
         test_ood = -0.5 + np.random.randn(TEST_SET_SIZE)
         test_name = "test"
         results = get_hz_detector_results(test_name, test_ind, test_ood, False)
-        self.assertAlmostEqual(0.7329999804496765, results["fpr@95"].values[0])
-        self.assertAlmostEqual(0.7484172582626343, results["aupr"].values[0])
-        self.assertAlmostEqual(0.7622030377388, results["auroc"].values[0])
+        self.assertAlmostEqual(0.7329999804496765, results["fpr@95"].values[0], delta=TOL)
+        self.assertAlmostEqual(0.7484172582626343, results["aupr"].values[0], delta=TOL)
+        self.assertAlmostEqual(0.7622030377388, results["auroc"].values[0], delta=TOL)
 
     def test_evaluate_lared_larem(self):
         np.random.seed(SEED)

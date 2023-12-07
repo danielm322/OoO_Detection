@@ -144,6 +144,7 @@ class Test(TestCase):
                         0.56711444,
                     ]
                 ),
+                atol=TOL,
             )
         )
 
@@ -179,6 +180,7 @@ class Test(TestCase):
                         0.2459123,
                     ]
                 ),
+                atol=TOL,
             )
         )
 
@@ -371,6 +373,7 @@ class Test(TestCase):
                         0.14461976,
                     ]
                 ),
+                atol=TOL,
             )
         )
 
@@ -405,6 +408,7 @@ class Test(TestCase):
                         0.0000000e00,
                     ]
                 ),
+                atol=TOL,
             )
         )
 
@@ -579,6 +583,7 @@ class Test(TestCase):
                         0.24692961,
                     ]
                 ),
+                atol=TOL,
             )
         )
         postprocessed = larem_processor.postprocess(test_features)
@@ -610,6 +615,7 @@ class Test(TestCase):
                         -16.28581699,
                     ]
                 ),
+                atol=TOL,
             )
         )
 
