@@ -11,9 +11,9 @@ Latent Representations Uncertainty</h1>
     </a>
 </div>
 <br>
+
 ---
-sidebar_position: 4
-title: Guideline CEA-LSEA Out-of-Distribution Detection using DNN Latent Representations Uncertainty
+Guideline CEA-LSEA Out-of-Distribution Detection using DNN Latent Representations Uncertainty
 ---
 
 CEA-LSEA package for Out-of-Distribution (OoD) detection using the uncertainty (entropy) from DNN latent representations.

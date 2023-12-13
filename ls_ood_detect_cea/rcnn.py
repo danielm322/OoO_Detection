@@ -63,6 +63,7 @@ def get_dice_feat_mean_react_percentile_rcnn(
     """
     Get the DICE and ReAct thresholds for sparsifying and clipping from an RCNN architecture, where
     the output has been modified to return the previous-to-last layer activations.
+
     Args:
         dnn_model: The RCNN model
         ind_dataloader: The Data loader
@@ -93,6 +94,7 @@ def get_energy_score_rcnn(dnn_model: torch.nn.Module, input_dataloader: DataLoad
     """
     Calculates the energy uncertainty score from an RCNN architecture where the output has been
     modified to return the raw activations before NMS alongside the normal (NMS filtered) ones.
+
     Args:
         dnn_model: The RCNN model
         input_dataloader: The Data loader

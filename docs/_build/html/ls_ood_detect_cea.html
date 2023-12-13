@@ -211,6 +211,14 @@ more details</p>
 <dt class="sig sig-object py" id="ls_ood_detect_cea.detectors.DetectorKDE.get_density_scores">
 <span class="sig-name descname"><span class="pre">get_density_scores</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_embeddings</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/detectors.html#DetectorKDE.get_density_scores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.detectors.DetectorKDE.get_density_scores" title="Permalink to this definition"></a></dt>
 <dd><p>Transforms the scores from a second distribution while normalizing the scores</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>test_embeddings</strong> – The new samples to get the density scores</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Density scores</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -609,16 +617,20 @@ existing mlflow run the best metrics</p>
 <dt class="sig sig-object py" id="ls_ood_detect_cea.rcnn.get_dice_feat_mean_react_percentile_rcnn">
 <span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.rcnn.</span></span><span class="sig-name descname"><span class="pre">get_dice_feat_mean_react_percentile_rcnn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dnn_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">react_percentile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">90</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/rcnn.html#get_dice_feat_mean_react_percentile_rcnn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.rcnn.get_dice_feat_mean_react_percentile_rcnn" title="Permalink to this definition"></a></dt>
 <dd><p>Get the DICE and ReAct thresholds for sparsifying and clipping from an RCNN architecture, where
-the output has been modified to return the previous-to-last layer activations.
-:param dnn_model: The RCNN model
-:param ind_dataloader: The Data loader
-:param react_percentile: Desired percentile for ReAct</p>
+the output has been modified to return the previous-to-last layer activations.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The DICE expected values, and the ReAct threshold</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dnn_model</strong> – The RCNN model</p></li>
+<li><p><strong>ind_dataloader</strong> – The Data loader</p></li>
+<li><p><strong>react_percentile</strong> – Desired percentile for ReAct</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Tuple[np.ndarray, float]</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The DICE expected values, and the ReAct threshold</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, float]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -627,15 +639,19 @@ the output has been modified to return the previous-to-last layer activations.
 <dt class="sig sig-object py" id="ls_ood_detect_cea.rcnn.get_energy_score_rcnn">
 <span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.rcnn.</span></span><span class="sig-name descname"><span class="pre">get_energy_score_rcnn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dnn_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/rcnn.html#get_energy_score_rcnn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.rcnn.get_energy_score_rcnn" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the energy uncertainty score from an RCNN architecture where the output has been
-modified to return the raw activations before NMS alongside the normal (NMS filtered) ones.
-:param dnn_model: The RCNN model
-:param input_dataloader: The Data loader</p>
+modified to return the raw activations before NMS alongside the normal (NMS filtered) ones.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Energy scores from the Raw and the filtered outputs</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dnn_model</strong> – The RCNN model</p></li>
+<li><p><strong>input_dataloader</strong> – The Data loader</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Tuple[np.ndarray, np.ndarray]</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Energy scores from the Raw and the filtered outputs</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, np.ndarray]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -866,11 +882,13 @@ of hooked representation</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.MCDSamplesExtractor.get_ls_mcd_samples_baselines">
 <span class="sig-name descname"><span class="pre">get_ls_mcd_samples_baselines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#MCDSamplesExtractor.get_ls_mcd_samples_baselines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.MCDSamplesExtractor.get_ls_mcd_samples_baselines" title="Permalink to this definition"></a></dt>
-<dd><p>Perform the Monte Carlo Dropout inference given a dataloader
-:param data_loader: DataLoader</p>
+<dd><p>Perform the Monte Carlo Dropout inference given a dataloader</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Latent MCD samples and optionally the raw inference results</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_loader</strong> – DataLoader</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Latent MCD samples and optionally the raw inference results</p>
 </dd>
 </dl>
 </dd></dl>
@@ -934,13 +952,19 @@ estimate if it belongs to the InD distribution</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">RouteDICE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv1x1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#RouteDICE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.RouteDICE" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Linear</span></code></p>
 <p>Class to replace the penultimate fully connected layer of a network in order to use the
-DICE method
-:param in_features: Dimension of the input vector
-:param out_features: Dimension of the output vector
-:param bias: Bias for the Linear layer
-:param p: Percentile for sparsifying
-:param conv1x1: Whether using a 1x1 conv layer
-:param info: The previously calculated expected values</p>
+DICE method</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_features</strong> – Dimension of the input vector</p></li>
+<li><p><strong>out_features</strong> – Dimension of the output vector</p></li>
+<li><p><strong>bias</strong> – Bias for the Linear layer</p></li>
+<li><p><strong>p</strong> – Percentile for sparsifying</p></li>
+<li><p><strong>conv1x1</strong> – Whether using a 1x1 conv layer</p></li>
+<li><p><strong>info</strong> – The previously calculated expected values</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.RouteDICE.calculate_mask_weight">
 <span class="sig-name descname"><span class="pre">calculate_mask_weight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#RouteDICE.calculate_mask_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.RouteDICE.calculate_mask_weight" title="Permalink to this definition"></a></dt>
@@ -980,8 +1004,12 @@ registered hooks while the latter silently ignores them.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.deeplabv3p_apply_dropout">
 <span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">deeplabv3p_apply_dropout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#deeplabv3p_apply_dropout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.deeplabv3p_apply_dropout" title="Permalink to this definition"></a></dt>
-<dd><p>Activate Dropout or Dropblock layers.
-:param m: Pytorch module</p>
+<dd><p>Activate Dropout or Dropblock layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>m</strong> – Pytorch module</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1152,8 +1180,12 @@ already calculated activations for a number of MCD steps.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.probunet_apply_dropout">
 <span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">probunet_apply_dropout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#probunet_apply_dropout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.probunet_apply_dropout" title="Permalink to this definition"></a></dt>
-<dd><p>Activate Dropout or Dropblock layers.
-:param m: Pytorch module</p>
+<dd><p>Activate Dropout or Dropblock layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>m</strong> – Pytorch module</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

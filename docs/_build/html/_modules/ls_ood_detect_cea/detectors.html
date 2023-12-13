@@ -132,6 +132,12 @@
 <div class="viewcode-block" id="DetectorKDE.get_density_scores"><a class="viewcode-back" href="../../ls_ood_detect_cea.html#ls_ood_detect_cea.detectors.DetectorKDE.get_density_scores">[docs]</a>    <span class="k">def</span> <span class="nf">get_density_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_embeddings</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transforms the scores from a second distribution while normalizing the scores</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            test_embeddings: The new samples to get the density scores</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Density scores</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="o">.</span><span class="n">score_samples</span><span class="p">(</span><span class="n">test_embeddings</span><span class="p">)</span></div></div>
 

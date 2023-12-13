@@ -255,6 +255,7 @@ def get_dl_h_z(
 def probunet_apply_dropout(m):
     """
     Activate Dropout or Dropblock layers.
+
     Args:
         m: Pytorch module
     """
@@ -265,6 +266,7 @@ def probunet_apply_dropout(m):
 def deeplabv3p_apply_dropout(m):
     """
     Activate Dropout or Dropblock layers.
+
     Args:
         m: Pytorch module
     """
@@ -376,6 +378,7 @@ class MCDSamplesExtractor:
     ) -> Union[Tuple[Tensor, Tensor], Tensor]:
         """
         Perform the Monte Carlo Dropout inference given a dataloader
+
         Args:
             data_loader: DataLoader
 
@@ -1205,6 +1208,7 @@ class RouteDICE(torch.nn.Linear):
     """
     Class to replace the penultimate fully connected layer of a network in order to use the
     DICE method
+
     Args:
         in_features: Dimension of the input vector
         out_features: Dimension of the output vector
@@ -1226,6 +1230,7 @@ class RouteDICE(torch.nn.Linear):
         """
         Class to replace the penultimate fully connected layer of a network in order to use the
         DICE method
+
         Args:
             in_features: Dimension of the input vector
             out_features: Dimension of the output vector

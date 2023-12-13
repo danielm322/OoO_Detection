@@ -59,6 +59,12 @@ class DetectorKDE:
     def get_density_scores(self, test_embeddings):
         """
         Transforms the scores from a second distribution while normalizing the scores
+
+        Args:
+            test_embeddings: The new samples to get the density scores
+
+        Returns:
+            Density scores
         """
         return self.density.score_samples(test_embeddings)
 

@@ -328,6 +328,7 @@
 <div class="viewcode-block" id="probunet_apply_dropout"><a class="viewcode-back" href="../../ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.probunet_apply_dropout">[docs]</a><span class="k">def</span> <span class="nf">probunet_apply_dropout</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Activate Dropout or Dropblock layers.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        m: Pytorch module</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -338,6 +339,7 @@
 <div class="viewcode-block" id="deeplabv3p_apply_dropout"><a class="viewcode-back" href="../../ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.deeplabv3p_apply_dropout">[docs]</a><span class="k">def</span> <span class="nf">deeplabv3p_apply_dropout</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Activate Dropout or Dropblock layers.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        m: Pytorch module</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -449,6 +451,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform the Monte Carlo Dropout inference given a dataloader</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            data_loader: DataLoader</span>
 
@@ -1278,6 +1281,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to replace the penultimate fully connected layer of a network in order to use the</span>
 <span class="sd">    DICE method</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        in_features: Dimension of the input vector</span>
 <span class="sd">        out_features: Dimension of the output vector</span>
@@ -1299,6 +1303,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Class to replace the penultimate fully connected layer of a network in order to use the</span>
 <span class="sd">        DICE method</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            in_features: Dimension of the input vector</span>
 <span class="sd">            out_features: Dimension of the output vector</span>
