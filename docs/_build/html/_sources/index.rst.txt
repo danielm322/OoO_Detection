@@ -1,17 +1,19 @@
-.. Latent space uncertainty estimation for OoD detection documentation master file, created by
-   sphinx-quickstart on Wed Dec 13 10:46:44 2023.
+.. OOD Detection using DNN Latent Representations Uncertainty documentation master file, created by
+   sphinx-quickstart on Wed Dec 13 18:23:07 2023.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Latent space uncertainty estimation for OoD detection's documentation!
-=================================================================================
+Welcome to OOD Detection using DNN Latent Representations Uncertainty's documentation!
+======================================================================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   ls_ood_detect_cea
 
+
+   README
+   modules
 
 Indices and tables
 ==================

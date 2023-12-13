@@ -1,6 +1,6 @@
 <div align="center">
-    <img src="docs/assets/Logo_ConfianceAI.png" width="20%" alt="ConfianceAI Logo" />
-    <h1 style="font-size: large; font-weight: bold;">Out-of-Distribution Detection using DNN 
+    <img src="assets/Logo_ConfianceAI.png" width="20%" alt="ConfianceAI Logo" />
+    <h1 style="font-size: large; font-weight: bold;">Out-of-Distribution Detection using DNN
 Latent Representations Uncertainty</h1>
 </div><div align="center">
     <a href="https://www.python.org/downloads/release/python-380/">
@@ -13,7 +13,7 @@ Latent Representations Uncertainty</h1>
 <br>
 
 ---
-Guideline CEA-LSEA Out-of-Distribution Detection using DNN Latent Representations Uncertainty
+# Guideline CEA-LSEA Out-of-Distribution Detection using DNN Latent Representations Uncertainty
 ---
 
 CEA-LSEA package for Out-of-Distribution (OoD) detection using the uncertainty (entropy) from DNN latent representations.
@@ -24,14 +24,14 @@ The package has been used with the following applications, the corresponding DNN
     - **Out-of-Distribution Datasets:** FMNIST, SVHN, Places365, Textures, iSUN, LSUN-C, LSUN-R
     - **DNN Architectures:**
         1. ResNet-18
-        2. ResNet-18 with Spectral Normalization 
+        2. ResNet-18 with Spectral Normalization
 
 - **Object Detection:**
     - **In-Distribution Dataset:** BDD100k
     - **Out-of-Distribution Datasets:** Pascal VOC, Openimages
     - **DNN Architectures:**
       1. Faster RCNN
-      
+
 - **Semantic Segmentation:**
     - **In-Distribution Dataset:** Woodscape  & Cityscapes
     - **Out-of-Distribution Datasets:** Woodscape soiling, Woodscape-anomalies, Cityscapes-anomalies
@@ -53,7 +53,7 @@ In all the above cases, the DNNs were slightly modified to capture _epistemic_ u
 ## 🔍 Specifications
 - Version: 1.0.0
 - Python Version: python 3.8
-- Strong Dependencies: torch, entropy_estimators, numpy, sklearn, dropblock, pandas, mlflow, matplotlib 
+- Strong Dependencies: torch, entropy_estimators, numpy, sklearn, dropblock, pandas, mlflow, matplotlib
 - Thematic: Computer vision
 - Trustworthy: Uncertainty Estimation -  OoD/Anomaly detection
 - Hardware : GPU
@@ -101,7 +101,7 @@ After installing all the requirements, then in the base folder of the repo do `p
 ## 🎮 Usage
 
 For a complete example of how to use the component refer to: [REF](ref)
-For detailed usage, check this [document](./ls_ood_detect_cea/CEA-LSEA-OoD%20Detection%20DNN%20Latent%20Space.md)
+For detailed usage, check this [document](./ls_ood_detect_cea/CEA-LSEA-OoD_Detection_DNN_Latent_Space.md)
 
 Here we present a general overview of how to evaluate the component and obtain detection metrics:
 
@@ -158,22 +158,22 @@ In general, to perform OoD or anomaly detection with our method you need:
 * One (or more) dataset(s) defined as Out of Distribution (OoD) or Anomaly.
 
 Then if the model was trained with at least one dropout or dropblock layer, we need to:
-* Attach a Hook to the dropblock or dropout layer to catch the outputs of such layer: Use the 
+* Attach a Hook to the dropblock or dropout layer to catch the outputs of such layer: Use the
   `Hook` class
 * Perform Monte Carlo dropout sampling, meaning, inference is performed $N$ times, at each time the
-  output of the hooked layer is taken (Use the `get_latent_representation_mcd_samples` function 
+  output of the hooked layer is taken (Use the `get_latent_representation_mcd_samples` function
   (You just need to specify the type of layer in the function parameters):
     * If the layer is convolutional (dropblock layer): we take the mean per channel
     * If the layer is Fully Connected (dropout layer): we take the raw output
-    
+
 * Take the entropy of the previously calculated samples. Use the `get_dl_h_z` function
-* Pass the entropy of each image to the LaRED and LaREM estimators to obtain the OoD score. Use the 
+* Pass the entropy of each image to the LaRED and LaREM estimators to obtain the OoD score. Use the
   `log_evaluate_lared_larem` function.
 
-We will obtain at the end a pandas dataframe with the evaluation metrics and classification 
+We will obtain at the end a pandas dataframe with the evaluation metrics and classification
 thresholds of LaRED and LaREM. To use the method during inference it is needed to save the density
-from LaRED or LaREM, 
-optionally the PCA transformation, and the threshold chosen for classification. Then we would 
+from LaRED or LaREM,
+optionally the PCA transformation, and the threshold chosen for classification. Then we would
 obtain the uncertainty estimation at inference time.
 
 <div id='hardware'/>
@@ -196,8 +196,8 @@ Technical Reports:
     - EC3-FA18 Run-Time Monitoring
 
 Publications
-    
+
     - Out-of-Distribution Detection using Deep Neural Network Latent Space
 
 
-Example : To display the component's references : [Open PDF file](./EC2_N6_AITA_V0_revise.pdf)
+Example : To display the component's references : [EC2 Process and Methods](https://irtsystemx.sharepoint.com/:b:/r/sites/IAdeConfiance833/Documents%20partages/General/EC_2/40_Deliverable/Livrables%20en%20cours/AI%20trustworthiness%20characteristics%20and%20assessment%20methodology/EC2_N6_AITA_V0.pdf?csf=1&web=1&e=6kx9Ao)
