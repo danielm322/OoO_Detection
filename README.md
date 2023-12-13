@@ -3,10 +3,10 @@
     <h1 style="font-size: large; font-weight: bold;">Out-of-Distribution Detection using DNN 
 Latent Representations Uncertainty</h1>
 </div><div align="center">
-    <a href="#">
+    <a href="https://www.python.org/downloads/release/python-380/">
         <img src="https://img.shields.io/badge/Python-3.8-efefef">
     </a>
-    <a href="#">
+    <a href="https://github.com/psf/black">
         <img src="https://img.shields.io/badge/code%20style-black-000000.svg">
     </a>
 </div>
