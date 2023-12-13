@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ls_ood_detect_cea package &mdash; Latent space uncertainty estimation for OoD detection 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=359c27e9"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to Latent space uncertainty estimation for OoD detection’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Latent space uncertainty estimation for OoD detection
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ls_ood_detect_cea package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ls_ood_detect_cea.detectors">ls_ood_detect_cea.detectors module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.detectors.DetectorKDE"><code class="docutils literal notranslate"><span class="pre">DetectorKDE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.detectors.DetectorKDE.density_fit"><code class="docutils literal notranslate"><span class="pre">DetectorKDE.density_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.detectors.DetectorKDE.get_density_scores"><code class="docutils literal notranslate"><span class="pre">DetectorKDE.get_density_scores()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.detectors.KDEClassifier"><code class="docutils literal notranslate"><span class="pre">KDEClassifier</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.detectors.KDEClassifier.estimate_joint_log_prob"><code class="docutils literal notranslate"><span class="pre">KDEClassifier.estimate_joint_log_prob()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.detectors.KDEClassifier.fit"><code class="docutils literal notranslate"><span class="pre">KDEClassifier.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.detectors.KDEClassifier.pred_prob"><code class="docutils literal notranslate"><span class="pre">KDEClassifier.pred_prob()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.detectors.KDEClassifier.predict"><code class="docutils literal notranslate"><span class="pre">KDEClassifier.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.detectors.KDEClassifier.predict_label"><code class="docutils literal notranslate"><span class="pre">KDEClassifier.predict_label()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.detectors.KDEClassifier.predict_prob"><code class="docutils literal notranslate"><span class="pre">KDEClassifier.predict_prob()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.detectors.KDEClassifier.predict_proba"><code class="docutils literal notranslate"><span class="pre">KDEClassifier.predict_proba()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.detectors.get_hz_scores"><code class="docutils literal notranslate"><span class="pre">get_hz_scores()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ls_ood_detect_cea.dimensionality_reduction">ls_ood_detect_cea.dimensionality_reduction module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.dimensionality_reduction.apply_pacmap_transform"><code class="docutils literal notranslate"><span class="pre">apply_pacmap_transform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.dimensionality_reduction.apply_pca_ds"><code class="docutils literal notranslate"><span class="pre">apply_pca_ds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.dimensionality_reduction.apply_pca_ds_split"><code class="docutils literal notranslate"><span class="pre">apply_pca_ds_split()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.dimensionality_reduction.apply_pca_transform"><code class="docutils literal notranslate"><span class="pre">apply_pca_transform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.dimensionality_reduction.fit_pacmap"><code class="docutils literal notranslate"><span class="pre">fit_pacmap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.dimensionality_reduction.plot_samples_pacmap"><code class="docutils literal notranslate"><span class="pre">plot_samples_pacmap()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ls_ood_detect_cea.metrics">ls_ood_detect_cea.metrics module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.metrics.get_hz_detector_results"><code class="docutils literal notranslate"><span class="pre">get_hz_detector_results()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.metrics.get_pred_scores_plots"><code class="docutils literal notranslate"><span class="pre">get_pred_scores_plots()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.metrics.log_evaluate_lared_larem"><code class="docutils literal notranslate"><span class="pre">log_evaluate_lared_larem()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.metrics.plot_roc_ood_detector"><code class="docutils literal notranslate"><span class="pre">plot_roc_ood_detector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.metrics.save_roc_ood_detector"><code class="docutils literal notranslate"><span class="pre">save_roc_ood_detector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.metrics.save_scores_plots"><code class="docutils literal notranslate"><span class="pre">save_scores_plots()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.metrics.select_and_log_best_lared_larem"><code class="docutils literal notranslate"><span class="pre">select_and_log_best_lared_larem()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ls_ood_detect_cea.ood_detection_dataset">ls_ood_detect_cea.ood_detection_dataset module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.ood_detection_dataset.build_ood_detection_ds"><code class="docutils literal notranslate"><span class="pre">build_ood_detection_ds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.ood_detection_dataset.build_ood_detection_train_split"><code class="docutils literal notranslate"><span class="pre">build_ood_detection_train_split()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ls_ood_detect_cea.rcnn">ls_ood_detect_cea.rcnn module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.rcnn.get_dice_feat_mean_react_percentile_rcnn"><code class="docutils literal notranslate"><span class="pre">get_dice_feat_mean_react_percentile_rcnn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.rcnn.get_energy_score_rcnn"><code class="docutils literal notranslate"><span class="pre">get_energy_score_rcnn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.rcnn.get_ls_mcd_samples_rcnn"><code class="docutils literal notranslate"><span class="pre">get_ls_mcd_samples_rcnn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.rcnn.get_msp_score_rcnn"><code class="docutils literal notranslate"><span class="pre">get_msp_score_rcnn()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ls_ood_detect_cea.uncertainty_estimation">ls_ood_detect_cea.uncertainty_estimation module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.Hook"><code class="docutils literal notranslate"><span class="pre">Hook</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.Hook.close"><code class="docutils literal notranslate"><span class="pre">Hook.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.Hook.hook_fn"><code class="docutils literal notranslate"><span class="pre">Hook.hook_fn()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor"><code class="docutils literal notranslate"><span class="pre">KNNPostprocessor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.get_K_hyperparam"><code class="docutils literal notranslate"><span class="pre">KNNPostprocessor.get_K_hyperparam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.postprocess"><code class="docutils literal notranslate"><span class="pre">KNNPostprocessor.postprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.set_K_hyperparam"><code class="docutils literal notranslate"><span class="pre">KNNPostprocessor.set_K_hyperparam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.setup"><code class="docutils literal notranslate"><span class="pre">KNNPostprocessor.setup()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.LaREMPostprocessor"><code class="docutils literal notranslate"><span class="pre">LaREMPostprocessor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.LaREMPostprocessor.postprocess"><code class="docutils literal notranslate"><span class="pre">LaREMPostprocessor.postprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.LaREMPostprocessor.setup"><code class="docutils literal notranslate"><span class="pre">LaREMPostprocessor.setup()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.MCDSamplesExtractor"><code class="docutils literal notranslate"><span class="pre">MCDSamplesExtractor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.MCDSamplesExtractor.get_ls_mcd_samples_baselines"><code class="docutils literal notranslate"><span class="pre">MCDSamplesExtractor.get_ls_mcd_samples_baselines()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.MDSPostprocessor"><code class="docutils literal notranslate"><span class="pre">MDSPostprocessor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.MDSPostprocessor.postprocess"><code class="docutils literal notranslate"><span class="pre">MDSPostprocessor.postprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.MDSPostprocessor.setup"><code class="docutils literal notranslate"><span class="pre">MDSPostprocessor.setup()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.RouteDICE"><code class="docutils literal notranslate"><span class="pre">RouteDICE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.RouteDICE.calculate_mask_weight"><code class="docutils literal notranslate"><span class="pre">RouteDICE.calculate_mask_weight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.RouteDICE.forward"><code class="docutils literal notranslate"><span class="pre">RouteDICE.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.RouteDICE.in_features"><code class="docutils literal notranslate"><span class="pre">RouteDICE.in_features</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.RouteDICE.out_features"><code class="docutils literal notranslate"><span class="pre">RouteDICE.out_features</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.RouteDICE.weight"><code class="docutils literal notranslate"><span class="pre">RouteDICE.weight</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.deeplabv3p_apply_dropout"><code class="docutils literal notranslate"><span class="pre">deeplabv3p_apply_dropout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.deeplabv3p_get_ls_mcd_samples"><code class="docutils literal notranslate"><span class="pre">deeplabv3p_get_ls_mcd_samples()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.get_dice_feat_mean_react_percentile"><code class="docutils literal notranslate"><span class="pre">get_dice_feat_mean_react_percentile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.get_dl_h_z"><code class="docutils literal notranslate"><span class="pre">get_dl_h_z()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.get_energy_score"><code class="docutils literal notranslate"><span class="pre">get_energy_score()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.get_latent_representation_mcd_samples"><code class="docutils literal notranslate"><span class="pre">get_latent_representation_mcd_samples()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.get_mcd_pred_uncertainty_score"><code class="docutils literal notranslate"><span class="pre">get_mcd_pred_uncertainty_score()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.get_mean_or_fullmean_ls_sample"><code class="docutils literal notranslate"><span class="pre">get_mean_or_fullmean_ls_sample()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.get_msp_score"><code class="docutils literal notranslate"><span class="pre">get_msp_score()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.get_predictive_uncertainty_score"><code class="docutils literal notranslate"><span class="pre">get_predictive_uncertainty_score()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.normalizer"><code class="docutils literal notranslate"><span class="pre">normalizer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.probunet_apply_dropout"><code class="docutils literal notranslate"><span class="pre">probunet_apply_dropout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.single_image_entropy_calculation"><code class="docutils literal notranslate"><span class="pre">single_image_entropy_calculation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ls_ood_detect_cea">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Latent space uncertainty estimation for OoD detection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">ls_ood_detect_cea package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ls_ood_detect_cea.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ls-ood-detect-cea-package">
+<h1>ls_ood_detect_cea package<a class="headerlink" href="#ls-ood-detect-cea-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-ls_ood_detect_cea.detectors">
+<span id="ls-ood-detect-cea-detectors-module"></span><h2>ls_ood_detect_cea.detectors module<a class="headerlink" href="#module-ls_ood_detect_cea.detectors" title="Permalink to this heading"></a></h2>
+<p>Module containing the KDE Detectors</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.detectors.DetectorKDE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.detectors.</span></span><span class="sig-name descname"><span class="pre">DetectorKDE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_embeddings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/detectors.html#DetectorKDE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.detectors.DetectorKDE" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Instantiates a Kernel Density Estimation Estimator. See
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KernelDensity.html">https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KernelDensity.html</a> for
+more details</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_embeddings</strong> – Samples to train the estimator</p></li>
+<li><p><strong>save_path</strong> – Optional path to save the estimator</p></li>
+<li><p><strong>kernel</strong> – Kernel. Default=’gaussian’</p></li>
+<li><p><strong>bandwidth</strong> – Bandwidth of the estimator.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.detectors.DetectorKDE.density_fit">
+<span class="sig-name descname"><span class="pre">density_fit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/detectors.html#DetectorKDE.density_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.detectors.DetectorKDE.density_fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the KDE Estimator</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.detectors.DetectorKDE.get_density_scores">
+<span class="sig-name descname"><span class="pre">get_density_scores</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_embeddings</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/detectors.html#DetectorKDE.get_density_scores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.detectors.DetectorKDE.get_density_scores" title="Permalink to this definition"></a></dt>
+<dd><p>Transforms the scores from a second distribution while normalizing the scores</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.detectors.KDEClassifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.detectors.</span></span><span class="sig-name descname"><span class="pre">KDEClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bandwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gaussian'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/detectors.html#KDEClassifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.detectors.KDEClassifier" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ClassifierMixin</span></code></p>
+<p>Bayesian classifier for OoD Detection based on KDE. Taken from:
+<a class="reference external" href="https://jakevdp.github.io/PythonDataScienceHandbook/05.13-kernel-density-estimation.html">https://jakevdp.github.io/PythonDataScienceHandbook/05.13-kernel-density-estimation.html</a>.
+Deprecated method</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bandwidth</strong> – The kernel bandwidth within each class</p></li>
+<li><p><strong>kernel</strong> – the kernel name, passed to KernelDensity</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.detectors.KDEClassifier.estimate_joint_log_prob">
+<span class="sig-name descname"><span class="pre">estimate_joint_log_prob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/detectors.html#KDEClassifier.estimate_joint_log_prob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.detectors.KDEClassifier.estimate_joint_log_prob" title="Permalink to this definition"></a></dt>
+<dd><p>Estimate the joint log-probabilities, log P(Z | Y) + log P(Y).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.detectors.KDEClassifier.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/detectors.html#KDEClassifier.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.detectors.KDEClassifier.fit" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.detectors.KDEClassifier.pred_prob">
+<span class="sig-name descname"><span class="pre">pred_prob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/detectors.html#KDEClassifier.pred_prob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.detectors.KDEClassifier.pred_prob" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.detectors.KDEClassifier.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/detectors.html#KDEClassifier.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.detectors.KDEClassifier.predict" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.detectors.KDEClassifier.predict_label">
+<span class="sig-name descname"><span class="pre">predict_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/detectors.html#KDEClassifier.predict_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.detectors.KDEClassifier.predict_label" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.detectors.KDEClassifier.predict_prob">
+<span class="sig-name descname"><span class="pre">predict_prob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/detectors.html#KDEClassifier.predict_prob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.detectors.KDEClassifier.predict_prob" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.detectors.KDEClassifier.predict_proba">
+<span class="sig-name descname"><span class="pre">predict_proba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/detectors.html#KDEClassifier.predict_proba"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.detectors.KDEClassifier.predict_proba" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the components’ density for each sample</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.detectors.get_hz_scores">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.detectors.</span></span><span class="sig-name descname"><span class="pre">get_hz_scores</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hz_detector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ls_ood_detect_cea.detectors.DetectorKDE" title="ls_ood_detect_cea.detectors.DetectorKDE"><span class="pre">DetectorKDE</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/detectors.html#get_hz_scores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.detectors.get_hz_scores" title="Permalink to this definition"></a></dt>
+<dd><p>Performs inference with an already trained KDE detector</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hz_detector</strong> – The trained estimator</p></li>
+<li><p><strong>samples</strong> – The new samples to be scored</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The density scores</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ls_ood_detect_cea.dimensionality_reduction">
+<span id="ls-ood-detect-cea-dimensionality-reduction-module"></span><h2>ls_ood_detect_cea.dimensionality_reduction module<a class="headerlink" href="#module-ls_ood_detect_cea.dimensionality_reduction" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.dimensionality_reduction.apply_pacmap_transform">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.dimensionality_reduction.</span></span><span class="sig-name descname"><span class="pre">apply_pacmap_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pm_instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PaCMAP</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">array</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/dimensionality_reduction.html#apply_pacmap_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.dimensionality_reduction.apply_pacmap_transform" title="Permalink to this definition"></a></dt>
+<dd><p>Use the already trained PaCMAP to transform new samples</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>new_samples</strong> – New samples to be transformed</p></li>
+<li><p><strong>original_samples</strong> – The original samples used to train the algorithm</p></li>
+<li><p><strong>pm_instance</strong> – Instance of the trained PaCMAP</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed new samples</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.dimensionality_reduction.apply_pca_ds">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.dimensionality_reduction.</span></span><span class="sig-name descname"><span class="pre">apply_pca_ds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nro_components</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svd_solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'randomized'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whiten</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">PCA</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/dimensionality_reduction.html#apply_pca_ds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.dimensionality_reduction.apply_pca_ds" title="Permalink to this definition"></a></dt>
+<dd><p>Applies PCA dimensionality reduction to a dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_samples</strong> – PCA train and fit samples</p></li>
+<li><p><strong>test_samples</strong> – PCA test samples</p></li>
+<li><p><strong>nro_components</strong> – PCA components number</p></li>
+<li><p><strong>svd_solver</strong> – PCA SVD solver</p></li>
+<li><p><strong>whiten</strong> – PCA whiten value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Train and Test samples with reduced dimensionality</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.dimensionality_reduction.apply_pca_ds_split">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.dimensionality_reduction.</span></span><span class="sig-name descname"><span class="pre">apply_pca_ds_split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nro_components</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svd_solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'randomized'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whiten</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">PCA</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/dimensionality_reduction.html#apply_pca_ds_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.dimensionality_reduction.apply_pca_ds_split" title="Permalink to this definition"></a></dt>
+<dd><p>Applies PCA dimensionality reduction to a dataset split</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples</strong> – Dataset split samples</p></li>
+<li><p><strong>nro_components</strong> – PCA nnumber of components, defaults to 16</p></li>
+<li><p><strong>svd_solver</strong> – PCA SVD solver, defaults to ‘randomized’</p></li>
+<li><p><strong>whiten</strong> – PCA whiten value, defaults to True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataset samples with reduced dimensionality, PCA transformation object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.dimensionality_reduction.apply_pca_transform">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.dimensionality_reduction.</span></span><span class="sig-name descname"><span class="pre">apply_pca_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pca_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PCA</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/dimensionality_reduction.html#apply_pca_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.dimensionality_reduction.apply_pca_transform" title="Permalink to this definition"></a></dt>
+<dd><p>Transform new samples with an already trained PCA transformation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples</strong> – New samples</p></li>
+<li><p><strong>pca_transform</strong> – The trained PCA</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed samples</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.dimensionality_reduction.fit_pacmap">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.dimensionality_reduction.</span></span><span class="sig-name descname"><span class="pre">fit_pacmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_ind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighbors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">components</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">PaCMAP</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/dimensionality_reduction.html#fit_pacmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.dimensionality_reduction.fit_pacmap" title="Permalink to this definition"></a></dt>
+<dd><p>In-Distribution vs Out-of-Distribution Data Projection 2D Plot using PaCMAP algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples_ind</strong> – Number of components in the output</p></li>
+<li><p><strong>neighbors</strong> – In-Distribution (InD) samples numpy array</p></li>
+<li><p><strong>components</strong> – Number of nearest-neighbors considered for the PaCMAP algorithm</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed samples and embedding</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.dimensionality_reduction.plot_samples_pacmap">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.dimensionality_reduction.</span></span><span class="sig-name descname"><span class="pre">plot_samples_pacmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_ind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples_ood</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighbors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">components</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Plot</span> <span class="pre">Title'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_figure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">scatter</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/dimensionality_reduction.html#plot_samples_pacmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.dimensionality_reduction.plot_samples_pacmap" title="Permalink to this definition"></a></dt>
+<dd><p>In-Distribution vs Out-of-Distribution Data Projection 2D Plot using PaCMAP algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples_ind</strong> – In-Distribution (InD) samples numpy array</p></li>
+<li><p><strong>samples_ood</strong> – Out-of-Distribution (OoD) samples numpy array</p></li>
+<li><p><strong>neighbors</strong> – Number of nearest-neighbors considered for the PaCMAP algorithm</p></li>
+<li><p><strong>components</strong> – Number of components in final reduction</p></li>
+<li><p><strong>title</strong> – Plot tile</p></li>
+<li><p><strong>return_figure</strong> – True if show picture to screen instead of returning it</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Either a plot or None (show the plot)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ls_ood_detect_cea.metrics">
+<span id="ls-ood-detect-cea-metrics-module"></span><h2>ls_ood_detect_cea.metrics module<a class="headerlink" href="#module-ls_ood_detect_cea.metrics" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.metrics.get_hz_detector_results">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.metrics.</span></span><span class="sig-name descname"><span class="pre">get_hz_detector_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detect_exp_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind_samples_scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ood_samples_scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_results_for_mlflow</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/metrics.html#get_hz_detector_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.metrics.get_hz_detector_results" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the metrics relevant OoD detection: AUROC, FPR, AUPR, TPR, precision, recall,
+and classification thresholds. Can optionally format results for mlflow logging (no &#64; allowed).
+Automatically inverts labels if AUROC&lt;0.5.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>detect_exp_name</strong> – Name of the current experiment. This will be of the name of the row
+of the returned pandas df</p></li>
+<li><p><strong>ind_samples_scores</strong> – Array of InD scores</p></li>
+<li><p><strong>ood_samples_scores</strong> – Array of OoD scores</p></li>
+<li><p><strong>return_results_for_mlflow</strong> – Optionally return AUROC, FPR and AUPR formatted for mlflow
+logging</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Results in a pandas dataframe format and optionally a dictionary with</dt><dd><p>results for mlflow</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(pd.Dataframe)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.metrics.get_pred_scores_plots">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.metrics.</span></span><span class="sig-name descname"><span class="pre">get_pred_scores_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ood_datasets_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind_dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/metrics.html#get_pred_scores_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.metrics.get_pred_scores_plots" title="Permalink to this definition"></a></dt>
+<dd><p>Function that takes as input an experiment dictionary (one classification technique), a list
+of ood datasets, a plot title, and the InD dataset name and returns a plot of the predictive
+score density</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>experiment</strong> – Dictionary with keys ‘InD’:ndarray, ‘x_axis’:str, and ‘plot_name’:str and other
+keys as ood dataset names with values as ndarray</p></li>
+<li><p><strong>ood_datasets_list</strong> – List with OoD datasets names</p></li>
+<li><p><strong>title</strong> – Title of the plot</p></li>
+<li><p><strong>ind_dataset_name</strong> – String with the name of the InD dataset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Figure with the density scores of the InD and the OoD datasets</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.metrics.log_evaluate_lared_larem">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.metrics.</span></span><span class="sig-name descname"><span class="pre">log_evaluate_lared_larem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind_train_h_z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind_test_h_z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ood_h_z_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experiment_name_extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_density_scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlflow_logging</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/metrics.html#log_evaluate_lared_larem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.metrics.log_evaluate_lared_larem" title="Permalink to this definition"></a></dt>
+<dd><p>Function that takes as input InD numpy arrays of entropies and one dictionary for all OoD
+datasets and returns LaRED and LaREM results in the form of a pandas dataframe.
+Optionally logs to a running mlflow experiment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ind_train_h_z</strong> – InD training samples for both LaRED and LaREM as numpy ndarray</p></li>
+<li><p><strong>ind_test_h_z</strong> – InD test samples as numpy ndarray</p></li>
+<li><p><strong>ood_h_z_dict</strong> – OoD dictionary where keys are the OoD datasets and the values are the
+ndarrays of entropies</p></li>
+<li><p><strong>experiment_name_extension</strong> – Extra string to add to the default experiment name, useful for
+PCA experiments</p></li>
+<li><p><strong>return_density_scores</strong> – return LaRED density scores for further analysis</p></li>
+<li><p><strong>log_step</strong> – optional step useful for PCA experiments. None if not performing PCA with
+several components</p></li>
+<li><p><strong>mlflow_logging</strong> – Optionally log to an existing mlflow run</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pandas dataframe with results, optionally LaRED density score</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.metrics.plot_roc_ood_detector">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.metrics.</span></span><span class="sig-name descname"><span class="pre">plot_roc_ood_detector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Plot</span> <span class="pre">Title'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/metrics.html#plot_roc_ood_detector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.metrics.plot_roc_ood_detector" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.metrics.save_roc_ood_detector">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.metrics.</span></span><span class="sig-name descname"><span class="pre">save_roc_ood_detector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Plot</span> <span class="pre">Title'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/metrics.html#save_roc_ood_detector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.metrics.save_roc_ood_detector" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a ROC plot figure that can be saved or logged with mlflow. Does not display any
+figure to screen</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results_table</strong> (<em>pd.Dataframe</em>) – Dataframe with results as rows and experiments names as
+indexes</p></li>
+<li><p><strong>plot_title</strong> (<em>str</em>) – Title of the plot</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A figure to be saved or logged with mlflow</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(plt.Figure)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.metrics.save_scores_plots">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.metrics.</span></span><span class="sig-name descname"><span class="pre">save_scores_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scores_ind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ood_lared_scores_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ood_datasets_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind_dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/metrics.html#save_scores_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.metrics.save_scores_plots" title="Permalink to this definition"></a></dt>
+<dd><p>InD and OoD agnostic function that takes as input the InD numpy ndarray with the LaRED scores,
+a dictionary of OoD LaRED scores, a list of the names of the OoD dataset, and the name of the
+InD dataset, and returns a histogram of pairwise comparisons, that can be saved to a
+file, logged with mlflow, or shown in screen</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scores_ind</strong> – InD LaRED scores as numpy ndarray</p></li>
+<li><p><strong>ood_lared_scores_dict</strong> – Dictionary keys as ood datasets names and values as ndarrays of
+LaRED scores per each</p></li>
+<li><p><strong>ood_datasets_list</strong> – List of OoD datasets names</p></li>
+<li><p><strong>ind_dataset_name</strong> – String with the name of the InD dataset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of plots where the keys are the plot names and the values are the figures</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.metrics.select_and_log_best_lared_larem">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.metrics.</span></span><span class="sig-name descname"><span class="pre">select_and_log_best_lared_larem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">overall_metrics_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_pca_components_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">technique</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_mlflow</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/metrics.html#select_and_log_best_lared_larem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.metrics.select_and_log_best_lared_larem" title="Permalink to this definition"></a></dt>
+<dd><p>Takes as input a Dataframe with the columns ‘auroc’, ‘aupr’ and <a class="reference external" href="mailto:'fpr&#37;&#52;&#48;95">‘fpr<span>&#64;</span>95</a>’, a list of PCA number
+of components, and the name of the technique: either ‘LaRED’ or ‘LaREM’, and logs to and
+existing mlflow run the best metrics</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>overall_metrics_df</strong> – Pandas DataFrame with the LaRED or LaREM experiments results</p></li>
+<li><p><strong>n_pca_components_list</strong> – List with the numbers of PCA components</p></li>
+<li><p><strong>technique</strong> – Either ‘LaRED’ or ‘LaREM’</p></li>
+<li><p><strong>log_mlflow</strong> – Log to mlflow boolean flag</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple with the best auroc, aupr and fpr</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ls_ood_detect_cea.ood_detection_dataset">
+<span id="ls-ood-detect-cea-ood-detection-dataset-module"></span><h2>ls_ood_detect_cea.ood_detection_dataset module<a class="headerlink" href="#module-ls_ood_detect_cea.ood_detection_dataset" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.ood_detection_dataset.build_ood_detection_ds">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.ood_detection_dataset.</span></span><span class="sig-name descname"><span class="pre">build_ood_detection_ds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind_valid_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ood_valid_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind_test_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ood_test_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_pca</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pca_nro_comp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pca_svd_solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'randomized'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pca_whiten</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">PCA</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/ood_detection_dataset.html#build_ood_detection_ds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.ood_detection_dataset.build_ood_detection_ds" title="Permalink to this definition"></a></dt>
+<dd><p>Adds labels of zeros and ones to some data. Optionally applies PCA to them. Deprecated method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ind_valid_data</strong> – InD validation set data</p></li>
+<li><p><strong>ood_valid_data</strong> – OoD validation set data</p></li>
+<li><p><strong>ind_test_data</strong> – InD test set data</p></li>
+<li><p><strong>ood_test_data</strong> – OoD test set data</p></li>
+<li><p><strong>apply_pca</strong> – Optionally apply PCA, defaults to True</p></li>
+<li><p><strong>pca_nro_comp</strong> – Number of PCA components, defaults to 16</p></li>
+<li><p><strong>pca_svd_solver</strong> – PCA solver, defaults to ‘randomized’</p></li>
+<li><p><strong>pca_whiten</strong> – Whiten PCA, defaults to True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>train_ds, labels_train_ds, test_ds, labels_test_ds, pca_dim_red</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.ood_detection_dataset.build_ood_detection_train_split">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.ood_detection_dataset.</span></span><span class="sig-name descname"><span class="pre">build_ood_detection_train_split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ood_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_pca</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pca_nro_comp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pca_svd_solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'randomized'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pca_whiten</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">PCA</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/ood_detection_dataset.html#build_ood_detection_train_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.ood_detection_dataset.build_ood_detection_train_split" title="Permalink to this definition"></a></dt>
+<dd><p>Adds labels of zeros and ones to some data. Optionally applies PCA to them. Deprecated method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ind_data</strong> – InD data</p></li>
+<li><p><strong>ood_data</strong> – OoD data</p></li>
+<li><p><strong>apply_pca</strong> – Optionally apply PCA, defaults to True</p></li>
+<li><p><strong>pca_nro_comp</strong> – Number of PCA components, defaults to 16</p></li>
+<li><p><strong>pca_svd_solver</strong> – PCA solver, defaults to ‘randomized’</p></li>
+<li><p><strong>pca_whiten</strong> – Whiten PCA, defaults to True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>samples, labels, PCA estimator</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ls_ood_detect_cea.rcnn">
+<span id="ls-ood-detect-cea-rcnn-module"></span><h2>ls_ood_detect_cea.rcnn module<a class="headerlink" href="#module-ls_ood_detect_cea.rcnn" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.rcnn.get_dice_feat_mean_react_percentile_rcnn">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.rcnn.</span></span><span class="sig-name descname"><span class="pre">get_dice_feat_mean_react_percentile_rcnn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dnn_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">react_percentile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">90</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/rcnn.html#get_dice_feat_mean_react_percentile_rcnn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.rcnn.get_dice_feat_mean_react_percentile_rcnn" title="Permalink to this definition"></a></dt>
+<dd><p>Get the DICE and ReAct thresholds for sparsifying and clipping from an RCNN architecture, where
+the output has been modified to return the previous-to-last layer activations.
+:param dnn_model: The RCNN model
+:param ind_dataloader: The Data loader
+:param react_percentile: Desired percentile for ReAct</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The DICE expected values, and the ReAct threshold</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple[np.ndarray, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.rcnn.get_energy_score_rcnn">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.rcnn.</span></span><span class="sig-name descname"><span class="pre">get_energy_score_rcnn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dnn_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/rcnn.html#get_energy_score_rcnn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.rcnn.get_energy_score_rcnn" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the energy uncertainty score from an RCNN architecture where the output has been
+modified to return the raw activations before NMS alongside the normal (NMS filtered) ones.
+:param dnn_model: The RCNN model
+:param input_dataloader: The Data loader</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Energy scores from the Raw and the filtered outputs</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple[np.ndarray, np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.rcnn.get_ls_mcd_samples_rcnn">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.rcnn.</span></span><span class="sig-name descname"><span class="pre">get_ls_mcd_samples_rcnn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mcd_nro_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hook_dropout_layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.Hook" title="ls_ood_detect_cea.uncertainty_estimation.Hook"><span class="pre">Hook</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_raw_predictions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tensor</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/rcnn.html#get_ls_mcd_samples_rcnn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.rcnn.get_ls_mcd_samples_rcnn" title="Permalink to this definition"></a></dt>
+<dd><p>Get Monte-Carlo Dropout samples from RCNN’s Dropout or Dropblock Layer.
+For this function to work on the RPN, it must have defined a list called
+‘rpn_intermediate_output’ that collects the intermediate representations at inference time
+i.e. the hook is not enough since it only captures one output per layer and this layer
+outputs five elements. A modification in the RPN is therefore needed.
+An example below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">rpn_intermediate_output</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">pred_objectness_logits</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pred_anchor_deltas</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">features</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropblock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="c1"># Normal NN operations</span>
+        <span class="n">pred_objectness_logits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objectness_logits</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+        <span class="n">pred_anchor_deltas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">anchor_deltas</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+        <span class="c1"># Hook operations to catch RPN intermediate output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rpn_intermediate_output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pred_objectness_logits</span><span class="p">,</span> <span class="n">pred_anchor_deltas</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – Torch model</p></li>
+<li><p><strong>data_loader</strong> – Input samples (torch) DataLoader</p></li>
+<li><p><strong>mcd_nro_samples</strong> – Number of Monte-Carlo Samples</p></li>
+<li><p><strong>hook_dropout_layer</strong> – Hook at the Dropout Layer from the Neural Network Module</p></li>
+<li><p><strong>layer_type</strong> – Type of layer that will get the MC samples. Either FC (Fully Connected) or
+Conv (Convolutional)</p></li>
+<li><p><strong>return_raw_predictions</strong> – Returns the raw logits output</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Monte-Carlo Dropout samples for the input dataloader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.rcnn.get_msp_score_rcnn">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.rcnn.</span></span><span class="sig-name descname"><span class="pre">get_msp_score_rcnn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dnn_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/rcnn.html#get_msp_score_rcnn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.rcnn.get_msp_score_rcnn" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the Maximum softmax probability score from an RCNN architecture coded with the
+Detectron 2 library, where the results are the first element of the output of the network,
+and the softmax are already calculated within the scores attribute of the results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dnn_model</strong> (<em>torch.nn.Module</em>) – The RCNN model</p></li>
+<li><p><strong>input_dataloader</strong> (<em>DataLoader</em>) – The Dataloader</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The MSP scores</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ls_ood_detect_cea.uncertainty_estimation">
+<span id="ls-ood-detect-cea-uncertainty-estimation-module"></span><h2>ls_ood_detect_cea.uncertainty_estimation module<a class="headerlink" href="#module-ls_ood_detect_cea.uncertainty_estimation" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.Hook">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">Hook</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backward</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#Hook"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.Hook" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class will catch the input and output of any torch layer during forward/backward pass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> (<em>torch.nn.Module</em>) – Layer block from Neural Network Module</p></li>
+<li><p><strong>backward</strong> (<em>bool</em>) – backward-poss hook</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.Hook.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#Hook.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.Hook.close" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.Hook.hook_fn">
+<span class="sig-name descname"><span class="pre">hook_fn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#Hook.hook_fn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.Hook.hook_fn" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">KNNPostprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setup_flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#KNNPostprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>kNN Distance Score uncertainty estimator class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>K</strong> – Number of neighbors for calculations</p></li>
+<li><p><strong>setup_flag</strong> – Whether the postprocessor is already trained</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.get_K_hyperparam">
+<span class="sig-name descname"><span class="pre">get_K_hyperparam</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#KNNPostprocessor.get_K_hyperparam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.get_K_hyperparam" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.postprocess">
+<span class="sig-name descname"><span class="pre">postprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dnn_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_hook</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.Hook" title="ls_ood_detect_cea.uncertainty_estimation.Hook"><span class="pre">Hook</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#KNNPostprocessor.postprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.postprocess" title="Permalink to this definition"></a></dt>
+<dd><p>Perform inference with the set-up estimator, i.e. for each sample in the Data Loader
+estimate if it belongs to the InD distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dnn_model</strong> – Trained torch or lightning model</p></li>
+<li><p><strong>dataloader</strong> – Dataloader</p></li>
+<li><p><strong>layer_hook</strong> – Hook to the layer to take samples from</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Model predictions and confidence scores</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(tuple)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.set_K_hyperparam">
+<span class="sig-name descname"><span class="pre">set_K_hyperparam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hyperparam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#KNNPostprocessor.set_K_hyperparam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.set_K_hyperparam" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dnn_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_hook</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.Hook" title="ls_ood_detect_cea.uncertainty_estimation.Hook"><span class="pre">Hook</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#KNNPostprocessor.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.setup" title="Permalink to this definition"></a></dt>
+<dd><p>Estimate the parameters of a kNN estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dnn_model</strong> – Trained torch or lightning model</p></li>
+<li><p><strong>ind_dataloader</strong> – Dataloader</p></li>
+<li><p><strong>layer_hook</strong> – Hook to the layer to take samples from</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.LaREMPostprocessor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">LaREMPostprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">setup_flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#LaREMPostprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.LaREMPostprocessor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>LaREM Distance Score uncertainty estimator class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>setup_flag</strong> – Whether the postprocessor is already trained</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.LaREMPostprocessor.postprocess">
+<span class="sig-name descname"><span class="pre">postprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ood_feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#LaREMPostprocessor.postprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.LaREMPostprocessor.postprocess" title="Permalink to this definition"></a></dt>
+<dd><p>Perform inference with the set up estimator, i.e. for each sample in the Data Loader
+estimate if it belongs to the InD distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ood_feats</strong> – Features (either InD or OoD) to estimate if they belong to the InD
+distribution</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Confidence scores</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(tuple)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.LaREMPostprocessor.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind_feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#LaREMPostprocessor.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.LaREMPostprocessor.setup" title="Permalink to this definition"></a></dt>
+<dd><p>Estimate the parameters of a multivariate normal distribution from a set of data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ind_feats</strong> – InD features to estimate the distribution</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.MCDSamplesExtractor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">MCDSamplesExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mcd_nro_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hook_dropout_layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.Hook" title="ls_ood_detect_cea.uncertainty_estimation.Hook"><span class="pre">Hook</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_resnet_architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_raw_predictions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#MCDSamplesExtractor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.MCDSamplesExtractor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to get Monte-Carlo samples from any torch model Dropout or Dropblock Layer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – Torch or Lightning model</p></li>
+<li><p><strong>mcd_nro_samples</strong> – Number of Monte-Carlo Samples</p></li>
+<li><p><strong>hook_dropout_layer</strong> – Hook at the Dropout Layer from the Neural Network Module</p></li>
+<li><p><strong>layer_type</strong> – Type of layer that will get the MC samples. Either FC (Fully Connected) or
+Conv (Convolutional)</p></li>
+<li><p><strong>device</strong> – CUDA or CPU device</p></li>
+<li><p><strong>architecture</strong> – The model architecture: either small or resnet</p></li>
+<li><p><strong>location</strong> – Location of the hook. This can be useful to select different latent sample
+catching layers</p></li>
+<li><p><strong>reduction_method</strong> – Whether to use fullmean, mean, or avgpool to reduce dimensionality
+of hooked representation</p></li>
+<li><p><strong>input_size</strong> – Image size (we assume squared images)</p></li>
+<li><p><strong>original_resnet_architecture</strong> – Either original or modified Lightning architecture</p></li>
+<li><p><strong>return_raw_predictions</strong> – Return or not network outputs</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Monte-Carlo Dropout samples for the input dataloader</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.MCDSamplesExtractor.get_ls_mcd_samples_baselines">
+<span class="sig-name descname"><span class="pre">get_ls_mcd_samples_baselines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#MCDSamplesExtractor.get_ls_mcd_samples_baselines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.MCDSamplesExtractor.get_ls_mcd_samples_baselines" title="Permalink to this definition"></a></dt>
+<dd><p>Perform the Monte Carlo Dropout inference given a dataloader
+:param data_loader: DataLoader</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Latent MCD samples and optionally the raw inference results</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.MDSPostprocessor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">MDSPostprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">43</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setup_flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#MDSPostprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.MDSPostprocessor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Mahalanobis Distance Score uncertainty estimator class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_classes</strong> – Number of In-distribution samples</p></li>
+<li><p><strong>setup_flag</strong> – Whether the postprocessor is already trained</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.MDSPostprocessor.postprocess">
+<span class="sig-name descname"><span class="pre">postprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dnn_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_hook</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.Hook" title="ls_ood_detect_cea.uncertainty_estimation.Hook"><span class="pre">Hook</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#MDSPostprocessor.postprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.MDSPostprocessor.postprocess" title="Permalink to this definition"></a></dt>
+<dd><p>Perform inference with the set up estimator, i.e. for each sample in the Data Loader
+estimate if it belongs to the InD distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dnn_model</strong> – Trained torch or lightning model</p></li>
+<li><p><strong>dataloader</strong> – Dataloader</p></li>
+<li><p><strong>layer_hook</strong> – Hook to the layer to take samples from</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Model predictions and confidence scores</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(tuple)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.MDSPostprocessor.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dnn_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_hook</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.Hook" title="ls_ood_detect_cea.uncertainty_estimation.Hook"><span class="pre">Hook</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#MDSPostprocessor.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.MDSPostprocessor.setup" title="Permalink to this definition"></a></dt>
+<dd><p>Estimate the parameters of a multivariate normal distribution from a set of data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dnn_model</strong> – Trained torch or lightning model</p></li>
+<li><p><strong>ind_dataloader</strong> – Dataloader</p></li>
+<li><p><strong>layer_hook</strong> – Hook to the layer to take samples from</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.RouteDICE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">RouteDICE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv1x1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#RouteDICE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.RouteDICE" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Linear</span></code></p>
+<p>Class to replace the penultimate fully connected layer of a network in order to use the
+DICE method
+:param in_features: Dimension of the input vector
+:param out_features: Dimension of the output vector
+:param bias: Bias for the Linear layer
+:param p: Percentile for sparsifying
+:param conv1x1: Whether using a 1x1 conv layer
+:param info: The previously calculated expected values</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.RouteDICE.calculate_mask_weight">
+<span class="sig-name descname"><span class="pre">calculate_mask_weight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#RouteDICE.calculate_mask_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.RouteDICE.calculate_mask_weight" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.RouteDICE.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#RouteDICE.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.RouteDICE.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.RouteDICE.in_features">
+<span class="sig-name descname"><span class="pre">in_features</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.RouteDICE.in_features" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.RouteDICE.out_features">
+<span class="sig-name descname"><span class="pre">out_features</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.RouteDICE.out_features" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.RouteDICE.weight">
+<span class="sig-name descname"><span class="pre">weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tensor</span></em><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.RouteDICE.weight" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.deeplabv3p_apply_dropout">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">deeplabv3p_apply_dropout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#deeplabv3p_apply_dropout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.deeplabv3p_apply_dropout" title="Permalink to this definition"></a></dt>
+<dd><p>Activate Dropout or Dropblock layers.
+:param m: Pytorch module</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.deeplabv3p_get_ls_mcd_samples">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">deeplabv3p_get_ls_mcd_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LightningModule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mcd_nro_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hook_dropout_layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.Hook" title="ls_ood_detect_cea.uncertainty_estimation.Hook"><span class="pre">Hook</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#deeplabv3p_get_ls_mcd_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.deeplabv3p_get_ls_mcd_samples" title="Permalink to this definition"></a></dt>
+<dd><blockquote>
+<div><p>Get Monte-Carlo samples form Deeplabv3+ DNN Dropout Layer</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_module</strong> (<em>pl.LightningModule</em>) – Deeplabv3+ Neural Network Lightning Module</p></li>
+<li><p><strong>dataloader</strong> (<em>DataLoader</em>) – Input samples (torch) Dataloader</p></li>
+<li><p><strong>mcd_nro_samples</strong> (<em>int</em>) – Number of Monte-Carlo Samples</p></li>
+<li><p><strong>hook_dropout_layer</strong> (<a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.Hook" title="ls_ood_detect_cea.uncertainty_estimation.Hook"><em>Hook</em></a>) – Hook at the Dropout Layer from the Neural Network Module</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Monte-Carlo Dropout samples for the input dataloader</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.get_dice_feat_mean_react_percentile">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">get_dice_feat_mean_react_percentile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dnn_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">react_percentile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">90</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#get_dice_feat_mean_react_percentile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.get_dice_feat_mean_react_percentile" title="Permalink to this definition"></a></dt>
+<dd><p>Get the DICE and ReAct thresholds for sparsifying and clipping from a given model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dnn_model</strong> – The RCNN model</p></li>
+<li><p><strong>ind_dataloader</strong> – The Data loader</p></li>
+<li><p><strong>react_percentile</strong> – Desired percentile for ReAct</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The DICE expected values, and the ReAct threshold</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.get_dl_h_z">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">get_dl_h_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dl_z_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mcd_samples_nro</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#get_dl_h_z"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.get_dl_h_z" title="Permalink to this definition"></a></dt>
+<dd><p>Get dataloader Entropy $h(.)$ for Z, from Monte Carlo Dropout (MCD) samples</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dl_z_samples</strong> – Dataloader Z Samples</p></li>
+<li><p><strong>mcd_samples_nro</strong> – Number of monte carlo dropout samples</p></li>
+<li><p><strong>parallel_run</strong> – Optionally try to perform entropy calculations in parallel</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Latent vector multivariate normal entropy $h(Z)$, Latent vector value entropy $h(z_i)$</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.get_energy_score">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">get_energy_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dnn_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#get_energy_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.get_energy_score" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the energy uncertainty score</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dnn_model</strong> – Trained torch or lightning model</p></li>
+<li><p><strong>input_dataloader</strong> – Dataloader</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Energy scores</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.get_latent_representation_mcd_samples">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">get_latent_representation_mcd_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dnn_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mcd_nro_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_hook</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ls_ood_detect_cea.uncertainty_estimation.Hook" title="ls_ood_detect_cea.uncertainty_estimation.Hook"><span class="pre">Hook</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#get_latent_representation_mcd_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.get_latent_representation_mcd_samples" title="Permalink to this definition"></a></dt>
+<dd><p>Get latent representations Monte-Carlo samples from DNN using a layer hook</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dnn_model</strong> – Neural Network Torch or Lightning Module</p></li>
+<li><p><strong>dataloader</strong> – Input samples (torch) Data loader</p></li>
+<li><p><strong>mcd_nro_samples</strong> – Number of Monte-Carlo Samples</p></li>
+<li><p><strong>layer_hook</strong> – DNN layer hook</p></li>
+<li><p><strong>layer_type</strong> – Type of layer that will get the MC samples. Either FC (Fully Connected)</p></li>
+<li><p><strong>Conv</strong> (<em>or</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Input dataloader latent representations MC samples tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.get_mcd_pred_uncertainty_score">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">get_mcd_pred_uncertainty_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dnn_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mcd_nro_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#get_mcd_pred_uncertainty_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.get_mcd_pred_uncertainty_score" title="Permalink to this definition"></a></dt>
+<dd><p>This function performs inference and calculates the predictive uncertainty, the mutual
+information, and returns the predictions, given a model, a dataloader and a number of MCD steps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dnn_model</strong> – Trained model</p></li>
+<li><p><strong>input_dataloader</strong> – Data Loader</p></li>
+<li><p><strong>mcd_nro_samples</strong> – Number of samples for MCD dropout</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>MCD samples, predictive entropy and mutual information scores</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.get_mean_or_fullmean_ls_sample">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">get_mean_or_fullmean_ls_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latent_sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#get_mean_or_fullmean_ls_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.get_mean_or_fullmean_ls_sample" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.get_msp_score">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">get_msp_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dnn_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#get_msp_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.get_msp_score" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the Maximum softmax probability score given a model and a dataloader</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dnn_model</strong> – Trained torch or lightning model</p></li>
+<li><p><strong>input_dataloader</strong> – Dataloader</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>MSP scores</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.get_predictive_uncertainty_score">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">get_predictive_uncertainty_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mcd_nro_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#get_predictive_uncertainty_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.get_predictive_uncertainty_score" title="Permalink to this definition"></a></dt>
+<dd><p>This function calculates the predictive uncertainty and the mutual information given some
+already calculated activations for a number of MCD steps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_samples</strong> – Already calculated outputs from a model with the given MCD steps</p></li>
+<li><p><strong>mcd_nro_samples</strong> – Number of samples for MCD dropout</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Predictive uncertainty, mutual information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.normalizer">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">normalizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.normalizer" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.probunet_apply_dropout">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">probunet_apply_dropout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#probunet_apply_dropout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.probunet_apply_dropout" title="Permalink to this definition"></a></dt>
+<dd><p>Activate Dropout or Dropblock layers.
+:param m: Pytorch module</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ls_ood_detect_cea.uncertainty_estimation.single_image_entropy_calculation">
+<span class="sig-prename descclassname"><span class="pre">ls_ood_detect_cea.uncertainty_estimation.</span></span><span class="sig-name descname"><span class="pre">single_image_entropy_calculation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighbors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/ls_ood_detect_cea/uncertainty_estimation.html#single_image_entropy_calculation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ls_ood_detect_cea.uncertainty_estimation.single_image_entropy_calculation" title="Permalink to this definition"></a></dt>
+<dd><p>Function used to calculate the entropy values of a single image. Used to calculate entropy
+in parallel</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample</strong> – MCD samples for a single image</p></li>
+<li><p><strong>neighbors</strong> – Number of neighbors to perform calculation. By default 5 seems ok, but should
+be n-1 if n&lt;=5</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Entropy of the activations for a single image</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ls_ood_detect_cea">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ls_ood_detect_cea" title="Permalink to this heading"></a></h2>
+<p>Import all module’s functions</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Latent space uncertainty estimation for OoD detection’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Fabio ARNEZ, Daniel MONTOYA.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

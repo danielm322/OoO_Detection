@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="docs/assets/Logo_ConfianceAI.png" width="20%" alt="ConfianceAI Logo" />
+    <img src="assets/Logo_ConfianceAI.png" width="20%" alt="ConfianceAI Logo" />
     <h1 style="font-size: large; font-weight: bold;">Out-of-Distribution Detection using DNN 
 Latent Representations Uncertainty</h1>
 </div><div align="center">
@@ -11,6 +11,7 @@ Latent Representations Uncertainty</h1>
     </a>
 </div>
 <br>
+
 ---
 sidebar_position: 4
 title: Guideline CEA-LSEA Out-of-Distribution Detection using DNN Latent Representations Uncertainty
