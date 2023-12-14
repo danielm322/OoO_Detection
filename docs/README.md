@@ -100,8 +100,8 @@ After installing all the requirements, then in the base folder of the repo do `p
 
 ## 🎮 Usage
 
-For a complete example of how to use the component refer to: [REF](ref)
-For detailed usage, check this [document](./ls_ood_detect_cea/CEA-LSEA-OoD_Detection_DNN_Latent_Space.md)
+For a complete example of how to use the component, check the notebooks: [Notebook 1: extract MCDz samples](./examples/1_example_deeplab_segmentation_samples_extraction.ipynb),
+and [Notebook 2: Evaluate LaREx](./examples/2_example_deeplab_segmentation_analysis.ipynb)
 
 Here we present a general overview of how to evaluate the component and obtain detection metrics:
 
