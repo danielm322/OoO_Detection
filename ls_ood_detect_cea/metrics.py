@@ -402,7 +402,7 @@ def select_and_log_best_lared_larem(
     n_pca_components_list: list,
     technique: str,
     log_mlflow: bool = False,
-) -> Tuple[float, float, float]:
+) -> Tuple[float, float, float, int]:
     """
     Takes as input a Dataframe with the columns 'auroc', 'aupr' and 'fpr@95', a list of PCA number
     of components, and the name of the technique: either 'LaRED' or 'LaREM', and logs to and
@@ -415,7 +415,7 @@ def select_and_log_best_lared_larem(
         log_mlflow: Log to mlflow boolean flag
 
     Returns:
-        Tuple with the best auroc, aupr and fpr
+        Tuple with the best auroc, aupr, fpr and the N components.
     """
     assert isinstance(overall_metrics_df, pd.DataFrame)
     assert hasattr(n_pca_components_list, "__iter__")
@@ -472,6 +472,7 @@ def select_and_log_best_lared_larem(
         means_df.loc[best_index, "auroc"],
         means_df.loc[best_index, "aupr"],
         means_df.loc[best_index, "fpr@95"],
+        best_n_comps
     )
 
 
