@@ -200,4 +200,7 @@ Publications
     - Out-of-Distribution Detection using Deep Neural Network Latent Space
 
 
-Example : To display the component's references : [EC2 Process and Methods](https://irtsystemx.sharepoint.com/:b:/r/sites/IAdeConfiance833/Documents%20partages/General/EC_2/40_Deliverable/Livrables%20en%20cours/AI%20trustworthiness%20characteristics%20and%20assessment%20methodology/EC2_N6_AITA_V0.pdf?csf=1&web=1&e=6kx9Ao)
+Confiance AI documents:
+* [Methodological guidelines](https://irtsystemx.sharepoint.com/:b:/s/IAdeConfiance833/ERYc5y-HkPdAvL0TVAQdp0kBkfsPhJwrXrfZrVsH8CuY8Q?e=1mpavP)
+* [Benchmarks](https://irtsystemx.sharepoint.com/:b:/s/IAdeConfiance833/EfaV2zJlJ9VOqMHSr9sk1JIBvXl3CjQGRzHzwAtO_SXiHQ?e=AbUAiM)
+* [Use Case application: Valeo - scene understanding](https://irtsystemx.sharepoint.com/:b:/s/IAdeConfiance833/EZKRyjRiobZLm58OoerTgTYB9o_PjyuPpVY7PXFb_v0_hg?e=cWNHdI)
