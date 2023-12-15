@@ -102,7 +102,7 @@ class Test(TestCase):
             # Add results to df
             overall_metrics_df = overall_metrics_df.append(r_df)
         # Check LaRED results
-        auroc_lared, aupr_lared, fpr_lared = select_and_log_best_lared_larem(
+        auroc_lared, aupr_lared, fpr_lared, best_n_comps_lared = select_and_log_best_lared_larem(
             overall_metrics_df, pca_components, technique="LaRED", log_mlflow=False
         )
         self.assertAlmostEqual(0.9400724172592163, auroc_lared)
@@ -110,7 +110,7 @@ class Test(TestCase):
         self.assertAlmostEqual(0.25679999589920044, fpr_lared)
 
         # Check LaREM results
-        auroc_larem, aupr_larem, fpr_larem = select_and_log_best_lared_larem(
+        auroc_larem, aupr_larem, fpr_larem, best_n_comps_larem = select_and_log_best_lared_larem(
             overall_metrics_df, pca_components, technique="LaREM", log_mlflow=True
         )
         self.assertAlmostEqual(0.9411856532096863, auroc_larem)
