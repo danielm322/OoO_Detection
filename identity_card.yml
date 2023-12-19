@@ -21,6 +21,6 @@ Link :
 
 Technical:
     Python Version: 3.8+
-    Dependencies : []pytorch, entropy_estimators, numpy, sklearn, dropblock, pandas, mlflow, matplotlib]
+    Dependencies : [pytorch, entropy_estimators, numpy, sklearn, dropblock, pandas, mlflow, matplotlib]
     Hardware_compatibility : GPU
     component_incompatibility : #

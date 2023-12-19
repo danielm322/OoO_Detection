@@ -63,7 +63,7 @@ In all the above cases, the DNNs were slightly modified to capture _epistemic_ u
 
 ## 🔍 Identity card
 
- Can be found here: [Identity card](./identity_card.yml)
+ Can be found here: [Identity card](https://git.irt-systemx.fr/confianceai/ec_3/n6_monitoring/component-latent-space/ood-latent-space/-/blob/4-finish-library/identity_card.yml)
 
 <div id='quickstart'/>
 
@@ -100,8 +100,8 @@ After installing all the requirements, then in the base folder of the repo do `p
 
 ## 🎮 Usage
 
-For a complete example of how to use the component, check the notebooks: [Notebook 1: extract MCDz samples](./examples/1_example_deeplab_segmentation_samples_extraction.ipynb),
-and [Notebook 2: Evaluate LaREx](./examples/2_example_deeplab_segmentation_analysis.ipynb)
+For a complete example of how to use the component, check the notebooks: [Notebook 1: extract MCDz samples](https://git.irt-systemx.fr/confianceai/ec_3/n6_monitoring/component-latent-space/ood-latent-space/-/blob/4-finish-library/examples/1_example_deeplab_segmentation_samples_extraction.ipynb?ref_type=heads),
+and [Notebook 2: Evaluate LaREx](https://git.irt-systemx.fr/confianceai/ec_3/n6_monitoring/component-latent-space/ood-latent-space/-/blob/4-finish-library/examples/2_example_deeplab_segmentation_analysis.ipynb?ref_type=heads)
 
 Here we present a general overview of how to evaluate the component and obtain detection metrics:
 
