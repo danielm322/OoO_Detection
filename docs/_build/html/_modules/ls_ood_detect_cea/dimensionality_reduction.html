@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ls_ood_detect_cea.dimensionality_reduction &mdash; OOD Detection using DNN Latent Representations Uncertainty 1.0.0-rc documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=25b81f78"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+        <script src="../../_static/design-tabs.js?v=36754332"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OOD Detection using DNN Latent Representations Uncertainty
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">Guideline CEA-LSEA Out-of-Distribution Detection using DNN Latent Representations Uncertainty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">ls_ood_detect_cea</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OOD Detection using DNN Latent Representations Uncertainty</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ls_ood_detect_cea.dimensionality_reduction</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ls_ood_detect_cea.dimensionality_reduction</h1><div class="highlight"><pre>
+<span></span><span class="c1"># (c) 2023, CEA LIST</span>
+<span class="c1">#</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+<span class="c1">#</span>
+<span class="c1"># Contributors</span>
+<span class="c1">#    Fabio Arnez</span>
+<span class="c1">#    Daniel Montoya</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pacmap</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+
+
+<div class="viewcode-block" id="apply_pca_ds">
+<a class="viewcode-back" href="../../ls_ood_detect_cea.html#ls_ood_detect_cea.dimensionality_reduction.apply_pca_ds">[docs]</a>
+<span class="k">def</span> <span class="nf">apply_pca_ds</span><span class="p">(</span>
+    <span class="n">train_samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">test_samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">nro_components</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="n">svd_solver</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;randomized&quot;</span><span class="p">,</span>
+    <span class="n">whiten</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">PCA</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies PCA dimensionality reduction to a dataset</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        train_samples: PCA train and fit samples</span>
+<span class="sd">        test_samples: PCA test samples</span>
+<span class="sd">        nro_components: PCA components number</span>
+<span class="sd">        svd_solver: PCA SVD solver</span>
+<span class="sd">        whiten: PCA whiten value</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Train and Test samples with reduced dimensionality</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">train_samples</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s2">&quot;train_samples must be a numpy array&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_samples</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s2">&quot;test_samples must be a numpy array&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nro_components</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+    <span class="n">pca_dim_red</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">nro_components</span><span class="p">,</span> <span class="n">svd_solver</span><span class="o">=</span><span class="n">svd_solver</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="n">whiten</span><span class="p">)</span>
+    <span class="n">train_ds</span> <span class="o">=</span> <span class="n">pca_dim_red</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">train_samples</span><span class="p">)</span>
+    <span class="n">test_ds</span> <span class="o">=</span> <span class="n">pca_dim_red</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_samples</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">train_ds</span><span class="p">,</span> <span class="n">test_ds</span><span class="p">,</span> <span class="n">pca_dim_red</span></div>
+
+
+
+<div class="viewcode-block" id="apply_pca_ds_split">
+<a class="viewcode-back" href="../../ls_ood_detect_cea.html#ls_ood_detect_cea.dimensionality_reduction.apply_pca_ds_split">[docs]</a>
+<span class="k">def</span> <span class="nf">apply_pca_ds_split</span><span class="p">(</span>
+    <span class="n">samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">nro_components</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="n">svd_solver</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;randomized&quot;</span><span class="p">,</span>
+    <span class="n">whiten</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">PCA</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies PCA dimensionality reduction to a dataset split</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        samples: Dataset split samples</span>
+<span class="sd">        nro_components: PCA nnumber of components, defaults to 16</span>
+<span class="sd">        svd_solver: PCA SVD solver, defaults to &#39;randomized&#39;</span>
+<span class="sd">        whiten: PCA whiten value, defaults to True</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dataset samples with reduced dimensionality, PCA transformation object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s2">&quot;samples must be a numpy array&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nro_components</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+    <span class="n">pca_dim_red</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">nro_components</span><span class="p">,</span> <span class="n">svd_solver</span><span class="o">=</span><span class="n">svd_solver</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="n">whiten</span><span class="p">)</span>
+    <span class="n">dataset_dim_red</span> <span class="o">=</span> <span class="n">pca_dim_red</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataset_dim_red</span><span class="p">,</span> <span class="n">pca_dim_red</span></div>
+
+
+
+<div class="viewcode-block" id="apply_pca_transform">
+<a class="viewcode-back" href="../../ls_ood_detect_cea.html#ls_ood_detect_cea.dimensionality_reduction.apply_pca_transform">[docs]</a>
+<span class="k">def</span> <span class="nf">apply_pca_transform</span><span class="p">(</span><span class="n">samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pca_transform</span><span class="p">:</span> <span class="n">PCA</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transform new samples with an already trained PCA transformation</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        samples: New samples</span>
+<span class="sd">        pca_transform: The trained PCA</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Transformed samples</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s2">&quot;samples must be a numpy array&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pca_transform</span><span class="p">,</span> <span class="n">PCA</span><span class="p">),</span> <span class="s2">&quot;pca_transform must be a PCA instance&quot;</span>
+    <span class="n">samples_dim_red</span> <span class="o">=</span> <span class="n">pca_transform</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">samples_dim_red</span></div>
+
+
+
+<div class="viewcode-block" id="plot_samples_pacmap">
+<a class="viewcode-back" href="../../ls_ood_detect_cea.html#ls_ood_detect_cea.dimensionality_reduction.plot_samples_pacmap">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_samples_pacmap</span><span class="p">(</span>
+    <span class="n">samples_ind</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">samples_ood</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">neighbors</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
+    <span class="n">components</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Plot Title&quot;</span><span class="p">,</span>
+    <span class="n">return_figure</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    In-Distribution vs Out-of-Distribution Data Projection 2D Plot using PaCMAP algorithm.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        samples_ind: In-Distribution (InD) samples numpy array</span>
+<span class="sd">        samples_ood: Out-of-Distribution (OoD) samples numpy array</span>
+<span class="sd">        neighbors: Number of nearest-neighbors considered for the PaCMAP algorithm</span>
+<span class="sd">        components: Number of components in final reduction</span>
+<span class="sd">        title: Plot tile</span>
+<span class="sd">        return_figure: True if show picture to screen instead of returning it</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Either a plot or None (show the plot)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples_ind</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s2">&quot;samples_ind must be a numpy array&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples_ood</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s2">&quot;samples_ood must be a numpy array&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">neighbors</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">return_figure</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+
+    <span class="n">samples_concat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">samples_ind</span><span class="p">,</span> <span class="n">samples_ood</span><span class="p">))</span>
+    <span class="n">label_normal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">samples_ind</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">label_anomaly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">samples_ood</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">label_normal</span><span class="p">,</span> <span class="n">label_anomaly</span><span class="p">))</span>
+    <span class="n">embedding</span> <span class="o">=</span> <span class="n">pacmap</span><span class="o">.</span><span class="n">PaCMAP</span><span class="p">(</span>
+        <span class="n">n_components</span><span class="o">=</span><span class="n">components</span><span class="p">,</span> <span class="n">n_neighbors</span><span class="o">=</span><span class="n">neighbors</span><span class="p">,</span> <span class="n">MN_ratio</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">FP_ratio</span><span class="o">=</span><span class="mf">2.0</span>
+    <span class="p">)</span>
+    <span class="n">samples_transformed</span> <span class="o">=</span> <span class="n">embedding</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">samples_concat</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;pca&quot;</span><span class="p">)</span>
+
+    <span class="c1"># visualize the embedding</span>
+    <span class="c1"># ToDo: Add Axis Names and plot legend</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">scatter</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+        <span class="n">samples_transformed</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="n">samples_transformed</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;brg&quot;</span><span class="p">,</span>
+        <span class="n">c</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">axes</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">axes</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
+        <span class="n">handles</span><span class="o">=</span><span class="n">scatter</span><span class="o">.</span><span class="n">legend_elements</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;In-Distribution&quot;</span><span class="p">,</span> <span class="s2">&quot;Out-of-Distribution&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_figure</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fig</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="fit_pacmap">
+<a class="viewcode-back" href="../../ls_ood_detect_cea.html#ls_ood_detect_cea.dimensionality_reduction.fit_pacmap">[docs]</a>
+<span class="k">def</span> <span class="nf">fit_pacmap</span><span class="p">(</span>
+    <span class="n">samples_ind</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span> <span class="n">components</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">pacmap</span><span class="o">.</span><span class="n">PaCMAP</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    In-Distribution vs Out-of-Distribution Data Projection 2D Plot using PaCMAP algorithm.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        samples_ind: Number of components in the output</span>
+<span class="sd">        neighbors: In-Distribution (InD) samples numpy array</span>
+<span class="sd">        components: Number of nearest-neighbors considered for the PaCMAP algorithm</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Transformed samples and embedding</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples_ind</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">neighbors</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+
+    <span class="n">embedding</span> <span class="o">=</span> <span class="n">pacmap</span><span class="o">.</span><span class="n">PaCMAP</span><span class="p">(</span>
+        <span class="n">n_components</span><span class="o">=</span><span class="n">components</span><span class="p">,</span> <span class="n">n_neighbors</span><span class="o">=</span><span class="n">neighbors</span><span class="p">,</span> <span class="n">MN_ratio</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">FP_ratio</span><span class="o">=</span><span class="mf">2.0</span>
+    <span class="p">)</span>
+    <span class="n">samples_transformed</span> <span class="o">=</span> <span class="n">embedding</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">samples_ind</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;pca&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">samples_transformed</span><span class="p">,</span> <span class="n">embedding</span></div>
+
+
+
+<div class="viewcode-block" id="apply_pacmap_transform">
+<a class="viewcode-back" href="../../ls_ood_detect_cea.html#ls_ood_detect_cea.dimensionality_reduction.apply_pacmap_transform">[docs]</a>
+<span class="k">def</span> <span class="nf">apply_pacmap_transform</span><span class="p">(</span>
+    <span class="n">new_samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">original_samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">pm_instance</span><span class="p">:</span> <span class="n">pacmap</span><span class="o">.</span><span class="n">PaCMAP</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use the already trained PaCMAP to transform new samples</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        new_samples: New samples to be transformed</span>
+<span class="sd">        original_samples: The original samples used to train the algorithm</span>
+<span class="sd">        pm_instance: Instance of the trained PaCMAP</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Transformed new samples</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_samples</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">original_samples</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pm_instance</span><span class="p">,</span> <span class="n">pacmap</span><span class="o">.</span><span class="n">PaCMAP</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pm_instance</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">new_samples</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="n">original_samples</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CEA-LSEA.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

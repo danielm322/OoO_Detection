@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ls_ood_detect_cea &mdash; OOD Detection using DNN Latent Representations Uncertainty 1.0.0-rc documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=25b81f78"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+        <script src="_static/design-tabs.js?v=36754332"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ls_ood_detect_cea package" href="ls_ood_detect_cea.html" />
+    <link rel="prev" title="Guideline CEA-LSEA Out-of-Distribution Detection using DNN Latent Representations Uncertainty" href="README.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OOD Detection using DNN Latent Representations Uncertainty
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">Guideline CEA-LSEA Out-of-Distribution Detection using DNN Latent Representations Uncertainty</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ls_ood_detect_cea</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ls_ood_detect_cea.html">ls_ood_detect_cea package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OOD Detection using DNN Latent Representations Uncertainty</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">ls_ood_detect_cea</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ls-ood-detect-cea">
+<h1>ls_ood_detect_cea<a class="headerlink" href="#ls-ood-detect-cea" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ls_ood_detect_cea.html">ls_ood_detect_cea package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ls_ood_detect_cea.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ls_ood_detect_cea.html#module-ls_ood_detect_cea.detectors">ls_ood_detect_cea.detectors module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.detectors.DetectorKDE"><code class="docutils literal notranslate"><span class="pre">DetectorKDE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.detectors.DetectorKDE.density_fit"><code class="docutils literal notranslate"><span class="pre">DetectorKDE.density_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.detectors.DetectorKDE.get_density_scores"><code class="docutils literal notranslate"><span class="pre">DetectorKDE.get_density_scores()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.detectors.KDEClassifier"><code class="docutils literal notranslate"><span class="pre">KDEClassifier</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.detectors.KDEClassifier.estimate_joint_log_prob"><code class="docutils literal notranslate"><span class="pre">KDEClassifier.estimate_joint_log_prob()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.detectors.KDEClassifier.fit"><code class="docutils literal notranslate"><span class="pre">KDEClassifier.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.detectors.KDEClassifier.pred_prob"><code class="docutils literal notranslate"><span class="pre">KDEClassifier.pred_prob()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.detectors.KDEClassifier.predict"><code class="docutils literal notranslate"><span class="pre">KDEClassifier.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.detectors.KDEClassifier.predict_label"><code class="docutils literal notranslate"><span class="pre">KDEClassifier.predict_label()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.detectors.KDEClassifier.predict_prob"><code class="docutils literal notranslate"><span class="pre">KDEClassifier.predict_prob()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.detectors.KDEClassifier.predict_proba"><code class="docutils literal notranslate"><span class="pre">KDEClassifier.predict_proba()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.detectors.get_hz_scores"><code class="docutils literal notranslate"><span class="pre">get_hz_scores()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ls_ood_detect_cea.html#module-ls_ood_detect_cea.dimensionality_reduction">ls_ood_detect_cea.dimensionality_reduction module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.dimensionality_reduction.apply_pacmap_transform"><code class="docutils literal notranslate"><span class="pre">apply_pacmap_transform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.dimensionality_reduction.apply_pca_ds"><code class="docutils literal notranslate"><span class="pre">apply_pca_ds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.dimensionality_reduction.apply_pca_ds_split"><code class="docutils literal notranslate"><span class="pre">apply_pca_ds_split()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.dimensionality_reduction.apply_pca_transform"><code class="docutils literal notranslate"><span class="pre">apply_pca_transform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.dimensionality_reduction.fit_pacmap"><code class="docutils literal notranslate"><span class="pre">fit_pacmap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.dimensionality_reduction.plot_samples_pacmap"><code class="docutils literal notranslate"><span class="pre">plot_samples_pacmap()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ls_ood_detect_cea.html#module-ls_ood_detect_cea.metrics">ls_ood_detect_cea.metrics module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.metrics.get_hz_detector_results"><code class="docutils literal notranslate"><span class="pre">get_hz_detector_results()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.metrics.get_pred_scores_plots"><code class="docutils literal notranslate"><span class="pre">get_pred_scores_plots()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.metrics.log_evaluate_lared_larem"><code class="docutils literal notranslate"><span class="pre">log_evaluate_lared_larem()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.metrics.plot_roc_ood_detector"><code class="docutils literal notranslate"><span class="pre">plot_roc_ood_detector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.metrics.save_roc_ood_detector"><code class="docutils literal notranslate"><span class="pre">save_roc_ood_detector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.metrics.save_scores_plots"><code class="docutils literal notranslate"><span class="pre">save_scores_plots()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.metrics.select_and_log_best_lared_larem"><code class="docutils literal notranslate"><span class="pre">select_and_log_best_lared_larem()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ls_ood_detect_cea.html#module-ls_ood_detect_cea.ood_detection_dataset">ls_ood_detect_cea.ood_detection_dataset module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.ood_detection_dataset.build_ood_detection_ds"><code class="docutils literal notranslate"><span class="pre">build_ood_detection_ds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.ood_detection_dataset.build_ood_detection_train_split"><code class="docutils literal notranslate"><span class="pre">build_ood_detection_train_split()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ls_ood_detect_cea.html#module-ls_ood_detect_cea.rcnn">ls_ood_detect_cea.rcnn module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.rcnn.get_dice_feat_mean_react_percentile_rcnn"><code class="docutils literal notranslate"><span class="pre">get_dice_feat_mean_react_percentile_rcnn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.rcnn.get_energy_score_rcnn"><code class="docutils literal notranslate"><span class="pre">get_energy_score_rcnn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.rcnn.get_ls_mcd_samples_rcnn"><code class="docutils literal notranslate"><span class="pre">get_ls_mcd_samples_rcnn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.rcnn.get_msp_score_rcnn"><code class="docutils literal notranslate"><span class="pre">get_msp_score_rcnn()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ls_ood_detect_cea.html#module-ls_ood_detect_cea.uncertainty_estimation">ls_ood_detect_cea.uncertainty_estimation module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.Hook"><code class="docutils literal notranslate"><span class="pre">Hook</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.Hook.close"><code class="docutils literal notranslate"><span class="pre">Hook.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.Hook.hook_fn"><code class="docutils literal notranslate"><span class="pre">Hook.hook_fn()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor"><code class="docutils literal notranslate"><span class="pre">KNNPostprocessor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.get_K_hyperparam"><code class="docutils literal notranslate"><span class="pre">KNNPostprocessor.get_K_hyperparam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.postprocess"><code class="docutils literal notranslate"><span class="pre">KNNPostprocessor.postprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.set_K_hyperparam"><code class="docutils literal notranslate"><span class="pre">KNNPostprocessor.set_K_hyperparam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.KNNPostprocessor.setup"><code class="docutils literal notranslate"><span class="pre">KNNPostprocessor.setup()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.LaREMPostprocessor"><code class="docutils literal notranslate"><span class="pre">LaREMPostprocessor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.LaREMPostprocessor.postprocess"><code class="docutils literal notranslate"><span class="pre">LaREMPostprocessor.postprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.LaREMPostprocessor.setup"><code class="docutils literal notranslate"><span class="pre">LaREMPostprocessor.setup()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.MCDSamplesExtractor"><code class="docutils literal notranslate"><span class="pre">MCDSamplesExtractor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.MCDSamplesExtractor.get_ls_mcd_samples_baselines"><code class="docutils literal notranslate"><span class="pre">MCDSamplesExtractor.get_ls_mcd_samples_baselines()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.MDSPostprocessor"><code class="docutils literal notranslate"><span class="pre">MDSPostprocessor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.MDSPostprocessor.postprocess"><code class="docutils literal notranslate"><span class="pre">MDSPostprocessor.postprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.MDSPostprocessor.setup"><code class="docutils literal notranslate"><span class="pre">MDSPostprocessor.setup()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.RouteDICE"><code class="docutils literal notranslate"><span class="pre">RouteDICE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.RouteDICE.calculate_mask_weight"><code class="docutils literal notranslate"><span class="pre">RouteDICE.calculate_mask_weight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.RouteDICE.forward"><code class="docutils literal notranslate"><span class="pre">RouteDICE.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.deeplabv3p_apply_dropout"><code class="docutils literal notranslate"><span class="pre">deeplabv3p_apply_dropout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.deeplabv3p_get_ls_mcd_samples"><code class="docutils literal notranslate"><span class="pre">deeplabv3p_get_ls_mcd_samples()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.get_dice_feat_mean_react_percentile"><code class="docutils literal notranslate"><span class="pre">get_dice_feat_mean_react_percentile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.get_dl_h_z"><code class="docutils literal notranslate"><span class="pre">get_dl_h_z()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.get_energy_score"><code class="docutils literal notranslate"><span class="pre">get_energy_score()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.get_latent_representation_mcd_samples"><code class="docutils literal notranslate"><span class="pre">get_latent_representation_mcd_samples()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.get_mcd_pred_uncertainty_score"><code class="docutils literal notranslate"><span class="pre">get_mcd_pred_uncertainty_score()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.get_mean_or_fullmean_ls_sample"><code class="docutils literal notranslate"><span class="pre">get_mean_or_fullmean_ls_sample()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.get_msp_score"><code class="docutils literal notranslate"><span class="pre">get_msp_score()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.get_predictive_uncertainty_score"><code class="docutils literal notranslate"><span class="pre">get_predictive_uncertainty_score()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.normalizer"><code class="docutils literal notranslate"><span class="pre">normalizer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.probunet_apply_dropout"><code class="docutils literal notranslate"><span class="pre">probunet_apply_dropout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ls_ood_detect_cea.html#ls_ood_detect_cea.uncertainty_estimation.single_image_entropy_calculation"><code class="docutils literal notranslate"><span class="pre">single_image_entropy_calculation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ls_ood_detect_cea.html#module-ls_ood_detect_cea">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="README.html" class="btn btn-neutral float-left" title="Guideline CEA-LSEA Out-of-Distribution Detection using DNN Latent Representations Uncertainty" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ls_ood_detect_cea.html" class="btn btn-neutral float-right" title="ls_ood_detect_cea package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CEA-LSEA.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

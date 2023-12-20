@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ls_ood_detect_cea.rcnn &mdash; OOD Detection using DNN Latent Representations Uncertainty 1.0.0-rc documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=25b81f78"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+        <script src="../../_static/design-tabs.js?v=36754332"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OOD Detection using DNN Latent Representations Uncertainty
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">Guideline CEA-LSEA Out-of-Distribution Detection using DNN Latent Representations Uncertainty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">ls_ood_detect_cea</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OOD Detection using DNN Latent Representations Uncertainty</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ls_ood_detect_cea.rcnn</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ls_ood_detect_cea.rcnn</h1><div class="highlight"><pre>
+<span></span><span class="c1"># (c) 2023, CEA LIST</span>
+<span class="c1">#</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+<span class="c1">#</span>
+<span class="c1"># Contributors</span>
+<span class="c1">#    Fabio Arnez</span>
+<span class="c1">#    Daniel Montoya</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">dropblock</span> <span class="kn">import</span> <span class="n">DropBlock2D</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">.uncertainty_estimation</span> <span class="kn">import</span> <span class="n">Hook</span>
+
+<span class="n">dropblock_ext</span> <span class="o">=</span> <span class="n">DropBlock2D</span><span class="p">(</span><span class="n">drop_prob</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_msp_score_rcnn">
+<a class="viewcode-back" href="../../ls_ood_detect_cea.html#ls_ood_detect_cea.rcnn.get_msp_score_rcnn">[docs]</a>
+<span class="k">def</span> <span class="nf">get_msp_score_rcnn</span><span class="p">(</span><span class="n">dnn_model</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">input_dataloader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the Maximum softmax probability score from an RCNN architecture coded with the</span>
+<span class="sd">    Detectron 2 library, where the results are the first element of the output of the network,</span>
+<span class="sd">    and the softmax are already calculated within the scores attribute of the results.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dnn_model (torch.nn.Module): The RCNN model</span>
+<span class="sd">        input_dataloader (DataLoader): The Dataloader</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: The MSP scores</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dnn_model</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">),</span> <span class="s2">&quot;dnn_model must be a pytorch model&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_dataloader</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">),</span> <span class="s2">&quot;input_dataloader must be a DataLoader&quot;</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+    <span class="c1"># gtsrb_model.to(device)</span>
+    <span class="n">dl_preds_msp_scores</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">image</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">input_dataloader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Getting MSP score&quot;</span><span class="p">)):</span>
+            <span class="c1"># image = image.to(device)</span>
+            <span class="n">results</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dnn_model</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+            <span class="n">pred_scores</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">scores</span>
+            <span class="c1"># ic(pred_score.shape)</span>
+            <span class="c1"># get the max values:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred_scores</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dl_preds_msp_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pred_scores</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dl_preds_msp_scores</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+
+        <span class="n">dl_preds_msp_scores_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">dl_preds_msp_scores</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># ic(dl_preds_msp_scores_t.shape)</span>
+        <span class="n">dl_preds_msp_scores</span> <span class="o">=</span> <span class="n">dl_preds_msp_scores_t</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">dl_preds_msp_scores</span></div>
+
+
+
+<div class="viewcode-block" id="get_dice_feat_mean_react_percentile_rcnn">
+<a class="viewcode-back" href="../../ls_ood_detect_cea.html#ls_ood_detect_cea.rcnn.get_dice_feat_mean_react_percentile_rcnn">[docs]</a>
+<span class="k">def</span> <span class="nf">get_dice_feat_mean_react_percentile_rcnn</span><span class="p">(</span>
+    <span class="n">dnn_model</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ind_dataloader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">react_percentile</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">90</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the DICE and ReAct thresholds for sparsifying and clipping from an RCNN architecture, where</span>
+<span class="sd">    the output has been modified to return the previous-to-last layer activations.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dnn_model: The RCNN model</span>
+<span class="sd">        ind_dataloader: The Data loader</span>
+<span class="sd">        react_percentile: Desired percentile for ReAct</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[np.ndarray, float]: The DICE expected values, and the ReAct threshold</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dnn_model</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">),</span> <span class="s2">&quot;dnn_model must be a pytorch model&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ind_dataloader</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">),</span> <span class="s2">&quot;ind_dataloader must be a DataLoader&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">react_percentile</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">&quot;react_percentile must be an integer&quot;</span>
+    <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">react_percentile</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;react_percentile must be greater than 0 and less than 100&quot;</span>
+    <span class="n">feat_log</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dnn_model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">dnn_model</span><span class="o">.</span><span class="n">dice_react_precompute</span>
+    <span class="c1"># device = torch.device(&quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;)</span>
+    <span class="k">for</span> <span class="n">inputs</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">ind_dataloader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Setting up DICE/ReAct&quot;</span><span class="p">):</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">dnn_model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># score = dnn_model.fc(out)</span>
+        <span class="n">feat_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+    <span class="n">feat_log_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">feat_log</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">feat_log_array</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">feat_log_array</span><span class="p">,</span> <span class="n">react_percentile</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_energy_score_rcnn">
+<a class="viewcode-back" href="../../ls_ood_detect_cea.html#ls_ood_detect_cea.rcnn.get_energy_score_rcnn">[docs]</a>
+<span class="k">def</span> <span class="nf">get_energy_score_rcnn</span><span class="p">(</span><span class="n">dnn_model</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">input_dataloader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the energy uncertainty score from an RCNN architecture where the output has been</span>
+<span class="sd">    modified to return the raw activations before NMS alongside the normal (NMS filtered) ones.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dnn_model: The RCNN model</span>
+<span class="sd">        input_dataloader: The Data loader</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[np.ndarray, np.ndarray]: Energy scores from the Raw and the filtered outputs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dnn_model</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">),</span> <span class="s2">&quot;dnn_model must be a pytorch model&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_dataloader</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">),</span> <span class="s2">&quot;input_dataloader must be a DataLoader&quot;</span>
+
+    <span class="c1"># Here we take the enrgy as a mean of the whole 1000 proposals</span>
+    <span class="n">raw_preds_energy_scores</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Here we take the enrgy as a mean of the filtered detections after NMS</span>
+    <span class="n">filtered_preds_energy_scores</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">image</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">input_dataloader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Getting energy score&quot;</span><span class="p">)):</span>
+            <span class="n">results</span><span class="p">,</span> <span class="n">box_cls</span> <span class="o">=</span> <span class="n">dnn_model</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+            <span class="c1"># Raw energy</span>
+            <span class="n">raw_energy_score</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="n">box_cls</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">raw_preds_energy_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">raw_energy_score</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="c1"># Filtered energy</span>
+            <span class="n">filtered_energy_score</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">inter_feat</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">filtered_preds_energy_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filtered_energy_score</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">raw_preds_energy_scores_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">raw_preds_energy_scores</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">raw_preds_energy_scores</span> <span class="o">=</span> <span class="n">raw_preds_energy_scores_t</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">filtered_preds_energy_scores_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">filtered_preds_energy_scores</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">filtered_preds_energy_scores</span> <span class="o">=</span> <span class="n">filtered_preds_energy_scores_t</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">raw_preds_energy_scores</span><span class="p">,</span> <span class="n">filtered_preds_energy_scores</span></div>
+
+
+
+<span class="c1"># Get latent space Monte Carlo Dropout samples</span>
+<div class="viewcode-block" id="get_ls_mcd_samples_rcnn">
+<a class="viewcode-back" href="../../ls_ood_detect_cea.html#ls_ood_detect_cea.rcnn.get_ls_mcd_samples_rcnn">[docs]</a>
+<span class="k">def</span> <span class="nf">get_ls_mcd_samples_rcnn</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+    <span class="n">data_loader</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">,</span>
+    <span class="n">mcd_nro_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">hook_dropout_layer</span><span class="p">:</span> <span class="n">Hook</span><span class="p">,</span>
+    <span class="n">layer_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">return_raw_predictions</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get Monte-Carlo Dropout samples from RCNN&#39;s Dropout or Dropblock Layer.</span>
+<span class="sd">    For this function to work on the RPN, it must have defined a list called</span>
+<span class="sd">    &#39;rpn_intermediate_output&#39; that collects the intermediate representations at inference time</span>
+<span class="sd">    i.e. the hook is not enough since it only captures one output per layer and this layer</span>
+<span class="sd">    outputs five elements. A modification in the RPN is therefore needed.</span>
+<span class="sd">    An example below::</span>
+
+<span class="sd">        def forward(self, features: List[torch.Tensor]):</span>
+<span class="sd">            self.rpn_intermediate_output.clear()</span>
+<span class="sd">            pred_objectness_logits = []</span>
+<span class="sd">            pred_anchor_deltas = []</span>
+<span class="sd">            for x in features:</span>
+<span class="sd">                t = self.dropblock(self.conv(x))</span>
+<span class="sd">                # Normal NN operations</span>
+<span class="sd">                pred_objectness_logits.append(self.objectness_logits(t))</span>
+<span class="sd">                pred_anchor_deltas.append(self.anchor_deltas(t))</span>
+<span class="sd">                # Hook operations to catch RPN intermediate output</span>
+<span class="sd">                self.rpn_intermediate_output.append(t)</span>
+<span class="sd">            return pred_objectness_logits, pred_anchor_deltas</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model: Torch model</span>
+<span class="sd">        data_loader: Input samples (torch) DataLoader</span>
+<span class="sd">        mcd_nro_samples: Number of Monte-Carlo Samples</span>
+<span class="sd">        hook_dropout_layer: Hook at the Dropout Layer from the Neural Network Module</span>
+<span class="sd">        layer_type: Type of layer that will get the MC samples. Either FC (Fully Connected) or</span>
+<span class="sd">            Conv (Convolutional)</span>
+<span class="sd">        return_raw_predictions: Returns the raw logits output</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Monte-Carlo Dropout samples for the input dataloader</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">),</span> <span class="s2">&quot;model must be a pytorch model&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mcd_nro_samples</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">&quot;mcd_nro_samples must be an integer&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_loader</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hook_dropout_layer</span><span class="p">,</span> <span class="n">Hook</span><span class="p">),</span> <span class="s2">&quot;hook_dropout_layer must be an Hook&quot;</span>
+    <span class="k">assert</span> <span class="n">layer_type</span> <span class="ow">in</span> <span class="p">(</span>
+        <span class="s2">&quot;FC&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Conv&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RPN&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;backbone&quot;</span><span class="p">,</span>
+    <span class="p">),</span> <span class="s2">&quot;Layer type must be either &#39;FC&#39;,&#39;backbone&#39;, &#39;RPN&#39; or &#39;Conv&#39;&quot;</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">data_loader</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Extracting MCD samples&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">dl_imgs_latent_mcd_samples</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">return_raw_predictions</span><span class="p">:</span>
+                <span class="n">raw_predictions</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">image</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data_loader</span><span class="p">):</span>
+                <span class="n">img_mcd_samples</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mcd_nro_samples</span><span class="p">):</span>
+                    <span class="n">instances</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">return_raw_predictions</span><span class="p">:</span>
+                        <span class="n">raw_predictions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instances</span><span class="o">.</span><span class="n">inter_feat</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+                    <span class="c1"># pred = torch.argmax(pred_img, dim=1)</span>
+                    <span class="n">latent_mcd_sample</span> <span class="o">=</span> <span class="n">hook_dropout_layer</span><span class="o">.</span><span class="n">output</span>
+                    <span class="k">if</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;Conv&quot;</span><span class="p">:</span>
+                        <span class="c1"># Get image HxW mean:</span>
+                        <span class="n">latent_mcd_sample</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">latent_mcd_sample</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="n">latent_mcd_sample</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">latent_mcd_sample</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="c1"># Remove useless dimensions:</span>
+                        <span class="n">latent_mcd_sample</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">latent_mcd_sample</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+                        <span class="n">latent_mcd_sample</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">latent_mcd_sample</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;RPN&quot;</span><span class="p">:</span>
+                        <span class="n">latent_mcd_sample</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">proposal_generator</span><span class="o">.</span><span class="n">rpn_head</span><span class="o">.</span><span class="n">rpn_intermediate_output</span>
+                        <span class="p">)</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">latent_mcd_sample</span><span class="p">)):</span>
+                            <span class="n">latent_mcd_sample</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+                                <span class="n">latent_mcd_sample</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span>
+                            <span class="p">)</span>
+                            <span class="n">latent_mcd_sample</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+                                <span class="n">latent_mcd_sample</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span>
+                            <span class="p">)</span>
+                            <span class="c1"># Remove useless dimensions:</span>
+                            <span class="n">latent_mcd_sample</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">latent_mcd_sample</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                        <span class="n">latent_mcd_sample</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">latent_mcd_sample</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;backbone&quot;</span><span class="p">:</span>
+                        <span class="c1"># Apply dropblock</span>
+                        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">latent_mcd_sample</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="n">latent_mcd_sample</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">dropblock_ext</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                            <span class="c1"># Get image HxW mean:</span>
+                            <span class="n">latent_mcd_sample</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+                                <span class="n">latent_mcd_sample</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span>
+                            <span class="p">)</span>
+                            <span class="n">latent_mcd_sample</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+                                <span class="n">latent_mcd_sample</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span>
+                            <span class="p">)</span>
+                            <span class="c1"># Remove useless dimensions:</span>
+                            <span class="n">latent_mcd_sample</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">latent_mcd_sample</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+                        <span class="n">latent_mcd_sample</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">latent_mcd_sample</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="c1"># FC</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Aggregate the second dimension (dim 1) to keep the proposed boxes dim</span>
+                        <span class="n">latent_mcd_sample</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">latent_mcd_sample</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;FC&quot;</span> <span class="ow">and</span> <span class="n">latent_mcd_sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1000</span>
+                    <span class="p">)</span> <span class="ow">or</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;RPN&quot;</span><span class="p">:</span>
+                        <span class="n">img_mcd_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">latent_mcd_sample</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;FC&quot;</span> <span class="ow">and</span> <span class="n">latent_mcd_sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1000</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+                <span class="k">if</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;Conv&quot;</span><span class="p">:</span>
+                    <span class="n">img_mcd_samples_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">img_mcd_samples</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">dl_imgs_latent_mcd_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img_mcd_samples_t</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;FC&quot;</span> <span class="ow">and</span> <span class="n">latent_mcd_sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1000</span>
+                    <span class="p">)</span> <span class="ow">or</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;RPN&quot;</span><span class="p">:</span>
+                        <span class="n">img_mcd_samples_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">img_mcd_samples</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                        <span class="n">dl_imgs_latent_mcd_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img_mcd_samples_t</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;FC&quot;</span> <span class="ow">and</span> <span class="n">latent_mcd_sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1000</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Omitted image: </span><span class="si">{</span><span class="n">image</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;image_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+                <span class="c1"># Update progress bar</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">dl_imgs_latent_mcd_samples_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">dl_imgs_latent_mcd_samples</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_raw_predictions</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dl_imgs_latent_mcd_samples_t</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">raw_predictions</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dl_imgs_latent_mcd_samples_t</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CEA-LSEA.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

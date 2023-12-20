@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guideline CEA-LSEA Out-of-Distribution Detection using DNN Latent Representations Uncertainty &mdash; OOD Detection using DNN Latent Representations Uncertainty 1.0.0-rc documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=25b81f78"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+        <script src="_static/design-tabs.js?v=36754332"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ls_ood_detect_cea" href="modules.html" />
+    <link rel="prev" title="Welcome to OOD Detection using DNN Latent Representations Uncertainty’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OOD Detection using DNN Latent Representations Uncertainty
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Guideline CEA-LSEA Out-of-Distribution Detection using DNN Latent Representations Uncertainty</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#specifications">🔍 Specifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#identity-card">🔍 Identity card</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start">🚀 Quick Start</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#setting-environement">Setting environement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">🎮 Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#description-of-inputs-and-outputs">🔀 Description of Inputs and Outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#required-hardware">💻 Required Hardware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">📚 References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">ls_ood_detect_cea</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OOD Detection using DNN Latent Representations Uncertainty</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Guideline CEA-LSEA Out-of-Distribution Detection using DNN Latent Representations Uncertainty</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/README.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div align="center">
+    <img src="assets/Logo_ConfianceAI.png" width="20%" alt="ConfianceAI Logo" />
+    <h1 style="font-size: large; font-weight: bold;">Out-of-Distribution Detection using DNN
+Latent Representations Uncertainty</h1>
+</div><div align="center">
+    <a href="https://www.python.org/downloads/release/python-380/">
+        <img src="https://img.shields.io/badge/Python-3.8-efefef">
+    </a>
+    <a href="https://github.com/psf/black">
+        <img src="https://img.shields.io/badge/code%20style-black-000000.svg">
+    </a>
+</div>
+<br>
+<hr class="docutils" />
+<section id="guideline-cea-lsea-out-of-distribution-detection-using-dnn-latent-representations-uncertainty">
+<h1>Guideline CEA-LSEA Out-of-Distribution Detection using DNN Latent Representations Uncertainty<a class="headerlink" href="#guideline-cea-lsea-out-of-distribution-detection-using-dnn-latent-representations-uncertainty" title="Link to this heading"></a></h1>
+<hr class="docutils" />
+<p>CEA-LSEA package for Out-of-Distribution (OoD) detection using the uncertainty (entropy) from DNN latent representations.
+The package has been used with the following applications, the corresponding DNN architectures and datasets:</p>
+<ul class="simple">
+<li><p><strong>Simple Classification:</strong></p>
+<ul>
+<li><p><strong>In-Distribution Dataset:</strong> CIFAR10</p></li>
+<li><p><strong>Out-of-Distribution Datasets:</strong> FMNIST, SVHN, Places365, Textures, iSUN, LSUN-C, LSUN-R</p></li>
+<li><p><strong>DNN Architectures:</strong></p>
+<ol class="arabic simple">
+<li><p>ResNet-18</p></li>
+<li><p>ResNet-18 with Spectral Normalization</p></li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p><strong>Object Detection:</strong></p>
+<ul>
+<li><p><strong>In-Distribution Dataset:</strong> BDD100k</p></li>
+<li><p><strong>Out-of-Distribution Datasets:</strong> Pascal VOC, Openimages</p></li>
+<li><p><strong>DNN Architectures:</strong></p>
+<ol class="arabic simple">
+<li><p>Faster RCNN</p></li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p><strong>Semantic Segmentation:</strong></p>
+<ul>
+<li><p><strong>In-Distribution Dataset:</strong> Woodscape  &amp; Cityscapes</p></li>
+<li><p><strong>Out-of-Distribution Datasets:</strong> Woodscape soiling, Woodscape-anomalies, Cityscapes-anomalies</p></li>
+<li><p><strong>DNN Architectures:</strong></p>
+<ol class="arabic simple">
+<li><p>Deeplabv3+</p></li>
+<li><p>U-Net</p></li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<p>In all the above cases, the DNNs were slightly modified to capture <em>epistemic</em> uncertainty using the Monte-Carlo Dropout by adding a <code class="docutils literal notranslate"><span class="pre">DropBlock2D</span></code> layer.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#specifications"><span class="xref myst">🔍 Specifications</span></a></p></li>
+<li><p><a class="reference internal" href="#quickstart"><span class="xref myst">🚀 Quick Start</span></a></p></li>
+<li><p><a class="reference internal" href="#usage"><span class="xref myst">🎮 Usage</span></a></p></li>
+<li><p><a class="reference internal" href="#io"><span class="xref myst">🔀 Description of Inputs and Outputs</span></a></p></li>
+<li><p><a class="reference internal" href="#hardware"><span class="xref myst">💻 Required Hardware</span></a></p></li>
+<li><p><a class="reference internal" href="#references"><span class="xref myst">📚 References</span></a></p></li>
+</ul>
+<div id='specifications'/>
+<section id="specifications">
+<h2>🔍 Specifications<a class="headerlink" href="#specifications" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Version: 1.0.0</p></li>
+<li><p>Python Version: python 3.8</p></li>
+<li><p>Strong Dependencies: torch, entropy_estimators, numpy, sklearn, dropblock, pandas, mlflow, matplotlib</p></li>
+<li><p>Thematic: Computer vision</p></li>
+<li><p>Trustworthy: Uncertainty Estimation -  OoD/Anomaly detection</p></li>
+<li><p>Hardware : GPU</p></li>
+</ul>
+<div id='id-card'/>
+</section>
+<section id="identity-card">
+<h2>🔍 Identity card<a class="headerlink" href="#identity-card" title="Link to this heading"></a></h2>
+<p>Can be found here: <a class="reference download internal" download="" href="_downloads/0f4455a2e0d2c8165673073d4b304481/identity_card.yml"><span class="xref download myst">Identity card</span></a></p>
+<div id='quickstart'/>
+</section>
+<section id="quick-start">
+<h2>🚀 Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
+<p>To install and use the component , it is recommended to create a Python virtual environment. You can do that with virtualenv, as follows:</p>
+<section id="setting-environement">
+<h3>Setting environement<a class="headerlink" href="#setting-environement" title="Link to this heading"></a></h3>
+<p>With <code class="docutils literal notranslate"><span class="pre">virtualenv</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>virtualenv
+virtualenv<span class="w"> </span>ls_ood_detection_env
+<span class="nb">source</span><span class="w"> </span>ls_ood_detection_env/bin/activate
+</pre></div>
+</div>
+<p>Or using conda:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>ls_ood_detection_env<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8
+conda<span class="w"> </span>activate<span class="w"> </span>ls_ood_detection_env
+</pre></div>
+</div>
+</section>
+<section id="installation">
+<h3>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h3>
+<p>After creating the environment with python 3.8, install the <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</pre></div>
+</div>
+<p>After installing all the requirements, then in the base folder of the repo do <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code></p>
+<div id='usage'/>
+</section>
+</section>
+<section id="usage">
+<h2>🎮 Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
+<p>For a complete example of how to use the component refer to: <a class="reference internal" href="#ref"><span class="xref myst">REF</span></a>
+For detailed usage, check this <a class="reference internal" href="ls_ood_detect_cea/CEA-LSEA-OoD_Detection_DNN_Latent_Space.html"><span class="std std-doc">document</span></a></p>
+<p>Here we present a general overview of how to evaluate the component and obtain detection metrics:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the trained model</span>
+<span class="n">trained_model</span> <span class="o">=</span> <span class="n">MyTrainedModel</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="o">=</span><span class="n">model_checkpoint_path</span><span class="p">)</span>
+<span class="c1"># Hook the dropout or dropblock layer</span>
+<span class="n">hooked_layer</span> <span class="o">=</span> <span class="n">Hook</span><span class="p">(</span><span class="n">trained_model</span><span class="o">.</span><span class="n">my_dropblock_layer</span><span class="p">)</span>
+<span class="n">N_MCD_SAMPLES</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="c1"># Activate dropout or dropblock at inference</span>
+<span class="n">trained_model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">trained_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">trained_model</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">deeplabv3p_apply_dropout</span><span class="p">)</span>
+
+<span class="c1"># Extract MCDz samples</span>
+<span class="c1"># InD</span>
+<span class="n">latent_samples_ind_train</span> <span class="o">=</span> <span class="n">get_latent_representation_mcd_samples</span><span class="p">(</span><span class="n">trained_model</span><span class="p">,</span>
+                                                                 <span class="n">my_ind_train_data_loader</span><span class="p">,</span>
+                                                                 <span class="n">N_MCD_SAMPLES</span><span class="p">,</span>
+                                                                 <span class="n">hooked_layer</span><span class="p">)</span>
+<span class="n">latent_samples_ind_test</span> <span class="o">=</span> <span class="n">get_latent_representation_mcd_samples</span><span class="p">(</span><span class="n">trained_model</span><span class="p">,</span>
+                                                                <span class="n">my_ind_test_data_loader</span><span class="p">,</span>
+                                                                <span class="n">N_MCD_SAMPLES</span><span class="p">,</span>
+                                                                <span class="n">hooked_layer</span><span class="p">)</span>
+<span class="c1"># OoD</span>
+<span class="n">latent_samples_ood_test</span> <span class="o">=</span> <span class="n">get_latent_representation_mcd_samples</span><span class="p">(</span><span class="n">trained_model</span><span class="p">,</span>
+                                                                <span class="n">my_ood_test_data_loader</span><span class="p">,</span>
+                                                                <span class="n">N_MCD_SAMPLES</span><span class="p">,</span>
+                                                                <span class="n">hooked_layer</span><span class="p">)</span>
+<span class="c1"># Get entropy</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">entropy_samples_ind_train</span> <span class="o">=</span> <span class="n">get_dl_h_z</span><span class="p">(</span><span class="n">latent_samples_ind_train</span><span class="p">,</span> <span class="n">mcd_samples_nro</span><span class="o">=</span><span class="n">N_MCD_SAMPLES</span><span class="p">)</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">entropy_samples_ind_test</span> <span class="o">=</span> <span class="n">get_dl_h_z</span><span class="p">(</span><span class="n">latent_samples_ind_test</span><span class="p">,</span> <span class="n">mcd_samples_nro</span><span class="o">=</span><span class="n">N_MCD_SAMPLES</span><span class="p">)</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">entropy_samples_ood_test</span> <span class="o">=</span> <span class="n">get_dl_h_z</span><span class="p">(</span><span class="n">latent_samples_ood_test</span><span class="p">,</span> <span class="n">mcd_samples_nro</span><span class="o">=</span><span class="n">N_MCD_SAMPLES</span><span class="p">)</span>
+
+<span class="c1"># Evaluate LaRED and LaREM</span>
+<span class="c1"># Pass OoD samples as dictionary (you can have several OoD datasets)</span>
+<span class="n">ood_datasets_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;my_ood_dataset1&#39;</span><span class="p">:</span> <span class="n">entropy_samples_ood_test</span>
+<span class="p">}</span>
+<span class="n">metrics_pandas_df</span> <span class="o">=</span> <span class="n">log_evaluate_lared_larem</span><span class="p">(</span>
+    <span class="n">ind_train_h_z</span><span class="o">=</span><span class="n">entropy_samples_ind_train</span><span class="p">,</span>
+    <span class="n">ind_test_h_z</span><span class="o">=</span><span class="n">entropy_samples_ind_test</span><span class="p">,</span>
+    <span class="n">ood_h_z_dict</span><span class="o">=</span><span class="n">ood_datasets_dict</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div id='io'/>
+</section>
+<section id="description-of-inputs-and-outputs">
+<h2>🔀 Description of Inputs and Outputs<a class="headerlink" href="#description-of-inputs-and-outputs" title="Link to this heading"></a></h2>
+<p>In general, to perform OoD or anomaly detection with our method you need:</p>
+<ul class="simple">
+<li><p>A well defined In Distribution (InD) dataset</p></li>
+<li><p>A model already trained on the InD dataset</p></li>
+<li><p>One (or more) dataset(s) defined as Out of Distribution (OoD) or Anomaly.</p></li>
+</ul>
+<p>Then if the model was trained with at least one dropout or dropblock layer, we need to:</p>
+<ul class="simple">
+<li><p>Attach a Hook to the dropblock or dropout layer to catch the outputs of such layer: Use the
+<code class="docutils literal notranslate"><span class="pre">Hook</span></code> class</p></li>
+<li><p>Perform Monte Carlo dropout sampling, meaning, inference is performed $N$ times, at each time the
+output of the hooked layer is taken (Use the <code class="docutils literal notranslate"><span class="pre">get_latent_representation_mcd_samples</span></code> function
+(You just need to specify the type of layer in the function parameters):</p>
+<ul>
+<li><p>If the layer is convolutional (dropblock layer): we take the mean per channel</p></li>
+<li><p>If the layer is Fully Connected (dropout layer): we take the raw output</p></li>
+</ul>
+</li>
+<li><p>Take the entropy of the previously calculated samples. Use the <code class="docutils literal notranslate"><span class="pre">get_dl_h_z</span></code> function</p></li>
+<li><p>Pass the entropy of each image to the LaRED and LaREM estimators to obtain the OoD score. Use the
+<code class="docutils literal notranslate"><span class="pre">log_evaluate_lared_larem</span></code> function.</p></li>
+</ul>
+<p>We will obtain at the end a pandas dataframe with the evaluation metrics and classification
+thresholds of LaRED and LaREM. To use the method during inference it is needed to save the density
+from LaRED or LaREM,
+optionally the PCA transformation, and the threshold chosen for classification. Then we would
+obtain the uncertainty estimation at inference time.</p>
+<div id='hardware'/>
+</section>
+<section id="required-hardware">
+<h2>💻 Required Hardware<a class="headerlink" href="#required-hardware" title="Link to this heading"></a></h2>
+<p>GPU is a requirement for our component since we deal with “heavy” tasks in computer vision such as
+object detection and image segmentation, which are typically too slow in CPU.</p>
+<div id='references'/>
+</section>
+<section id="references">
+<h2>📚 References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<p>For more technical and implementation details, we refer the user to the following technical
+reports and publications:</p>
+<p>Technical Reports:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>- EC3-FA06 Run-Time Monitoring
+- EC3-FA18 Run-Time Monitoring
+</pre></div>
+</div>
+<p>Publications</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>- Out-of-Distribution Detection using Deep Neural Network Latent Space
+</pre></div>
+</div>
+<p>Example : To display the component’s references : <a class="reference external" href="https://irtsystemx.sharepoint.com/:b:/r/sites/IAdeConfiance833/Documents%20partages/General/EC_2/40_Deliverable/Livrables%20en%20cours/AI%20trustworthiness%20characteristics%20and%20assessment%20methodology/EC2_N6_AITA_V0.pdf?csf=1&amp;amp;web=1&amp;amp;e=6kx9Ao">EC2 Process and Methods</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to OOD Detection using DNN Latent Representations Uncertainty’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="ls_ood_detect_cea" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CEA-LSEA.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
