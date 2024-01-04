@@ -279,11 +279,13 @@ def get_mean_or_fullmean_ls_sample(latent_sample: Tensor, method: str):
     if method == "mean":
         latent_sample = torch.mean(latent_sample, dim=3, keepdim=True)
         latent_sample = torch.squeeze(latent_sample)
+        latent_sample = latent_sample.reshape(1, -1)
     # fullmean
     else:
         latent_sample = torch.mean(latent_sample, dim=3, keepdim=True)
         latent_sample = torch.mean(latent_sample, dim=2, keepdim=True)
         latent_sample = torch.squeeze(latent_sample)
+        latent_sample = latent_sample.reshape(1, -1)
     return latent_sample
 
 

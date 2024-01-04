@@ -4,3 +4,4 @@ from .dimensionality_reduction import *
 from .metrics import *
 from .ood_detection_dataset import *
 from .rcnn import *
+from .yolov8 import *
