@@ -3,22 +3,15 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 from torchvision import transforms
+import torchvision.transforms.functional as tf
+from PIL import Image
 import pytorch_lightning as pl
 import torchmetrics
-
-# from torchmetrics import Accuracy, JaccardIndex
-from pytorch_lightning.utilities.types import STEP_OUTPUT, EPOCH_OUTPUT
-
-# from deeplab import deeplab_v3plus
-# from deeplab_v3p.deeplab import deeplab_v3plus
+from pytorch_lightning.utilities.types import STEP_OUTPUT
 from deeplab_v3p import deeplab_v3plus
-
-# from loss import FocalLoss, ELBO
 from .loss import FocalLoss, ELBOWeightVILoss, get_beta
 from torch.optim.lr_scheduler import CosineAnnealingLR
-from .scheduler import PolyLR
 import glob
-from utils import img2tensor
 from torchvision.utils import make_grid
 from icecream import ic
 
@@ -113,11 +106,6 @@ class DeepLabV3PlusModule(pl.LightningModule):
             momentum=self.optimizer_momentum,
             weight_decay=self.optimizer_weight_decay,
         )
-
-        # lr_scheduler = {"scheduler": PolyLR(optimizer,
-        #                                     max_iters=self.max_nro_epochs,
-        #                                     power=0.9),
-        #                 "monitor": "validation_IoU"}
         lr_scheduler = {
             "scheduler": CosineAnnealingLR(optimizer, T_max=self.max_nro_epochs, eta_min=1e-3)
         }
@@ -250,3 +238,15 @@ class DeepLabV3PlusModule(pl.LightningModule):
 
         else:
             pass
+
+
+def img2tensor(file):
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    norm_mean = [0.485, 0.456, 0.406]
+    norm_std = [0.229, 0.224, 0.225]
+    img = Image.open(file)
+    img = img.resize((640, 483), Image.BILINEAR)
+    img = tf.to_tensor(img)
+    img = tf.normalize(img, norm_mean, norm_std, False)
+    img = img.unsqueeze(0).to(device)
+    return img
