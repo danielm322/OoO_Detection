@@ -17,8 +17,7 @@ from sklearn.metrics import auc
 import torchmetrics.functional as tmf
 import seaborn as sns
 
-from .detectors import DetectorKDE, get_hz_scores
-from .uncertainty_estimation import LaREMPostprocessor
+from .uncertainty_estimation import LaREMPostprocessor, LaREDPostprocessor
 
 
 def get_hz_detector_results(
@@ -341,12 +340,12 @@ def log_evaluate_lared_larem(
     ######################################################
     # Evaluate OoD detection method LaRED
     ######################################################
-    lared_ds_shift_detector = DetectorKDE(train_embeddings=ind_train_h_z)
-    # Extract Density scores
-    ind_lared_score = get_hz_scores(lared_ds_shift_detector, ind_test_h_z)
+    lared_ds_shift_detector = LaREDPostprocessor()
+    lared_ds_shift_detector.setup(ind_train_h_z)
+    ind_lared_score = lared_ds_shift_detector.postprocess(ind_test_h_z)
     ood_lared_scores_dict = {}
     for dataset_name, ood_dataset in ood_h_z_dict.items():
-        ood_lared_scores_dict[dataset_name] = get_hz_scores(lared_ds_shift_detector, ood_dataset)
+        ood_lared_scores_dict[dataset_name] = lared_ds_shift_detector.postprocess(ood_dataset)
 
     ######################################################
     # Evaluate OoD detection method LaREM
@@ -472,7 +471,7 @@ def select_and_log_best_lared_larem(
         means_df.loc[best_index, "auroc"],
         means_df.loc[best_index, "aupr"],
         means_df.loc[best_index, "fpr@95"],
-        best_n_comps
+        best_n_comps,
     )
 
 

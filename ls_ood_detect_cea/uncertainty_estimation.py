@@ -7,7 +7,7 @@
 #    Based on https://github.com/fregu856/deeplabv3
 #    Fabio Arnez, probabilistic adaptation
 #    Daniel Montoya
-
+from time import monotonic
 from typing import Tuple, Union
 import numpy as np
 import torch
@@ -22,6 +22,8 @@ from sklearn.covariance import EmpiricalCovariance
 from copy import deepcopy
 import faiss
 from tqdm.contrib.concurrent import process_map
+
+from ls_ood_detect_cea import DetectorKDE, apply_pca_transform
 
 
 class Hook:
@@ -230,7 +232,7 @@ def get_dl_h_z(
     # Get dataloader entropy $h(z_i)$ for each value of Z, from mcd_samples
     if not parallel_run:
         dl_h_z_samples = []
-        for input_mcd_samples in tqdm(z_samples_np_ls, desc="Calculating entropy"):
+        for input_mcd_samples in z_samples_np_ls:
             h_z_batch = []
             for z_val_i in range(input_mcd_samples.shape[1]):
                 # h_z_i = continuous.get_h(input_mcd_samples[:, z_val_i], k=5)  # old
@@ -1098,9 +1100,9 @@ class KNNPostprocessor:
         return self.K
 
 
-class LaREMPostprocessor:
+class LaREDPostprocessor:
     """
-    LaREM Distance Score uncertainty estimator class
+    LaRED Distance Score uncertainty estimator class for already calculated entropies.
 
     Args:
         setup_flag: Whether the postprocessor is already trained
@@ -1108,7 +1110,59 @@ class LaREMPostprocessor:
 
     def __init__(self, setup_flag: bool = False):
         """
-        LaREM Distance Score uncertainty estimator class
+        LaRED Distance Score uncertainty estimator class for already calculated entropies.
+
+        Args:
+            setup_flag: Whether the postprocessor is already trained
+        """
+        assert isinstance(setup_flag, bool), "setup_flag must be a boolean"
+        self.detector = None
+        self.setup_flag = setup_flag
+
+    def setup(self, ind_feats: np.ndarray):
+        """
+        Estimate the parameters of a multivariate normal distribution from a set of data
+
+        Args:
+            ind_feats: InD features to estimate the distribution
+
+        """
+        assert isinstance(ind_feats, np.ndarray), "ind_feats must be a numpy array"
+        assert ind_feats.ndim == 2, "ind_feats must be 2 dimensional"
+        if not self.setup_flag:
+            self.detector = DetectorKDE(train_embeddings=ind_feats)
+            self.setup_flag = True
+        else:
+            pass
+
+    def postprocess(self, test_feats: np.ndarray):
+        """
+        Perform inference with the set-up estimator, i.e. for each sample in the Data Loader
+        estimate if it belongs to the InD distribution
+
+        Args:
+            test_feats: Features (either InD or OoD) to estimate if they belong to the InD
+                distribution
+
+        Returns:
+            (tuple): Confidence scores
+        """
+        assert isinstance(test_feats, np.ndarray), "test_feats must be a numpy array"
+        assert test_feats.ndim == 2, "ood_feats must be 2 dimensional"
+        return self.detector.get_density_scores(test_feats)
+
+
+class LaREMPostprocessor:
+    """
+    LaREM Distance Score uncertainty estimator class for already calculated entropies.
+
+    Args:
+        setup_flag: Whether the postprocessor is already trained
+    """
+
+    def __init__(self, setup_flag: bool = False):
+        """
+        LaREM Distance Score uncertainty estimator class for already calculated entropies.
 
         Args:
             setup_flag: Whether the postprocessor is already trained
@@ -1163,6 +1217,173 @@ class LaREMPostprocessor:
         conf_score = -np.diag(np.matmul(np.matmul(diff, self.precision), np.transpose(diff)))
 
         return conf_score
+
+
+class MCSamplerModule(torch.nn.Module):
+    """
+    Class that takes MCD samples from an already trained model.
+    Args:
+        mc_samples: Number of MCD samples to take
+        layer_type: Either 'Conv' or 'FC'
+    """
+
+    def __init__(self, mc_samples=8, layer_type: str = "Conv"):
+        """
+        Class that takes MCD samples from an already trained model.
+        Args:
+            mc_samples: Number of MCD samples to take
+            layer_type: Either 'Conv' or 'FC'
+        """
+        super(MCSamplerModule, self).__init__()
+        assert layer_type in ("Conv", "FC", "RPN")
+        self.layer_type = layer_type
+        self.mc_samples = mc_samples
+        self.drop_blocks = torch.nn.ModuleList(
+            [DropBlock2D(block_size=8, drop_prob=0.5) for i in range(self.mc_samples)]
+        )
+
+    def forward(self, latent_rep):
+        samples = []
+        for i, l in enumerate(self.drop_blocks):
+            mc_sample = self.drop_blocks[i](latent_rep)
+
+            if self.layer_type == "Conv":
+                # Get image HxW mean:
+                mc_sample = torch.mean(mc_sample, dim=2, keepdim=True)
+                mc_sample = torch.mean(mc_sample, dim=3, keepdim=True)
+                # Remove useless dimensions:
+                mc_sample = torch.squeeze(mc_sample, dim=2)
+                mc_sample = torch.squeeze(mc_sample, dim=2)
+
+            samples.append(mc_sample)
+        samples_t = torch.cat(samples)
+        return samples_t
+
+
+###########################################################################
+# Time-measuring Inference modules
+###########################################################################
+# Record time wrapper
+def record_time(function):
+    def wrap(*args, **kwargs):
+        start_time = monotonic()
+        function_return = function(*args, **kwargs)
+        delta_t = monotonic() - start_time
+        # print(f"Run time {monotonic() - start_time} seconds")
+        # print(f"Run time {delta_t} seconds")
+        return function_return, delta_t
+
+    return wrap
+
+
+class LaRExInference:
+    """
+    Class intended to perform inference on new data. It can also perform testing of inference time.
+    Args:
+            dnn_model: Trained model
+            detector: LaRED or laREM trained postprocessor.
+            pca_transform: Optionally PCA already trained for dimension reduction. Default: None
+            mcd_samples_nro: Number of MCD samples.
+            layer_type: Either 'Conv' or 'FC'
+    """
+
+    def __init__(
+        self,
+        dnn_model: torch.nn.Module,
+        detector,
+        mcd_sampler,
+        pca_transform=None,
+        mcd_samples_nro=16,
+        layer_type="Conv",
+    ):
+        """
+        Class intended to perform inference on new data. It can also perform testing
+            of inference time.
+        Args:
+            dnn_model: Trained model
+            detector: LaRED or laREM trained postprocessor.
+            pca_transform: Optionally PCA trained for dimension reduction. Default: None
+            mcd_samples_nro: Number of MCD samples.
+            layer_type: Either 'Conv' or 'FC'
+        """
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        self.dnn_model = dnn_model
+        try:
+            self.dnn_model.to(self.device)
+        except AttributeError:
+            pass
+
+        self.mcd_samples_nro = mcd_samples_nro
+        self.layer_type = layer_type
+        self.pca_transform = pca_transform
+        self.detector = detector
+
+        self.mc_sampler = mcd_sampler(mc_samples=self.mcd_samples_nro, layer_type=layer_type)
+        self.mc_sampler.to(self.device)
+        self.mc_sampler.train()
+
+        # self.sample_larex_score = None
+
+    def get_larex_score(self, input_image, layer_hook):
+        """
+        Compute LaREx score for a single image
+        Args:
+            input_image: New image, in tensor format
+            layer_hook: Hooked layer
+
+        Returns:
+            LaREx score
+        """
+        with torch.no_grad():
+            try:
+                input_image = input_image.to(self.device)
+            except AttributeError:
+                pass
+            _ = self.dnn_model(input_image)
+            latent_rep = layer_hook.output  # latent representation sample
+
+        mc_samples_t = self.mc_sampler(latent_rep)
+        _, sample_h_z = get_dl_h_z(mc_samples_t, self.mcd_samples_nro)
+        if self.pca_transform:
+            sample_h_z = apply_pca_transform(sample_h_z, self.pca_transform)
+        sample_larex_score = self.detector.postprocess(sample_h_z)
+        return sample_larex_score
+
+    @record_time
+    def test_time_larex_inference(self, input_image, layer_hook):
+        return self.get_larex_score(input_image, layer_hook)
+
+    @record_time
+    def get_layer_mc_samples(self, input_image, layer_hook):
+        with torch.no_grad():
+            input_image = input_image.to(self.device)
+            _ = self.dnn_model(input_image)
+            latent_rep = layer_hook.output  # latent representation sample
+
+        mc_samples_t = self.mc_sampler(latent_rep)
+        return mc_samples_t
+
+    @record_time
+    def get_mc_samples_full_inference(self, input_image, layer_hook):
+        mc_samples = []
+        with torch.no_grad():
+            for i in range(self.mcd_samples_nro):
+                try:
+                    input_image = input_image.to(self.device)
+                except AttributeError:
+                    pass
+                _ = self.dnn_model(input_image)
+                latent_rep = layer_hook.output
+                mc_samples.append(latent_rep)
+
+            mc_samples_t = torch.cat(mc_samples)
+            mc_samples_np = mc_samples_t.cpu().numpy()
+        return mc_samples_np
+
+    @record_time
+    def get_larex_score_full_inference(self, input_image, layer_hook):
+        raise NotImplementedError
 
 
 def get_dice_feat_mean_react_percentile(

@@ -80,6 +80,11 @@ def get_hz_scores(hz_detector: DetectorKDE, samples: np.ndarray):
     Returns:
         The density scores
     """
+    warn(
+        "This method will be deprecated. ",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     assert isinstance(hz_detector, DetectorKDE)
     scores = hz_detector.get_density_scores(samples)
     return scores
