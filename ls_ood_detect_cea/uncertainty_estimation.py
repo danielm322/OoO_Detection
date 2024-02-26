@@ -1102,7 +1102,7 @@ class KNNPostprocessor:
 
 class LaREDPostprocessor:
     """
-    LaRED Distance Score uncertainty estimator class for already calculated entropies.
+    LaRED Distance Score uncertainty estimator class for already calculated representations.
 
     Args:
         setup_flag: Whether the postprocessor is already trained
@@ -1110,7 +1110,7 @@ class LaREDPostprocessor:
 
     def __init__(self, setup_flag: bool = False):
         """
-        LaRED Distance Score uncertainty estimator class for already calculated entropies.
+        LaRED Distance Score uncertainty estimator class for already calculated representations.
 
         Args:
             setup_flag: Whether the postprocessor is already trained
@@ -1154,7 +1154,7 @@ class LaREDPostprocessor:
 
 class LaREMPostprocessor:
     """
-    LaREM Distance Score uncertainty estimator class for already calculated entropies.
+    LaREM Distance Score uncertainty estimator class for already calculated representations.
 
     Args:
         setup_flag: Whether the postprocessor is already trained
@@ -1162,7 +1162,7 @@ class LaREMPostprocessor:
 
     def __init__(self, setup_flag: bool = False):
         """
-        LaREM Distance Score uncertainty estimator class for already calculated entropies.
+        LaREM Distance Score uncertainty estimator class for already calculated representations.
 
         Args:
             setup_flag: Whether the postprocessor is already trained
@@ -1282,6 +1282,7 @@ class LaRExInference:
     Args:
             dnn_model: Trained model
             detector: LaRED or laREM trained postprocessor.
+            mcd_sampler: Monte Carlo Dropout sampler module
             pca_transform: Optionally PCA already trained for dimension reduction. Default: None
             mcd_samples_nro: Number of MCD samples.
             layer_type: Either 'Conv' or 'FC'
@@ -1302,6 +1303,7 @@ class LaRExInference:
         Args:
             dnn_model: Trained model
             detector: LaRED or laREM trained postprocessor.
+            mcd_sampler: Monte Carlo Dropout sampler module
             pca_transform: Optionally PCA trained for dimension reduction. Default: None
             mcd_samples_nro: Number of MCD samples.
             layer_type: Either 'Conv' or 'FC'
@@ -1384,6 +1386,71 @@ class LaRExInference:
     @record_time
     def get_larex_score_full_inference(self, input_image, layer_hook):
         raise NotImplementedError
+
+
+class LaRDInference:
+    """
+    Class intended to perform inference on new data. It can also perform testing of inference time.
+    Args:
+            dnn_model: Trained model
+            detector: LaRED or laREM trained postprocessor.
+            pca_transform: Optionally PCA already trained for dimension reduction. Default: None
+            layer_type: Either 'Conv' or 'FC'
+    """
+
+    def __init__(
+        self,
+        dnn_model: torch.nn.Module,
+        detector,
+        pca_transform=None,
+        layer_type="Conv",
+    ):
+        """
+        Class intended to perform inference on new data. It can also perform testing
+            of inference time.
+        Args:
+            dnn_model: Trained model
+            detector: LaRED or laREM trained postprocessor.
+            pca_transform: Optionally PCA trained for dimension reduction. Default: None
+            layer_type: Either 'Conv' or 'FC'
+        """
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.dnn_model = dnn_model
+        try:
+            self.dnn_model.to(self.device)
+        except AttributeError:
+            pass
+        self.layer_type = layer_type
+        self.pca_transform = pca_transform
+        self.detector = detector
+        # self.sample_larex_score = None
+
+    def get_score(self, input_image, layer_hook):
+        """
+        Compute LaREx score for a single image
+        Args:
+            input_image: New image, in tensor format
+            layer_hook: Hooked layer
+
+        Returns:
+            LaREx score
+        """
+        with torch.no_grad():
+            try:
+                input_image = input_image.to(self.device)
+            except AttributeError:
+                pass
+            _ = self.dnn_model(input_image)
+            latent_rep = layer_hook.output  # latent representation sample
+
+        if self.pca_transform:
+            latent_rep = apply_pca_transform(latent_rep, self.pca_transform)
+        sample_score = self.detector.postprocess(latent_rep)
+        return sample_score
+
+    @record_time
+    def test_time_inference(self, input_image, layer_hook):
+        return self.get_score(input_image, layer_hook)
 
 
 def get_dice_feat_mean_react_percentile(
