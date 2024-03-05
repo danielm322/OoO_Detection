@@ -1279,6 +1279,7 @@ def record_time(function):
 class LaRExInference:
     """
     Class intended to perform inference on new data. It can also perform testing of inference time.
+
     Args:
             dnn_model: Trained model
             detector: LaRED or laREM trained postprocessor.
@@ -1299,7 +1300,8 @@ class LaRExInference:
     ):
         """
         Class intended to perform inference on new data. It can also perform testing
-            of inference time.
+        of inference time.
+
         Args:
             dnn_model: Trained model
             detector: LaRED or laREM trained postprocessor.
@@ -1327,9 +1329,10 @@ class LaRExInference:
 
         # self.sample_larex_score = None
 
-    def get_larex_score(self, input_image, layer_hook):
+    def get_score(self, input_image, layer_hook):
         """
-        Compute LaREx score for a single image
+        Compute LaREx score for a single image.
+
         Args:
             input_image: New image, in tensor format
             layer_hook: Hooked layer
@@ -1342,7 +1345,7 @@ class LaRExInference:
                 input_image = input_image.to(self.device)
             except AttributeError:
                 pass
-            _ = self.dnn_model(input_image)
+            output = self.dnn_model(input_image)
             latent_rep = layer_hook.output  # latent representation sample
 
         mc_samples_t = self.mc_sampler(latent_rep)
@@ -1350,11 +1353,11 @@ class LaRExInference:
         if self.pca_transform:
             sample_h_z = apply_pca_transform(sample_h_z, self.pca_transform)
         sample_larex_score = self.detector.postprocess(sample_h_z)
-        return sample_larex_score
+        return output, sample_larex_score
 
     @record_time
-    def test_time_larex_inference(self, input_image, layer_hook):
-        return self.get_larex_score(input_image, layer_hook)
+    def test_time_inference(self, input_image, layer_hook):
+        return self.get_score(input_image, layer_hook)
 
     @record_time
     def get_layer_mc_samples(self, input_image, layer_hook):
@@ -1384,13 +1387,14 @@ class LaRExInference:
         return mc_samples_np
 
     @record_time
-    def get_larex_score_full_inference(self, input_image, layer_hook):
+    def get_score_full_inference(self, input_image, layer_hook):
         raise NotImplementedError
 
 
 class LaRDInference:
     """
     Class intended to perform inference on new data. It can also perform testing of inference time.
+
     Args:
             dnn_model: Trained model
             detector: LaRED or laREM trained postprocessor.
@@ -1407,7 +1411,8 @@ class LaRDInference:
     ):
         """
         Class intended to perform inference on new data. It can also perform testing
-            of inference time.
+        of inference time.
+
         Args:
             dnn_model: Trained model
             detector: LaRED or laREM trained postprocessor.
@@ -1421,13 +1426,20 @@ class LaRDInference:
         except AttributeError:
             pass
         self.layer_type = layer_type
+        if self.layer_type == "Conv":
+            self.reducer = self.reduce_conv_representation
+        elif self.layer_type == "FC":
+            self.reducer = self.reduce_fc_representation
+        else:
+            pass  # The only other possibility so far is RPN, implemented in their own subclass
         self.pca_transform = pca_transform
         self.detector = detector
         # self.sample_larex_score = None
 
     def get_score(self, input_image, layer_hook):
         """
-        Compute LaREx score for a single image
+        Compute LaRx score for a single image
+
         Args:
             input_image: New image, in tensor format
             layer_hook: Hooked layer
@@ -1440,17 +1452,30 @@ class LaRDInference:
                 input_image = input_image.to(self.device)
             except AttributeError:
                 pass
-            _ = self.dnn_model(input_image)
+            output = self.dnn_model(input_image)
             latent_rep = layer_hook.output  # latent representation sample
-
+        latent_rep = self.reducer(latent_rep)
         if self.pca_transform:
             latent_rep = apply_pca_transform(latent_rep, self.pca_transform)
         sample_score = self.detector.postprocess(latent_rep)
-        return sample_score
+        return output, sample_score
 
     @record_time
     def test_time_inference(self, input_image, layer_hook):
         return self.get_score(input_image, layer_hook)
+
+    @staticmethod
+    def reduce_conv_representation(representation):
+        return (
+            get_mean_or_fullmean_ls_sample(representation, "fullmean").cpu().numpy().reshape(1, -1)
+        )
+
+    @staticmethod
+    def reduce_fc_representation(representation):
+        if representation.ndim > 1:
+            return torch.mean(representation, dim=1).cpu().numpy().reshape(1, -1)
+        else:
+            return representation.reshape(1, -1)
 
 
 def get_dice_feat_mean_react_percentile(
