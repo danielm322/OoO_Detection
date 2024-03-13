@@ -22,6 +22,7 @@ from sklearn.covariance import EmpiricalCovariance
 from copy import deepcopy
 import faiss
 from tqdm.contrib.concurrent import process_map
+from warnings import warn
 
 from ls_ood_detect_cea import DetectorKDE, apply_pca_transform
 
@@ -78,6 +79,11 @@ def deeplabv3p_get_ls_mcd_samples(
     Returns:
         (Tensor): Monte-Carlo Dropout samples for the input dataloader
     """
+    warn(
+        "This method is deprecated." "Use the get_latent_representation_mcd_samples method instead",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     assert isinstance(model_module, torch.nn.Module), "model_module must be a pytorch model"
     assert isinstance(dataloader, DataLoader), "dataloader must be a DataLoader"
     assert isinstance(mcd_nro_samples, int), "mcd_nro_samples must be an integer"
@@ -254,18 +260,7 @@ def get_dl_h_z(
     return dl_h_mvn_z_samples_np, dl_h_z_samples_np
 
 
-def probunet_apply_dropout(m):
-    """
-    Activate Dropout or Dropblock layers.
-
-    Args:
-        m: Pytorch module
-    """
-    if type(m) == torch.nn.Dropout or type(m) == DropBlock2D:
-        m.train()
-
-
-def deeplabv3p_apply_dropout(m):
+def apply_dropout(m):
     """
     Activate Dropout or Dropblock layers.
 
