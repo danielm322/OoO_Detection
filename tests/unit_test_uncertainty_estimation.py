@@ -72,7 +72,7 @@ class Test(TestCase):
     def test_latent_representation_mcd_samples(self):
         torch.manual_seed(SEED)
         hooked_layer = Hook(tests_model.conv2_drop)
-        tests_model.apply(deeplabv3p_apply_dropout)  # enable dropout
+        tests_model.apply(apply_dropout)  # enable dropout
         mcd_samples = get_latent_representation_mcd_samples(
             tests_model, test_loader, MCD_N_SAMPLES, hooked_layer, "Conv"
         )
