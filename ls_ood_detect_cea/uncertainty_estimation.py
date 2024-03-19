@@ -8,7 +8,7 @@
 #    Fabio Arnez, probabilistic adaptation
 #    Daniel Montoya
 from time import monotonic
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 import numpy as np
 import torch
 from torch import Tensor
@@ -96,17 +96,14 @@ def deeplabv3p_get_ls_mcd_samples(
                 image = image.to(device)
                 img_mcd_samples = []
                 for s in range(mcd_nro_samples):
-                    pred_img = model_module.deeplab_v3plus_model(image)
+                    _ = model_module.deeplab_v3plus_model(image)
                     # pred = torch.argmax(pred_img, dim=1)
                     latent_mcd_sample = hook_dropout_layer.output
                     # Get image HxW mean:
-                    latent_mcd_sample = torch.mean(latent_mcd_sample, dim=2, keepdim=True)
-                    latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
-                    # Remove useless dimensions:
-                    latent_mcd_sample = torch.squeeze(latent_mcd_sample, dim=2)
-                    latent_mcd_sample = torch.squeeze(latent_mcd_sample, dim=2)
-
-                    img_mcd_samples.append(latent_mcd_sample)
+                    latent_mcd_sample = get_mean_or_fullmean_ls_sample(
+                        latent_mcd_sample, method="fullmean"
+                    )
+                    img_mcd_samples.append(latent_mcd_sample.reshape(1, -1))
 
                 img_mcd_samples_t = torch.cat(img_mcd_samples, dim=0)
                 dl_imgs_latent_mcd_samples.append(img_mcd_samples_t)
@@ -152,27 +149,22 @@ def get_latent_representation_mcd_samples(
                 image = image.to(device)
                 img_mcd_samples = []
                 for s in range(mcd_nro_samples):
-                    pred_img = dnn_model(image)
+                    _ = dnn_model(image)
                     latent_mcd_sample = layer_hook.output
 
                     if layer_type == "Conv":
                         # Get image HxW mean:
-                        latent_mcd_sample = torch.mean(latent_mcd_sample, dim=2, keepdim=True)
-                        latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
-                        # Remove useless dimensions:
-                        latent_mcd_sample = torch.squeeze(latent_mcd_sample, dim=2)
-                        latent_mcd_sample = torch.squeeze(latent_mcd_sample, dim=2)
+                        latent_mcd_sample = get_mean_or_fullmean_ls_sample(
+                            latent_mcd_sample, method="fullmean"
+                        )
                     else:
                         # Aggregate the second dimension (dim 1) to keep the proposed boxes
                         # dimension
                         latent_mcd_sample = torch.mean(latent_mcd_sample, dim=1)
 
-                    img_mcd_samples.append(latent_mcd_sample)
+                    img_mcd_samples.append(latent_mcd_sample.reshape(1, -1))
 
-                if layer_type == "Conv":
-                    img_mcd_samples_t = torch.cat(img_mcd_samples, dim=0)
-                else:
-                    img_mcd_samples_t = torch.stack(img_mcd_samples, dim=0)
+                img_mcd_samples_t = torch.cat(img_mcd_samples, dim=0)
                 dl_imgs_latent_mcd_samples.append(img_mcd_samples_t)
                 # Update progress bar
                 pbar.update(1)
@@ -196,7 +188,6 @@ def single_image_entropy_calculation(sample: np.ndarray, neighbors: int) -> np.n
     """
     h_z_batch = []
     for z_val_i in range(sample.shape[1]):
-        # h_z_i = continuous.get_h(input_mcd_samples[:, z_val_i], k=5)  # old
         h_z_i = continuous.get_h(sample[:, z_val_i], k=neighbors, norm="max", min_dist=1e-5)
         h_z_batch.append(h_z_i)
     h_z_batch_np = np.asarray(h_z_batch)
@@ -222,10 +213,7 @@ def get_dl_h_z(
     assert isinstance(parallel_run, bool), "parallel_run must be a boolean"
     # Get dataloader mvn h(z), from mcd_samples
     z_samples_ls = [i for i in dl_z_samples.split(mcd_samples_nro)]
-    # ic(z_samples_ls[0].shape)
     z_samples_np_ls = [t.cpu().numpy() for t in z_samples_ls]
-    # ic(z_samples_np_ls[0].shape)
-    # dl_h_mvn_z_samples_ls = [continuous.get_h_mvn(s) for s in z_samples_np_ls]
     # Choose correctly the number of neighbors for the entropy calculations:
     # It has to be smaller than the mcd_samples_nro by at least 1
     k_neighbors = 5 if mcd_samples_nro > 5 else mcd_samples_nro - 1
@@ -234,7 +222,6 @@ def get_dl_h_z(
     ]
     dl_h_mvn_z_samples_np = np.array(dl_h_mvn_z_samples_ls)
     dl_h_mvn_z_samples_np = np.expand_dims(dl_h_mvn_z_samples_np, axis=1)
-    # ic(dl_h_mvn_z_samples_np.shape)
     # Get dataloader entropy $h(z_i)$ for each value of Z, from mcd_samples
     if not parallel_run:
         dl_h_z_samples = []
@@ -256,7 +243,6 @@ def get_dl_h_z(
             chunksize=1,
         )
     dl_h_z_samples_np = np.asarray(dl_h_z_samples)
-    # ic(dl_h_z_samples_np.shape)
     return dl_h_mvn_z_samples_np, dl_h_z_samples_np
 
 
@@ -271,7 +257,19 @@ def apply_dropout(m):
         m.train()
 
 
-def get_mean_or_fullmean_ls_sample(latent_sample: Tensor, method: str):
+def get_mean_or_fullmean_ls_sample(latent_sample: Tensor, method: str = "fullmean"):
+    """
+    Get either the mean (get a $W \times C$-sized vector) or fullmean (get a $C$-sized vector)
+    from the convolutional activation map. (From a $C \times H \times W_sized convolutional
+    activation map)
+
+    Args:
+        latent_sample: Convolutional activation map
+        method: Either 'mean' or 'fullmean'
+
+    Returns:
+        The reduced activation map
+    """
     assert method in ("mean", "fullmean")
     if method == "mean":
         latent_sample = torch.mean(latent_sample, dim=3, keepdim=True)
@@ -291,18 +289,18 @@ class MCDSamplesExtractor:
     Args:
         model: Torch or Lightning model
         mcd_nro_samples: Number of Monte-Carlo Samples
-        hook_dropout_layer: Hook at the Dropout Layer from the Neural Network Module
+        hooked_layer: Hooked Layer from the Neural Network Module
         layer_type: Type of layer that will get the MC samples. Either FC (Fully Connected) or
             Conv (Convolutional)
         device: CUDA or CPU device
-        architecture: The model architecture: either small or resnet
         location: Location of the hook. This can be useful to select different latent sample
             catching layers
         reduction_method: Whether to use fullmean, mean, or avgpool to reduce dimensionality
             of hooked representation
-        input_size: Image size (we assume squared images)
-        original_resnet_architecture: Either original or modified Lightning architecture
         return_raw_predictions: Return or not network outputs
+        avg_pooling_parameters: Optionally pass parameters for average pooling reduction, as a
+            tuple of integers as: kernel size, stride, padding.
+
 
     Returns:
         Monte-Carlo Dropout samples for the input dataloader
@@ -312,15 +310,13 @@ class MCDSamplesExtractor:
         self,
         model,
         mcd_nro_samples: int,
-        hook_dropout_layer: Hook,
+        hooked_layer: Hook,
         layer_type: str,
         device: str,
-        architecture: str,
         location: int,
         reduction_method: str,
-        input_size: int,
-        original_resnet_architecture: bool = False,
         return_raw_predictions: bool = False,
+        avg_pooling_parameters: Union[Tuple, List, None] = None,
     ):
         """
         Class to get Monte-Carlo samples from any torch model Dropout or Dropblock Layer
@@ -328,51 +324,46 @@ class MCDSamplesExtractor:
         Args:
             model: Torch or Lightning model
             mcd_nro_samples: Number of Monte-Carlo Samples
-            hook_dropout_layer: Hook at the Dropout Layer from the Neural Network Module
+            hooked_layer: Hooked Layer from the Neural Network Module
             layer_type: Type of layer that will get the MC samples. Either FC (Fully Connected) or
                 Conv (Convolutional)
             device: CUDA or CPU device
-            architecture: The model architecture: either small or resnet
             location: Location of the hook. This can be useful to select different latent sample
                 catching layers
             reduction_method: Whether to use fullmean, mean, or avgpool to reduce dimensionality
                 of hooked representation
-            input_size: Image size (we assume squared images)
-            original_resnet_architecture: Either original or modified Lightning architecture
             return_raw_predictions: Return or not network outputs
+            avg_pooling_parameters: Optionally pass parameters for average pooling reduction, as a
+                tuple of integers as: kernel size, stride, padding.
 
         Returns:
             Monte-Carlo Dropout samples for the input dataloader
         """
 
         assert layer_type in ("FC", "Conv"), "Layer type must be either 'FC' or 'Conv'"
-        assert architecture in ("small", "resnet"), "Only 'small' or 'resnet' are supported"
-        if architecture == "resnet":
-            assert input_size in (32, 64, 128)
-        if architecture == "resnet" and location in (1, 2):
-            assert reduction_method in (
-                "mean",
-                "fullmean",
-                "avgpool",
-            ), "Only mean, fullmean and avg pool reduction method supported for resnet"
+        assert reduction_method in (
+            "mean",
+            "fullmean",
+            "avgpool",
+        ), "Only mean, fullmean and avg pool reduction methods supported"
         assert isinstance(model, torch.nn.Module), "model must be a pytorch model"
         assert isinstance(mcd_nro_samples, int), "mcd_nro_samples must be an integer"
-        assert isinstance(hook_dropout_layer, Hook), "hook_dropout_layer must be an Hook"
+        assert isinstance(hooked_layer, Hook), "hook_dropout_layer must be an Hook"
+        if avg_pooling_parameters is not None:
+            assert len(avg_pooling_parameters) == 3, (
+                "Three parameters are needed for average pooling"
+            )
         self.model = model
         self.mcd_nro_samples = mcd_nro_samples
-        self.hook_dropout_layer = hook_dropout_layer
+        self.hooked_layer = hooked_layer
         self.layer_type = layer_type
         self.device = device
-        self.architecture = architecture
         self.location = location
         self.reduction_method = reduction_method
-        self.input_size = input_size
-        self.original_resnet_architecture = original_resnet_architecture
         self.return_raw_predictions = return_raw_predictions
+        self.avg_pooling_parameters = avg_pooling_parameters
 
-    def get_ls_mcd_samples_baselines(
-        self, data_loader: DataLoader
-    ) -> Union[Tuple[Tensor, Tensor], Tensor]:
+    def get_ls_mcd_samples(self, data_loader: DataLoader) -> Union[Tuple[Tensor, Tensor], Tensor]:
         """
         Perform the Monte Carlo Dropout inference given a dataloader
 
@@ -392,14 +383,12 @@ class MCDSamplesExtractor:
                     # image = image.view(1, 1, 28, 28).to(device)
                     image = image.to(self.device)
                     if self.return_raw_predictions:
-                        latent_samples, raw_preds = self._get_mcd_samples_one_image_baselines(
-                            image=image
-                        )
+                        latent_samples, raw_preds = self._get_mcd_samples_one_image(image=image)
                         dl_imgs_latent_mcd_samples.append(latent_samples)
                         raw_predictions.extend(raw_preds)
                     else:
                         dl_imgs_latent_mcd_samples.append(
-                            self._get_mcd_samples_one_image_baselines(image=image)
+                            self._get_mcd_samples_one_image(image=image)
                         )
                     # Update progress bar
                     pbar.update(1)
@@ -410,7 +399,17 @@ class MCDSamplesExtractor:
         else:
             return dl_imgs_latent_mcd_samples_t
 
-    def _get_mcd_samples_one_image_baselines(self, image):
+    def _get_mcd_samples_one_image(self, image):
+        """
+        Private method that extracts latent samples from one image, and optionally returns
+        raw predictions
+
+        Args:
+            image: Image
+
+        Returns:
+            Latent activation map reduced, and optionally raw predictions.
+        """
         img_mcd_samples = []
         if self.return_raw_predictions:
             raw_predictions = []
@@ -418,253 +417,28 @@ class MCDSamplesExtractor:
             pred_img = self.model(image)
             if self.return_raw_predictions:
                 raw_predictions.append(pred_img)
-            # pred = torch.argmax(pred_img, dim=1)
-            latent_mcd_sample = self.hook_dropout_layer.output
+            latent_mcd_sample = self.hooked_layer.output
             if self.layer_type == "Conv":
-                if self.architecture == "small":
-                    # Get image HxW mean:
-                    latent_mcd_sample = torch.mean(latent_mcd_sample, dim=2, keepdim=True)
-                    # latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
-                    # Remove useless dimensions:
-                    # latent_mcd_sample = torch.squeeze(latent_mcd_sample, dim=3)
-                    latent_mcd_sample = torch.squeeze(latent_mcd_sample, dim=2)
-                    latent_mcd_sample = latent_mcd_sample.reshape(1, -1)
-                # Resnet 18
+                if self.reduction_method == "mean" or self.reduction_method == "fullmean":
+                    latent_mcd_sample = get_mean_or_fullmean_ls_sample(
+                        latent_mcd_sample, method=self.reduction_method
+                    )
+                # Avg pool
                 else:
-                    # latent_mcd_sample = dropblock_ext(latent_mcd_sample)
-                    # For 2nd conv layer block of resnet 18:
-                    if self.location == 2:
-                        # To conserve the most info, while also aggregating: let us reshape then average
-                        if self.input_size == 32:
-                            if self.original_resnet_architecture:
-                                assert latent_mcd_sample.shape == torch.Size([1, 128, 4, 4])
-                                if self.reduction_method == "mean":
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                                elif self.reduction_method == "fullmean":
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=2, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                                # Avg pool
-                                else:
-                                    # Perform average pooling over latent representations
-                                    # For input of size 32
-                                    latent_mcd_sample = avg_pool2d(
-                                        latent_mcd_sample, kernel_size=2, stride=2, padding=0
-                                    )
-                            # Modified Lightning arch
-                            else:
-                                assert latent_mcd_sample.shape == torch.Size([1, 128, 16, 16])
-                                if self.reduction_method == "mean":
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = latent_mcd_sample.reshape(1, 128, 8, -1)
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                                # Avg pool
-                                else:
-                                    # Perform average pooling over latent representations
-                                    # For input of size 32
-                                    latent_mcd_sample = avg_pool2d(
-                                        latent_mcd_sample, kernel_size=8, stride=6, padding=2
-                                    )
-                        # Input size 64
-                        elif self.input_size == 64:
-                            if self.original_resnet_architecture:
-                                assert latent_mcd_sample.shape == torch.Size([1, 128, 8, 8])
-                                if self.reduction_method == "mean":
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                                elif self.reduction_method == "fullmean":
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=2, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                                # Avg pool
-                                else:
-                                    # Perform average pooling over latent representations
-                                    # For input of size 32
-                                    raise NotImplementedError
-                            # Modified Lightning arch
-                            else:
-                                assert latent_mcd_sample.shape == torch.Size([1, 128, 32, 32])
-                                if self.reduction_method == "mean":
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = latent_mcd_sample.reshape(1, 128, 8, -1)
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                                else:
-                                    # For input of size 64
-                                    latent_mcd_sample = avg_pool2d(
-                                        latent_mcd_sample, kernel_size=16, stride=12, padding=4
-                                    )
-                        # Input size 128
-                        else:
-                            if self.original_resnet_architecture:
-                                assert latent_mcd_sample.shape == torch.Size(
-                                    [1, 128, 16, 16]
-                                ), f"got {latent_mcd_sample.shape}"
-                                if self.reduction_method == "mean":
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                                elif self.reduction_method == "fullmean":
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=2, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                                # Avg pool
-                                else:
-                                    # Perform average pooling over latent representations
-                                    # For input of size 128
-                                    # latent_mcd_sample = avg_pool2d(
-                                    # latent_mcd_sample, kernel_size=2, stride=2, padding=0
-                                    # )
-                                    raise NotImplementedError
-                            # Modified pytorch lightning Resnet Architecture
-                            else:
-                                assert latent_mcd_sample.shape == torch.Size([1, 128, 64, 64])
-                                if self.reduction_method == "mean":
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = latent_mcd_sample.reshape(1, 128, 8, -1)
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                                else:
-                                    # For input of size 64
-                                    latent_mcd_sample = avg_pool2d(
-                                        latent_mcd_sample, kernel_size=16, stride=12, padding=4
-                                    )
-
-                        latent_mcd_sample = latent_mcd_sample.reshape(1, -1)
-                    elif self.location == 1:
-                        assert self.input_size == 128, f"Input size: {self.input_size}"
-                        assert latent_mcd_sample.shape == torch.Size([1, 64, 32, 32])
-                        # latent_mcd_sample = latent_mcd_sample.reshape(1, 128, 4, -1)
-                        if self.reduction_method == "mean":
-                            latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
-                            latent_mcd_sample = latent_mcd_sample.reshape(1, 64, 16, -1)
-                            latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
-                            latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                        elif self.reduction_method == "fullmean":
-                            latent_mcd_sample = torch.mean(latent_mcd_sample, dim=3, keepdim=True)
-                            latent_mcd_sample = torch.mean(latent_mcd_sample, dim=2, keepdim=True)
-                            latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                        # Avg pool
-                        else:
-                            latent_mcd_sample = avg_pool2d(
-                                latent_mcd_sample, kernel_size=4, stride=2, padding=2
-                            )
-                        latent_mcd_sample = latent_mcd_sample.reshape(1, -1)
-                    elif self.location == 3:
-                        if self.input_size == 32:
-                            if self.original_resnet_architecture:
-                                assert latent_mcd_sample.shape == torch.Size([1, 256, 2, 2])
-                                if self.reduction_method == "mean":
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                                elif self.reduction_method == "fullmean":
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=2, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                                # Avg pool
-                                else:
-                                    raise NotImplementedError
-                            # Modified Lightning arch
-                            else:
-                                assert latent_mcd_sample.shape == torch.Size([1, 256, 8, 8])
-                                if self.reduction_method == "mean":
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = latent_mcd_sample.reshape(1, 256, 4, -1)
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                                elif self.reduction_method == "fullmean":
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=3, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.mean(
-                                        latent_mcd_sample, dim=2, keepdim=True
-                                    )
-                                    latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                                # Avg pool
-                                else:
-                                    latent_mcd_sample = avg_pool2d(
-                                        latent_mcd_sample, kernel_size=4, stride=4, padding=0
-                                    )
-                                latent_mcd_sample = latent_mcd_sample.reshape(1, -1)
-                            # latent_mcd_sample = latent_mcd_sample.reshape(1, 128, 4, -1)
-                        elif self.input_size == 128:
-                            assert self.original_resnet_architecture, "Not implemented otherwise"
-                            assert latent_mcd_sample.shape == torch.Size(
-                                [1, 256, 8, 8]
-                            ), f"got {latent_mcd_sample.shape}"
-                            if self.reduction_method == "mean":
-                                latent_mcd_sample = torch.mean(
-                                    latent_mcd_sample, dim=3, keepdim=True
-                                )
-                                latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                            elif self.reduction_method == "fullmean":
-                                latent_mcd_sample = torch.mean(
-                                    latent_mcd_sample, dim=3, keepdim=True
-                                )
-                                latent_mcd_sample = torch.mean(
-                                    latent_mcd_sample, dim=2, keepdim=True
-                                )
-                                latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-                            # Avg pool
-                            else:
-                                raise NotImplementedError
-                        else:
-                            raise NotImplementedError
-                        latent_mcd_sample = latent_mcd_sample.reshape(1, -1)
-                    else:
-                        raise NotImplementedError
+                    # Perform average pooling over latent representations
+                    latent_mcd_sample = avg_pool2d(
+                        latent_mcd_sample,
+                        kernel_size=self.avg_pooling_parameters[0],
+                        stride=self.avg_pooling_parameters[1],
+                        padding=self.avg_pooling_parameters[2],
+                    )
             # FC
             else:
                 # It is already a 1d tensor
-                # latent_mcd_sample = dropout_ext(latent_mcd_sample)
                 latent_mcd_sample = torch.squeeze(latent_mcd_sample)
-            img_mcd_samples.append(latent_mcd_sample)
+            img_mcd_samples.append(latent_mcd_sample.reshape(1, -1))
 
-        if self.layer_type == "Conv":
-            img_mcd_samples_t = torch.cat(img_mcd_samples, dim=0)
-        else:
-            img_mcd_samples_t = torch.stack(img_mcd_samples, dim=0)
+        img_mcd_samples_t = torch.cat(img_mcd_samples, dim=0)
         if self.return_raw_predictions:
             return img_mcd_samples_t, raw_predictions
         else:
@@ -706,7 +480,6 @@ def get_mcd_pred_uncertainty_score(
                 img_pred_mcd_samples.append(pred_img)
 
         img_pred_mcd_samples_t = torch.cat(img_pred_mcd_samples, dim=0)
-        # ic(img_pred_mcd_samples_t.shape)
 
         # compute softmax output - normalized output:
         img_pred_softmax_mcd_samples_t = softmax_fn(img_pred_mcd_samples_t)
@@ -793,12 +566,10 @@ def get_msp_score(dnn_model: torch.nn.Module, input_dataloader: DataLoader) -> n
             pred_logits = dnn_model(image)
 
             pred_score = torch.max(softmax_fn(pred_logits), dim=1)
-            # ic(pred_score.shape)
             # get the max values:
             dl_preds_msp_scores.append(pred_score[0])
 
         dl_preds_msp_scores_t = torch.cat(dl_preds_msp_scores, dim=0)
-        # ic(dl_preds_msp_scores_t.shape)
         # pred = np.max(softmax_fn(pred_logits).detach().cpu().numpy(), axis=1)
         dl_preds_msp_scores = dl_preds_msp_scores_t.detach().cpu().numpy()
 
@@ -820,7 +591,6 @@ def get_energy_score(dnn_model: torch.nn.Module, input_dataloader: DataLoader) -
     assert isinstance(input_dataloader, DataLoader), "input_dataloader must be a DataLoader"
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # gtsrb_det_model.to(device)
 
     dl_preds_energy_scores = []
 
@@ -931,7 +701,7 @@ class MDSPostprocessor:
         self, dnn_model: torch.nn.Module, dataloader: DataLoader, layer_hook: Hook
     ) -> Tuple[Tensor, Tensor]:
         """
-        Perform inference with the set up estimator, i.e. for each sample in the Data Loader
+        Perform inference with the set-up estimator, i.e. for each sample in the Data Loader
         estimate if it belongs to the InD distribution
 
         Args:
@@ -1238,19 +1008,24 @@ class MCSamplerModule(torch.nn.Module):
         )
 
     def forward(self, latent_rep):
+        """
+        Apply the MCD sampling module to a latent representation.
+
+        Args:
+            latent_rep: Latent representation
+
+        Returns:
+            Noised and reduced activations
+        """
         samples = []
         for i, l in enumerate(self.drop_blocks):
             mc_sample = self.drop_blocks[i](latent_rep)
 
             if self.layer_type == "Conv":
                 # Get image HxW mean:
-                mc_sample = torch.mean(mc_sample, dim=2, keepdim=True)
-                mc_sample = torch.mean(mc_sample, dim=3, keepdim=True)
-                # Remove useless dimensions:
-                mc_sample = torch.squeeze(mc_sample, dim=2)
-                mc_sample = torch.squeeze(mc_sample, dim=2)
+                mc_sample = get_mean_or_fullmean_ls_sample(mc_sample, method="fullmean")
 
-            samples.append(mc_sample)
+            samples.append(mc_sample.reshape(1, -1))
         samples_t = torch.cat(samples)
         return samples_t
 
@@ -1260,12 +1035,20 @@ class MCSamplerModule(torch.nn.Module):
 ###########################################################################
 # Record time wrapper
 def record_time(function):
+    """
+    Decorator to record the execution time
+
+    Args:
+        function: Function to decorate
+
+    Returns:
+        Function return and execution time
+    """
+
     def wrap(*args, **kwargs):
         start_time = monotonic()
         function_return = function(*args, **kwargs)
         delta_t = monotonic() - start_time
-        # print(f"Run time {monotonic() - start_time} seconds")
-        # print(f"Run time {delta_t} seconds")
         return function_return, delta_t
 
     return wrap
@@ -1273,7 +1056,10 @@ def record_time(function):
 
 class LaRExInference:
     """
-    Class intended to perform inference on new data. It can also perform testing of inference time.
+    Class intended to perform inference on new data using the LaREx methods (either LaRED or LaREM).
+    LaREx performs zMCD sampling, entropy and density calculations to return a confidence score.
+    It assumes that an optional PCA reducer plus LaRED or LaREM postprocessors are already trained.
+    It can also perform testing of inference time.
 
     Args:
             dnn_model: Trained model
@@ -1294,8 +1080,10 @@ class LaRExInference:
         layer_type="Conv",
     ):
         """
-        Class intended to perform inference on new data. It can also perform testing
-        of inference time.
+        Class intended to perform inference on new data using the LaREx methods (either LaRED or LaREM).
+        LaREx performs zMCD sampling, entropy and density calculations to return a confidence score.
+        It assumes that an optional PCA reducer plus LaRED or LaREM postprocessors are already trained.
+        It can also perform testing of inference time.
 
         Args:
             dnn_model: Trained model
@@ -1352,10 +1140,30 @@ class LaRExInference:
 
     @record_time
     def test_time_inference(self, input_image, layer_hook):
+        """
+        Call the inference function and get the execution time
+
+        Args:
+            input_image: Input image
+            layer_hook: Hooked layer
+
+        Returns:
+            LaREx inference results plus execution time
+        """
         return self.get_score(input_image, layer_hook)
 
     @record_time
     def get_layer_mc_samples(self, input_image, layer_hook):
+        """
+        Function used to benchmark execution time of model inference and MC sampling
+
+        Args:
+            input_image: Input image
+            layer_hook: Hooked layer
+
+        Returns:
+            Mc samples plus execution time
+        """
         with torch.no_grad():
             input_image = input_image.to(self.device)
             _ = self.dnn_model(input_image)
@@ -1366,6 +1174,17 @@ class LaRExInference:
 
     @record_time
     def get_mc_samples_full_inference(self, input_image, layer_hook):
+        """
+        Function used to benchmark execution time of full model inferences, instead of the fast
+        method with only one inference.
+
+        Args:
+            input_image: Input image
+            layer_hook: Hooked layer
+
+        Returns:
+            MC samples plus execution time
+        """
         mc_samples = []
         with torch.no_grad():
             for i in range(self.mcd_samples_nro):
@@ -1383,12 +1202,28 @@ class LaRExInference:
 
     @record_time
     def get_score_full_inference(self, input_image, layer_hook):
+        """
+        Abstract function that should be implemented in child class to benchmark execution time
+        of the full method using complete inferences instead of the fast method. Do not use this
+        function for normal inference.
+
+        Args:
+            input_image: Input image
+            layer_hook: Hooked layer
+
+        Returns:
+            LaREx inference results and execution time
+        """
         raise NotImplementedError
 
 
 class LaRDInference:
     """
-    Class intended to perform inference on new data. It can also perform testing of inference time.
+    Class intended to perform inference on new data using the LaREx methods (either LaRED or LaREM).
+    LaRD performs representation reduction and density calculations to return a confidence score.
+    This method does not perform zMCD sampling nor entropy calculations.
+    It assumes that an optional PCA reducer plus LaRED or LaREM postprocessors are already trained.
+    It can also perform testing of inference time.
 
     Args:
             dnn_model: Trained model
@@ -1405,8 +1240,11 @@ class LaRDInference:
         layer_type="Conv",
     ):
         """
-        Class intended to perform inference on new data. It can also perform testing
-        of inference time.
+        Class intended to perform inference on new data using the LaREx methods (either LaRED or LaREM).
+        LaRD performs representation reduction and density calculations to return a confidence score.
+        This method does not perform zMCD sampling nor entropy calculations.
+        It assumes that an optional PCA reducer plus LaRED or LaREM postprocessors are already trained.
+        It can also perform testing of inference time.
 
         Args:
             dnn_model: Trained model
@@ -1422,9 +1260,9 @@ class LaRDInference:
             pass
         self.layer_type = layer_type
         if self.layer_type == "Conv":
-            self.reducer = self.reduce_conv_representation
+            self._reducer = self._reduce_conv_representation
         elif self.layer_type == "FC":
-            self.reducer = self.reduce_fc_representation
+            self._reducer = self._reduce_fc_representation
         else:
             pass  # The only other possibility so far is RPN, implemented in their own subclass
         self.pca_transform = pca_transform
@@ -1449,7 +1287,7 @@ class LaRDInference:
                 pass
             output = self.dnn_model(input_image)
             latent_rep = layer_hook.output  # latent representation sample
-        latent_rep = self.reducer(latent_rep)
+        latent_rep = self._reducer(latent_rep)
         if self.pca_transform:
             latent_rep = apply_pca_transform(latent_rep, self.pca_transform)
         sample_score = self.detector.postprocess(latent_rep)
@@ -1457,16 +1295,44 @@ class LaRDInference:
 
     @record_time
     def test_time_inference(self, input_image, layer_hook):
+        """
+        Call the inference function and get the execution time
+
+        Args:
+            input_image: Input image
+            layer_hook: Hooked layer
+
+        Returns:
+            LaREx inference results plus execution time
+        """
         return self.get_score(input_image, layer_hook)
 
     @staticmethod
-    def reduce_conv_representation(representation):
+    def _reduce_conv_representation(representation):
+        """
+        Private method that performs reduction of latent representations from convolutional layers.
+
+        Args:
+            representation: Latent representation
+
+        Returns:
+            Average per channel from convolutional activation maps.
+        """
         return (
             get_mean_or_fullmean_ls_sample(representation, "fullmean").cpu().numpy().reshape(1, -1)
         )
 
     @staticmethod
-    def reduce_fc_representation(representation):
+    def _reduce_fc_representation(representation):
+        """
+        Private method that performs reduction of latent representations from Fully connected layers.
+
+        Args:
+            representation: Latent representation
+
+        Returns:
+            If dim(representation) > 1, average per column, reshaped representation otherwise.
+        """
         if representation.ndim > 1:
             return torch.mean(representation, dim=1).cpu().numpy().reshape(1, -1)
         else:

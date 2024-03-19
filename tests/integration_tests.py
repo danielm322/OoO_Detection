@@ -14,6 +14,7 @@ TEST_SET_PROPORTION = 0.5
 MCD_N_SAMPLES = 3
 LATENT_SPACE_DIM = 20
 TOL = 1e-7
+N_PCA_COMPONENTS = 4
 ########################################################################
 
 torch.manual_seed(SEED)
@@ -189,6 +190,52 @@ class Test(TestCase):
                         -10.31977828,
                         -10.31977828,
                         -10.31977828,
+                    ]
+                )
+            ).sum(),
+            delta=TOL,
+        )
+
+    def test_larex_inference(self):
+        np.random.seed(SEED)
+        torch.manual_seed(SEED)
+        hooked_layer = Hook(tests_model.conv2_drop)
+        ind_test_features = np.random.rand(ind_subset_ds_len, LATENT_SPACE_DIM)
+        pca_ind_train, pca_transformation = apply_pca_ds_split(
+            samples=ind_test_features, nro_components=N_PCA_COMPONENTS
+        )
+        larem_processor = LaREMPostprocessor()
+        larem_processor.setup(pca_ind_train)
+        larem_inference = LaRExInference(
+            dnn_model=tests_model,
+            detector=larem_processor,
+            mcd_sampler=MCSamplerModule,
+            pca_transform=pca_transformation,
+            mcd_samples_nro=MCD_N_SAMPLES,
+            layer_type="Conv",
+        )
+        ood_iterator = iter(ood_test_loader)
+        ood_test_image = next(ood_iterator)[0]
+        ood_prediction, ood_img_score = larem_inference.get_score(
+            ood_test_image, layer_hook=hooked_layer
+        )
+        self.assertAlmostEqual(-5197.65951981, ood_img_score, delta=TOL)
+        self.assertAlmostEqual(
+            0.0,
+            (
+                ood_prediction[0].cpu().numpy()
+                - np.array(
+                    [
+                        -2.220272,
+                        -1.9602958,
+                        -2.413187,
+                        -2.3508754,
+                        -2.1869168,
+                        -2.4406095,
+                        -2.3969295,
+                        -2.4229457,
+                        -2.4164813,
+                        -2.327633,
                     ]
                 )
             ).sum(),

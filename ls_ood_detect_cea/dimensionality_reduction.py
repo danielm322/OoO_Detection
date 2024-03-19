@@ -151,8 +151,8 @@ def fit_pacmap(
     In-Distribution vs Out-of-Distribution Data Projection 2D Plot using PaCMAP algorithm.
 
     Args:
-        samples_ind: Number of components in the output
-        neighbors: In-Distribution (InD) samples numpy array
+        samples_ind: In-Distribution (InD) samples numpy array
+        neighbors: Number of components in the output
         components: Number of nearest-neighbors considered for the PaCMAP algorithm
 
     Returns:

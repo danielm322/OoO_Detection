@@ -122,6 +122,14 @@ def get_hz_detector_results(
 
 
 def plot_roc_ood_detector(results_table, plot_title: str = "Plot Title"):
+    """
+    Plot ROC curve from the results table from the function get_hz_detector_results.
+
+    Args:
+        results_table: Pandas table obtained with the get_hz_detector_results function
+        plot_title: Title of the plot
+
+    """
     fig = plt.figure(figsize=(8, 6))
     for i in results_table.index:
         # print(i)
