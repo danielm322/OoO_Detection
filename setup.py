@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = "1.0.0rc-1"
+VERSION = "1.1.0-rc"
 DESCRIPTION = "CEA-DNN Latent Space Out-of-Distribution Detection"
 LONG_DESCRIPTION = "CEA package for Out-of-Distribution Detection in DNN Latent Space"
 

@@ -1,7 +1,6 @@
 from unittest import TestCase, main
 from ls_ood_detect_cea.metrics import *
 
-
 #########################################################################
 # PARAMETERS
 # If you change any of the following parameters the tests will not pass!!

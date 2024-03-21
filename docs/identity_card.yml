@@ -1,7 +1,7 @@
 Global_information:
     ID: 363
     Name: Latent space uncertainty estimation for OoD detection
-    Version: 1.0.0-rc
+    Version: 1.1.0-rc
     License: EPLv2.0
     Type: PythonLib
     Domain :  [Cars, Automotive]

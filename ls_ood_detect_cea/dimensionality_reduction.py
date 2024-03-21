@@ -124,7 +124,6 @@ def plot_samples_pacmap(
     samples_transformed = embedding.fit_transform(samples_concat, init="pca")
 
     # visualize the embedding
-    # ToDo: Add Axis Names and plot legend
     fig, axes = plt.subplots()
     scatter = axes.scatter(
         samples_transformed[:, 0],
@@ -134,6 +133,8 @@ def plot_samples_pacmap(
         s=1.5,
     )
     axes.set_title(title)
+    axes.set_xlabel("PACMAP dimension 1")
+    axes.set_ylabel("PACMAP dimension 2")
     axes.legend(
         handles=scatter.legend_elements()[0],
         labels=["In-Distribution", "Out-of-Distribution"],
