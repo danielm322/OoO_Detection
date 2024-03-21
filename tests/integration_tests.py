@@ -36,15 +36,16 @@ mnist_data = torchvision.datasets.MNIST(
 )
 if not os.path.exists("./emnist_data_source/EMNIST/raw"):
     print("getting emnist raw data from confianceai repository ..")
-    if not os.path.exists('./emnist_data_source/EMNIST'):
-        os.makedirs('./emnist_data_source/EMNIST')
+    if not os.path.exists("./emnist_data_source/EMNIST"):
+        os.makedirs("./emnist_data_source/EMNIST")
 
     urllib.request.urlretrieve(
         "https://minio-storage.apps.confianceai-public.irtsysx.fr/ml-models/emnist.tar.gz",
-        "./emnist_data_source/EMNIST/emnist.tar.gz")
+        "./emnist_data_source/EMNIST/emnist.tar.gz",
+    )
 
-    file = tarfile.open('./emnist_data_source/EMNIST/emnist.tar.gz')
-    file.extractall('./emnist_data_source/EMNIST')
+    file = tarfile.open("./emnist_data_source/EMNIST/emnist.tar.gz")
+    file.extractall("./emnist_data_source/EMNIST")
     file.close()
     print("emnist raw data have been downloaded")
 
