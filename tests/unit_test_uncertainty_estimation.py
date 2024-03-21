@@ -12,6 +12,8 @@ TEST_SET_PROPORTION = 0.1
 MCD_N_SAMPLES = 3
 LATENT_SPACE_DIM = 20
 TOL = 1e-6
+LAYER_TYPE = "Conv"
+REDUCTION_METHOD = "fullmean"
 ########################################################################
 
 torch.manual_seed(SEED)
@@ -76,6 +78,54 @@ class Test(TestCase):
         mcd_samples = get_latent_representation_mcd_samples(
             tests_model, test_loader, MCD_N_SAMPLES, hooked_layer, "Conv"
         )
+        self.assertEqual(
+            mcd_samples.shape, torch.Size([MCD_N_SAMPLES * subset_ds_len, LATENT_SPACE_DIM])
+        )
+        self.assertTrue(
+            (
+                mcd_samples[0].cpu()
+                - torch.Tensor(
+                    [
+                        0.0032064617,
+                        0.1210283488,
+                        0.0136697628,
+                        0.1224055067,
+                        -0.0258768126,
+                        0.0873960480,
+                        -0.0569284856,
+                        -0.0059729815,
+                        -0.5415794849,
+                        0.0916501209,
+                        -0.6159725785,
+                        -0.0845529139,
+                        -0.6451811790,
+                        0.0113038644,
+                        -0.4393664598,
+                        -0.0969015583,
+                        -0.5628786683,
+                        0.8988993168,
+                        -0.1274375170,
+                        0.2650382817,
+                    ]
+                )
+            ).sum()
+            < TOL
+        )
+
+    def test_mcd_samples_extractor(self):
+        torch.manual_seed(SEED)
+        hooked_layer = Hook(tests_model.conv2_drop)
+        tests_model.apply(apply_dropout)  # enable dropout
+        samples_extractor = MCDSamplesExtractor(
+            model=tests_model,
+            mcd_nro_samples=MCD_N_SAMPLES,
+            hooked_layer=hooked_layer,
+            layer_type=LAYER_TYPE,
+            device=device,
+            reduction_method=REDUCTION_METHOD,
+            return_raw_predictions=False,
+        )
+        mcd_samples = samples_extractor.get_ls_mcd_samples(data_loader=test_loader)
         self.assertEqual(
             mcd_samples.shape, torch.Size([MCD_N_SAMPLES * subset_ds_len, LATENT_SPACE_DIM])
         )
@@ -613,6 +663,44 @@ class Test(TestCase):
                         -20.50299392,
                         -24.93608634,
                         -16.28581699,
+                    ]
+                ),
+                atol=TOL,
+            )
+        )
+
+    def test_lared_postprocessor(self):
+        np.random.seed(SEED)
+        test_features = np.random.rand(subset_ds_len, LATENT_SPACE_DIM)
+        lared_processor = LaREDPostprocessor()
+        lared_processor.setup(test_features)
+        postprocessed = lared_processor.postprocess(test_features)
+        self.assertEqual(postprocessed.shape, (subset_ds_len,))
+        self.assertTrue(
+            np.allclose(
+                postprocessed[:LATENT_SPACE_DIM],
+                np.array(
+                    [
+                        -19.91285992,
+                        -20.18685465,
+                        -19.98303992,
+                        -19.937434,
+                        -19.92117358,
+                        -20.22682757,
+                        -20.14255507,
+                        -20.2227513,
+                        -19.82865285,
+                        -20.13994971,
+                        -20.19335801,
+                        -19.86726602,
+                        -19.97992749,
+                        -19.664516,
+                        -19.88776353,
+                        -19.88357531,
+                        -19.76506903,
+                        -20.0045806,
+                        -20.1114499,
+                        -19.82522835,
                     ]
                 ),
                 atol=TOL,

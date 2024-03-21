@@ -313,7 +313,6 @@ class MCDSamplesExtractor:
         hooked_layer: Hook,
         layer_type: str,
         device: str,
-        location: int,
         reduction_method: str,
         return_raw_predictions: bool = False,
         avg_pooling_parameters: Union[Tuple, List, None] = None,
@@ -328,8 +327,6 @@ class MCDSamplesExtractor:
             layer_type: Type of layer that will get the MC samples. Either FC (Fully Connected) or
                 Conv (Convolutional)
             device: CUDA or CPU device
-            location: Location of the hook. This can be useful to select different latent sample
-                catching layers
             reduction_method: Whether to use fullmean, mean, or avgpool to reduce dimensionality
                 of hooked representation
             return_raw_predictions: Return or not network outputs
@@ -350,15 +347,14 @@ class MCDSamplesExtractor:
         assert isinstance(mcd_nro_samples, int), "mcd_nro_samples must be an integer"
         assert isinstance(hooked_layer, Hook), "hook_dropout_layer must be an Hook"
         if avg_pooling_parameters is not None:
-            assert len(avg_pooling_parameters) == 3, (
-                "Three parameters are needed for average pooling"
-            )
+            assert (
+                len(avg_pooling_parameters) == 3
+            ), "Three parameters are needed for average pooling"
         self.model = model
         self.mcd_nro_samples = mcd_nro_samples
         self.hooked_layer = hooked_layer
         self.layer_type = layer_type
         self.device = device
-        self.location = location
         self.reduction_method = reduction_method
         self.return_raw_predictions = return_raw_predictions
         self.avg_pooling_parameters = avg_pooling_parameters

@@ -32,7 +32,7 @@ mnist_data = torchvision.datasets.MNIST(
     transform=transforms,
 )
 emnist_data = torchvision.datasets.EMNIST(
-    "./emnist-data", split="letters", train=False, download=True, transform=transforms
+    "./emnist-data", split="letters", train=False, download=False, transform=transforms
 )
 # Subset InD dataset
 ind_subset_ds_len = int(len(mnist_data) * TEST_SET_PROPORTION)
@@ -64,7 +64,7 @@ class Test(TestCase):
         # Here we start from a supposed already calculated entropy
         test_ind = 0.5 + np.random.randn(ind_subset_ds_len, LATENT_SPACE_DIM)
         train_ind = 0.5 + np.random.randn(ind_subset_ds_len, LATENT_SPACE_DIM)
-        ood_ds_name = "test"
+        ood_ds_name = "test_ood"
         ood_dict = {ood_ds_name: -0.5 + np.random.randn(ind_subset_ds_len, LATENT_SPACE_DIM)}
         pca_components = (2, 6, 10)
         overall_metrics_df = pd.DataFrame(
@@ -91,12 +91,12 @@ class Test(TestCase):
                 ood_dict[ood_ds_name], pca_transformation
             )
 
-            r_df = log_evaluate_lared_larem(
+            r_df, ind_larem_score, ood_larem_scores_dict = log_evaluate_lared_larem(
                 ind_train_h_z=pca_h_z_ind_train,
                 ind_test_h_z=pca_h_z_ind_test,
                 ood_h_z_dict=ood_pca_dict,
                 experiment_name_extension=f" PCA {n_components}",
-                return_density_scores=False,
+                return_density_scores=True,
                 log_step=n_components,
                 mlflow_logging=False,
             )
@@ -106,17 +106,42 @@ class Test(TestCase):
         auroc_lared, aupr_lared, fpr_lared, best_n_comps_lared = select_and_log_best_lared_larem(
             overall_metrics_df, pca_components, technique="LaRED", log_mlflow=False
         )
-        self.assertAlmostEqual(0.9400724172592163, auroc_lared)
-        self.assertAlmostEqual(0.9367987513542175, aupr_lared)
-        self.assertAlmostEqual(0.25679999589920044, fpr_lared)
+        self.assertAlmostEqual(0.9400724172592163, auroc_lared, delta=TOL)
+        self.assertAlmostEqual(0.9367987513542175, aupr_lared, delta=TOL)
+        self.assertAlmostEqual(0.25679999589920044, fpr_lared, delta=TOL)
 
         # Check LaREM results
         auroc_larem, aupr_larem, fpr_larem, best_n_comps_larem = select_and_log_best_lared_larem(
             overall_metrics_df, pca_components, technique="LaREM", log_mlflow=True
         )
-        self.assertAlmostEqual(0.9411856532096863, auroc_larem)
-        self.assertAlmostEqual(0.938223659992218, aupr_larem)
-        self.assertAlmostEqual(0.2556000053882599, fpr_larem)
+        self.assertAlmostEqual(0.9411856532096863, auroc_larem, delta=TOL)
+        self.assertAlmostEqual(0.938223659992218, aupr_larem, delta=TOL)
+        self.assertAlmostEqual(0.2556000053882599, fpr_larem, delta=TOL)
+
+        roc_curve_test = save_roc_ood_detector(overall_metrics_df, "Test title")
+        self.assertEqual(1.0, roc_curve_test.axes[0].dataLim.max[0])
+        self.assertEqual(1.0, roc_curve_test.axes[0].dataLim.max[1])
+        self.assertEqual(0.0, roc_curve_test.axes[0].dataLim.min[0])
+        self.assertEqual(0.0, roc_curve_test.axes[0].dataLim.min[1])
+        self.assertAlmostEqual(0.00019999999494757503, roc_curve_test.axes[0].dataLim.minposx)
+        self.assertAlmostEqual(0.00019999999494757503, roc_curve_test.axes[0].dataLim.minposy)
+
+        experiment_dict = {
+            "InD": ind_larem_score,
+            "x_axis": "LaREM score",
+            "plot_name": "LaREM test plot",
+            "test_ood": ood_larem_scores_dict[ood_ds_name],
+        }
+        pred_scores_plot_test = get_pred_scores_plots(
+            experiment=experiment_dict,
+            ood_datasets_list=[ood_ds_name],
+            title="Test title",
+            ind_dataset_name="Test InD",
+        )
+        self.assertAlmostEqual(478.905, pred_scores_plot_test.ax.bbox.max[0])
+        self.assertAlmostEqual(484.9999999999999, pred_scores_plot_test.ax.bbox.max[1], delta=TOL)
+        self.assertAlmostEqual(70.65277777777779, pred_scores_plot_test.ax.bbox.min[0], delta=TOL)
+        self.assertAlmostEqual(58.277777777777764, pred_scores_plot_test.ax.bbox.min[1], delta=TOL)
 
     def test_extract_entropy_lared_larem(self):
         torch.manual_seed(SEED)

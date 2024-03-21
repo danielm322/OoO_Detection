@@ -98,6 +98,31 @@ class Test(TestCase):
             delta=TOL,
         )
 
+    def test_plot_pacmap(self):
+        np.random.seed(SEED)
+        test_ind = 0.5 + np.random.randn(TEST_SET_SIZE, LATENT_SPACE_DIM)
+        test_ood = -0.5 + np.random.randn(TEST_SET_SIZE, LATENT_SPACE_DIM)
+        test_fig = plot_samples_pacmap(
+            samples_ind=test_ind, samples_ood=test_ood, title="My title", return_figure=True
+        )
+        self.assertEqual((0, 0, 640, 480), test_fig.bbox.bounds)
+        self.assertTrue(10 < test_fig.axes[0].dataLim.max[0] < 15)
+        self.assertTrue(0 < test_fig.axes[0].dataLim.max[1] < 5)
+        self.assertTrue(-15 < test_fig.axes[0].dataLim.min[0] < -10)
+        self.assertTrue(-5 < test_fig.axes[0].dataLim.min[1] < 0)
+
+    def test_pacmap(self):
+        np.random.seed(SEED)
+        test_ind = 0.5 + np.random.randn(TEST_SET_SIZE, LATENT_SPACE_DIM)
+        test_ood = -0.5 + np.random.randn(TEST_SET_SIZE, LATENT_SPACE_DIM)
+        transformed, pacmap_estimator = fit_pacmap(samples_ind=test_ind)
+        ood_transformed = apply_pacmap_transform(
+            new_samples=test_ood, original_samples=test_ind, pm_instance=pacmap_estimator
+        )
+        self.assertEqual((1000, 2), ood_transformed.shape)
+        self.assertTrue(-4 < ood_transformed.min() < -2)
+        self.assertTrue(2 < ood_transformed.max() < 4)
+
 
 if __name__ == "__main__":
     main()

@@ -399,7 +399,7 @@ def log_evaluate_lared_larem(
         overall_metrics_df = overall_metrics_df.append(r_df)
 
     if return_density_scores:
-        return overall_metrics_df, ind_lared_score, ood_lared_scores_dict
+        return overall_metrics_df, ind_larem_score, ood_larem_scores_dict
     else:
         return overall_metrics_df
 
