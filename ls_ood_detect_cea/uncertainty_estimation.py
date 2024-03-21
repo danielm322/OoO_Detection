@@ -347,9 +347,9 @@ class MCDSamplesExtractor:
         assert isinstance(mcd_nro_samples, int), "mcd_nro_samples must be an integer"
         assert isinstance(hooked_layer, Hook), "hook_dropout_layer must be an Hook"
         if avg_pooling_parameters is not None:
-            assert len(avg_pooling_parameters) == 3, (
-                "Three parameters are needed for average pooling"
-            )
+            assert (
+                len(avg_pooling_parameters) == 3
+            ), "Three parameters are needed for average pooling"
         self.model = model
         self.mcd_nro_samples = mcd_nro_samples
         self.hooked_layer = hooked_layer
