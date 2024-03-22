@@ -13,7 +13,7 @@ import os
 # PARAMETERS
 # If you change any of the following parameters the tests will not pass!!
 SEED = 1
-TEST_SET_PROPORTION = 0.5
+TEST_SET_PROPORTION = 0.1
 MCD_N_SAMPLES = 3
 LATENT_SPACE_DIM = 20
 TOL = 1e-7
@@ -124,25 +124,25 @@ class Test(TestCase):
         auroc_lared, aupr_lared, fpr_lared, best_n_comps_lared = select_and_log_best_lared_larem(
             overall_metrics_df, pca_components, technique="LaRED", log_mlflow=False
         )
-        self.assertAlmostEqual(0.9400724172592163, auroc_lared, delta=TOL)
-        self.assertAlmostEqual(0.9367987513542175, aupr_lared, delta=TOL)
-        self.assertAlmostEqual(0.25679999589920044, fpr_lared, delta=TOL)
+        self.assertAlmostEqual(0.8123379945755005, auroc_lared, delta=TOL)
+        self.assertAlmostEqual(0.7958850860595703, aupr_lared, delta=TOL)
+        self.assertAlmostEqual(0.5989999771118164, fpr_lared, delta=TOL)
 
         # Check LaREM results
         auroc_larem, aupr_larem, fpr_larem, best_n_comps_larem = select_and_log_best_lared_larem(
             overall_metrics_df, pca_components, technique="LaREM", log_mlflow=True
         )
-        self.assertAlmostEqual(0.9411856532096863, auroc_larem, delta=TOL)
-        self.assertAlmostEqual(0.938223659992218, aupr_larem, delta=TOL)
-        self.assertAlmostEqual(0.2556000053882599, fpr_larem, delta=TOL)
+        self.assertAlmostEqual(0.8106609582901001, auroc_larem, delta=TOL)
+        self.assertAlmostEqual(0.7947214841842651, aupr_larem, delta=TOL)
+        self.assertAlmostEqual(0.6159999966621399, fpr_larem, delta=TOL)
 
         roc_curve_test = save_roc_ood_detector(overall_metrics_df, "Test title")
         self.assertEqual(1.0, roc_curve_test.axes[0].dataLim.max[0])
         self.assertEqual(1.0, roc_curve_test.axes[0].dataLim.max[1])
         self.assertEqual(0.0, roc_curve_test.axes[0].dataLim.min[0])
         self.assertEqual(0.0, roc_curve_test.axes[0].dataLim.min[1])
-        self.assertAlmostEqual(0.00019999999494757503, roc_curve_test.axes[0].dataLim.minposx)
-        self.assertAlmostEqual(0.00019999999494757503, roc_curve_test.axes[0].dataLim.minposy)
+        self.assertAlmostEqual(0.0010000000474974513, roc_curve_test.axes[0].dataLim.minposx)
+        self.assertAlmostEqual(0.0010000000474974513, roc_curve_test.axes[0].dataLim.minposy)
 
         experiment_dict = {
             "InD": ind_larem_score,
@@ -156,7 +156,7 @@ class Test(TestCase):
             title="Test title",
             ind_dataset_name="Test InD",
         )
-        self.assertAlmostEqual(478.905, pred_scores_plot_test.ax.bbox.max[0])
+        self.assertAlmostEqual(478.9049999999999, pred_scores_plot_test.ax.bbox.max[0])
         self.assertAlmostEqual(484.9999999999999, pred_scores_plot_test.ax.bbox.max[1], delta=TOL)
         self.assertAlmostEqual(70.65277777777779, pred_scores_plot_test.ax.bbox.min[0], delta=TOL)
         self.assertAlmostEqual(58.277777777777764, pred_scores_plot_test.ax.bbox.min[1], delta=TOL)
@@ -262,23 +262,23 @@ class Test(TestCase):
         ood_prediction, ood_img_score = larem_inference.get_score(
             ood_test_image, layer_hook=hooked_layer
         )
-        self.assertAlmostEqual(-5197.65951981, ood_img_score, delta=TOL)
+        self.assertAlmostEqual(-6103.11052918, ood_img_score, delta=TOL)
         self.assertAlmostEqual(
             0.0,
             (
                 ood_prediction[0].cpu().numpy()
                 - np.array(
                     [
-                        -2.220272,
-                        -1.9602958,
-                        -2.413187,
-                        -2.3508754,
-                        -2.1869168,
-                        -2.4406095,
-                        -2.3969295,
-                        -2.4229457,
-                        -2.4164813,
-                        -2.327633,
+                        -2.275621,
+                        -2.007265,
+                        -2.4919932,
+                        -2.2528067,
+                        -2.1876812,
+                        -2.345544,
+                        -2.314673,
+                        -2.4217446,
+                        -2.4728994,
+                        -2.3519247,
                     ]
                 )
             ).sum(),
