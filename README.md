@@ -51,7 +51,7 @@ In all the above cases, the DNNs were slightly modified to capture _epistemic_ u
 <div id='specifications'/>
 
 ## 🔍 Specifications
-- Version: 1.0.0
+- Version: 1.1.0
 - Python Version: python 3.8
 - Strong Dependencies: torch, entropy_estimators, numpy, sklearn, dropblock, pandas, mlflow, matplotlib
 - Thematic: Computer vision
@@ -63,7 +63,7 @@ In all the above cases, the DNNs were slightly modified to capture _epistemic_ u
 
 ## 🔍 Identity card
 
- Can be found here: [Identity card](https://git.irt-systemx.fr/confianceai/ec_3/n6_monitoring/component-latent-space/ood-latent-space/-/blob/4-finish-library/identity_card.yml)
+ Can be found here: [Identity card](https://git.irt-systemx.fr/confianceai/ec_3/n6_monitoring/component-latent-space/ood-latent-space/-/blob/4-finish-library/docs/identity_card.yml)
 
 <div id='quickstart'/>
 
