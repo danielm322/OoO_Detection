@@ -8,7 +8,6 @@ import urllib
 import tarfile
 import os
 
-
 #########################################################################
 # PARAMETERS
 # If you change any of the following parameters the tests will not pass!!
@@ -282,7 +281,7 @@ class Test(TestCase):
                     ]
                 )
             ).sum(),
-            delta=TOL,
+            delta=1e-6,
         )
 
 
